@@ -1,0 +1,16 @@
+<html>
+	<head>
+	</head>
+	<body>
+	  <div style="color: red">{{ .error }}</div>
+	  <form action="/login" method="post">
+	    <label>User
+				<input name="vaultAlias" type="text"/>
+			</label>
+			<label>Password
+				<input name="password" type="password"/>
+			</label>
+			<button>Login</button>
+	  </form>
+	</body>
+</html>

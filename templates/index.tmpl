@@ -1,0 +1,59 @@
+<html>
+	<head>
+	  <style>
+	    .secrets {
+	      width: 50%;
+	    }
+
+	    .secret {
+	      margin-bottom: 2em;
+	    }
+
+	    pre {
+				font-family: inherit;
+				display: none;
+	    }
+
+	    .shown {
+				display: block;
+	    }
+	  </style>
+	  <script>
+	    document.addEventListener("DOMContentLoaded", function() {
+	      var secretsContainer = document.querySelector(".secrets")
+	      secretsContainer.addEventListener("click", function(event) {
+	        var element = event.target.closest(".show")
+	        if (!element) return
+
+					event.preventDefault()
+	        element.innerText = element.innerText == "show" ? "hide" : "show"
+
+	        var container = element.closest(".secret")
+	        container.querySelector("pre").classList.toggle("shown")
+				})
+	    })
+	  </script>
+	</head>
+	<body>
+	  <form action="/logout" method="post">
+	    <button>Logout</button>
+	  </form>
+	  <form action="/" method="POST">
+	    <label>Filter:
+				<input name="filter" type="text" value="{{ .filter }}"/>
+			</label>
+			<button>Submit</button>
+	  </form>
+	  <div>
+	  <ol class="secrets">
+			{{range .secrets}}
+				<li class="secret">
+					{{ .Name }}
+					<a class="show" href="#">show</a>
+					<pre>{{ .Value }}</pre>
+				</li>
+			{{end}}
+	  </ol>
+	  </div>
+	</body>
+</html>
