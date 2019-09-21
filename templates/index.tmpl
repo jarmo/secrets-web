@@ -2,24 +2,7 @@
 <html>
 	<head>
 		<meta charset="utf-8" />
-	  <style>
-	    .secrets {
-	      width: 50%;
-	    }
-
-	    .secret {
-	      margin-bottom: 2em;
-	    }
-
-	    pre {
-				font-family: inherit;
-				display: none;
-	    }
-
-	    .shown {
-				display: block;
-	    }
-	  </style>
+		<link rel="stylesheet" href="/assets/css/app.css" />
 	  <script>
 	    document.addEventListener("DOMContentLoaded", function() {
 	      var secretsContainer = document.querySelector(".secrets")
@@ -37,25 +20,25 @@
 	  </script>
 	</head>
 	<body>
-	  <form action="/logout" method="post">
-	    <button>Logout</button>
-	  </form>
-	  <form action="/" method="POST">
-	    <label>Filter:
-				<input name="filter" type="text" value="{{ .filter }}"/>
-			</label>
-			<button>Submit</button>
-	  </form>
-	  <div>
-	  <ol class="secrets">
-			{{range .secrets}}
-				<li class="secret">
-					{{ .Name }}
-					<a class="show" href="#">show</a>
-					<pre>{{ .Value }}</pre>
-				</li>
-			{{end}}
-	  </ol>
-	  </div>
+		<main>
+			<div class="container">
+				<form action="/" method="POST">
+					<input id="filter" name="filter" type="text" value="{{ .filter }}" required autocomplete="off" />
+					<label for="filter"><span>Filter</span></label>
+					<input type="submit" value="Search" />
+				</form>
+				<div class="secrets">
+					{{range .secrets}}
+						<div class="secret">
+							<label for="secret-{{ .Id }}">
+								<h3>{{ .Name }}</h3>
+							</label>
+							<input id="secret-{{ .Id }}" type="checkbox" name="secret" />
+							<div class="value">{{ .Value}}</div>
+						</div>
+					{{end}}
+				</div>
+			</div>
+	  </main>
 	</body>
 </html>

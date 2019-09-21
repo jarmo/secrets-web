@@ -31,6 +31,43 @@ h1 {
   }
 }
 
+.secrets {
+  margin-top: 3em;
+}
+
+.secret h3 {
+  margin: 0;
+  padding: 0;
+}
+
+.secret h3 {
+  cursor: pointer;
+}
+
+.secret .value {
+  max-height: 0;
+  max-width: 40vw;
+  overflow: hidden;
+  transition: all .5s ease-in-out;
+  transition-property: max-height;
+  font-size: 1.5em;
+  white-space: pre;
+}
+
+.secret input:checked ~ .value {
+  max-height: 1000px;
+}
+
+.secret .value {
+  width: 100%;
+  overflow-x: scroll;
+  background-color: #f7f7f7;
+}
+
+input[name=secret] {
+  display: none;
+}
+
 main {
   width: 100%;
   height: 90vh;
