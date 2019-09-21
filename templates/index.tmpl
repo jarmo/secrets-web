@@ -3,27 +3,15 @@
 	<head>
 		<meta charset="utf-8" />
 		<link rel="stylesheet" href="/assets/css/app.css" />
-	  <script>
-	    document.addEventListener("DOMContentLoaded", function() {
-	      var secretsContainer = document.querySelector(".secrets")
-	      secretsContainer.addEventListener("click", function(event) {
-	        var element = event.target.closest(".show")
-	        if (!element) return
-
-					event.preventDefault()
-	        element.innerText = element.innerText == "show" ? "hide" : "show"
-
-	        var container = element.closest(".secret")
-	        container.querySelector("pre").classList.toggle("shown")
-				})
-	    })
-	  </script>
 	</head>
 	<body>
 		<main>
 			<div class="container">
-				<form action="/" method="POST">
-					<input id="filter" name="filter" type="text" value="{{ .filter }}" required autocomplete="off" />
+				<form class="logout" action="/logout" method="POST">
+					<button>X</button>
+				</form>
+				<form class="filter" action="/" method="POST">
+					<input id="filter" name="filter" type="text" value="{{ .filter }}" required autocomplete="off" {{ if not .filter }}autofocus{{ end }} />
 					<label for="filter"><span>Filter</span></label>
 					<input type="submit" value="Search" />
 				</form>

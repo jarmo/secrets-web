@@ -12,9 +12,9 @@
 				{{ end }}
 				<h1>Secrets</h1>
 				<form action="/login" method="post">
-					<input id="vault-alias" name="vault-alias" type="text" required autocomplete="off" />
+					<input id="vault-alias" name="vault-alias" type="text" required autocomplete="off" value="{{ .user }}"/>
 					<label for="vault-alias"><span>User</span></label>
-					<input id="password" name="password" type="password" required autocomplete="off"/>
+					<input id="password" name="password" type="password" required autocomplete="off" {{ if .user }}autofocus{{ end }} />
 					<label for="password"><span>Password</span></label>
 					<input type="submit" value="Login"/>
 				</form>
