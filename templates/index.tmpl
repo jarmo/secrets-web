@@ -7,9 +7,11 @@
 	<body>
 		<main>
 			<div class="container">
-				<form class="logout" action="/logout" method="POST">
-					<button>X</button>
-				</form>
+				<aside>
+					<form class="logout" action="/logout" method="POST">
+						<button>X</button>
+					</form>
+				</aside>
 				<form class="filter" action="/" method="POST">
 					<input id="filter" name="filter" type="text" value="{{ .filter }}" required autocomplete="off" {{ if not .filter }}autofocus{{ end }} />
 					<label for="filter"><span>Filter</span></label>

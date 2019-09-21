@@ -30,7 +30,7 @@ h1 {
 }
 
 .logout button {
-  float: right;
+  transition: background 0.2s ease;
   display: block;
   margin: 10px 0 0 0;
   padding: 10px;
@@ -38,6 +38,10 @@ h1 {
   background: #eee;
   border: 0;
   font-size: 16px;
+}
+
+.logout button:hover {
+  background: #e2e3e5;
 }
 
 @media (max-width: 767px) {
@@ -83,6 +87,12 @@ input[name=secret] {
   display: none;
 }
 
+aside {
+  display: flex;
+  flex-direction: row;
+  justify-content: end;
+}
+
 main {
   width: 100%;
   min-height: 90vh;
@@ -92,7 +102,7 @@ main {
 }
 
 main form {
-  width: 40vw;
+  max-width: 40vw;
 }
 
 @media (max-width: 767px) {
