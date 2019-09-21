@@ -39,6 +39,7 @@ func setupRouter() *gin.Engine {
 
 	router.Use(sessions.Sessions("secrets", memstore))
 	router.LoadHTMLGlob("templates/*")
+	router.Static("/assets", "./assets")
 
 	router.GET("/login", func(c *gin.Context) {
 		session := sessions.Default(c)
@@ -50,7 +51,7 @@ func setupRouter() *gin.Engine {
 	})
 
 	router.POST("/login", func(c *gin.Context) {
-		vaultAlias := c.PostForm("user")
+		vaultAlias := c.PostForm("vault-alias")
 		password := c.PostForm("password")
 
 		if path, aliasErr := path.Get(vaultAlias); aliasErr != nil {

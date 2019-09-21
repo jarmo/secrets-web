@@ -1,16 +1,24 @@
+<!DOCTYPE html>
 <html>
 	<head>
+		<meta charset="utf-8" />
+		<link rel="stylesheet" href="/assets/css/login.css" />
 	</head>
 	<body>
-	  <div style="color: red">{{ .error }}</div>
-	  <form action="/login" method="post">
-	    <label>User
-				<input name="vaultAlias" type="text"/>
-			</label>
-			<label>Password
-				<input name="password" type="password"/>
-			</label>
-			<button>Login</button>
-	  </form>
+	  <main>
+			<div class="container">
+				{{ if .error }}
+					<div class="error">{{ .error }}</div>
+				{{ end }}
+				<h1>Secrets</h1>
+				<form action="/login" method="post">
+					<input id="vault-alias" name="vault-alias" type="text" required autocomplete="off" />
+					<label for="vault-alias"><span>User</span></label>
+					<input id="password" name="password" type="password" required autocomplete="off"/>
+					<label for="password"><span>Password</span></label>
+					<input type="submit" value="Login"/>
+				</form>
+			</div>
+	  </main>
 	</body>
 </html>

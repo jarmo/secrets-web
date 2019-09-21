@@ -1,0 +1,111 @@
+input,
+span,
+label {
+  margin: 10px;
+  padding: 5px;
+  border: none;
+}
+
+label {
+  padding: 1.3em 0;
+}
+
+input:focus {
+  outline: 0;
+}
+
+input {
+  font-size: 36px;
+  font-weight: 300;
+  border-radius: 2px;
+  margin: 0;
+  border: none;
+  width: 100%;
+  background: rgba(0, 0, 0, 0);
+  transition: padding-top 0.2s ease, margin-top 0.2s ease;
+}
+
+input + label {
+  display: block;
+  position: relative;
+  white-space: nowrap;
+  margin: 0;
+  width: 20%;
+  border-top: 1px solid red;
+  transition: width 0.4s ease;
+  height: 0px;
+}
+
+input:focus + label {
+  width: 100%;
+}
+
+input:focus,
+input:valid {
+  padding-top: 35px;
+}
+
+input:focus + label > span,
+input:valid + label > span {
+  top: -100px;
+  font-size: 22px;
+  color: #333;
+}
+
+input:valid + label {
+  border-color: green;
+}
+
+input:invalid {
+  box-shadow: none;
+}
+
+input + label > span {
+  font-weight: 300;
+  margin: 0;
+  position: absolute;
+  color: #8F8F8F;
+  font-size: 36px;
+  top: -48px;
+  left: 0px;
+  z-index: -1;
+  transition: top 0.2s ease, font-size 0.2s ease, color 0.2s ease;
+}
+
+input[type="submit"] {
+  transition: opacity 0.2s ease, background 0.2s ease;
+  display: block;
+  opacity: 0;
+  margin: 10px 0 0 0;
+  padding: 10px;
+  cursor: pointer;
+  background: #eee;
+}
+
+input[type="submit"]:hover {
+  background: #e2e3e5;
+}
+
+input[type="submit"]:active {
+  background: #999;
+}
+
+input:valid ~ input[type="submit"] {
+  animation: appear 1s forwards;
+}
+
+input:invalid ~ input[type="submit"] {
+  display: none;
+}
+
+@-webkit-keyframes appear {
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes appear {
+  100% {
+    opacity: 1;
+  }
+}
