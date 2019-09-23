@@ -22,12 +22,11 @@
 						<div class="secret">
 							<div class="header">
 								<label for="secret-{{ .Id }}">{{ .Name }}</label>
-								<label for="secret-{{ .Id }}-edit">[edit]</label>
-								<input id="secret-{{ .Id }}-edit" name="edit-modal" type="checkbox" />
+								<input id="secret-{{ .Id }}" name="secret" type="checkbox" />
 								<div class="edit-modal">
 									<div class="modal-container">
 										<div class="modal-header">
-											<label for="secret-{{ .Id }}-edit" class="close">×</label>
+											<label for="secret-{{ .Id }}" class="close">×</label>
 											<div>Edit Secret</div>
 										</div>
 										<div class="modal-content">
@@ -42,8 +41,6 @@
 								  </div>
 								</div>
 							</div>
-							<input id="secret-{{ .Id }}" type="checkbox" name="secret" />
-							<div class="value">{{ .Value}}</div>
 						</div>
 					{{end}}
 				</div>

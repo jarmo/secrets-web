@@ -71,29 +71,12 @@ label {
   font-size: 26px;
 }
 
-.secret .value {
-  margin-top: .5em;
-  max-height: 0;
-  max-width: 40vw;
-  overflow: hidden;
-  transition: all .5s ease-in-out;
-  transition-property: max-height;
-  font-size: 1.5em;
-  white-space: pre;
-}
-
-.secret input:checked ~ .value {
-  max-height: 1000px;
-}
-
-.secret .value {
-  width: 100%;
-  overflow-x: scroll;
-  background-color: #f7f7f7;
-}
-
-input[name=secret], input[name=edit-modal] {
+input[name=secret] {
   display: none;
+}
+
+.secret input:checked ~ .edit-modal {
+  display: block;
 }
 
 .edit-modal {
@@ -114,7 +97,7 @@ input[name=secret], input[name=edit-modal] {
   background-color: #fefefe;
   margin: auto;
   padding: 0;
-  width: 40%;
+  width: 70%;
   box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
   animation-name: animatetop;
   animation-duration: 0.4s
@@ -146,10 +129,6 @@ input[name=secret], input[name=edit-modal] {
   to {top:0; opacity:1}
 }
 
-.secret input:checked ~ .edit-modal {
-  display: block;
-}
-
 aside {
   display: flex;
   flex-direction: row;
@@ -165,7 +144,11 @@ main {
 }
 
 main form {
-  max-width: 40vw;
+  max-width: 60vw;
+}
+
+.edit-modal form {
+  max-width: 100%;
 }
 
 @media (max-width: 767px) {
