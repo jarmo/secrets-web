@@ -1,20 +1,27 @@
 input,
 span,
+textarea,
 label {
   margin: 10px;
   padding: 5px;
   border: none;
 }
 
+textarea {
+  white-space: pre;
+}
+
 label {
   padding: 1.3em 0;
 }
 
-input:focus {
+input:focus,
+textarea:focus {
   outline: 0;
 }
 
-input {
+input,
+textarea {
   font-size: 36px;
   font-weight: 300;
   border-radius: 2px;
@@ -25,7 +32,8 @@ input {
   transition: padding-top 0.2s ease, margin-top 0.2s ease;
 }
 
-input + label {
+input + label,
+textarea + label {
   display: block;
   position: relative;
   white-space: nowrap;
@@ -36,7 +44,8 @@ input + label {
   height: 0px;
 }
 
-input:focus + label {
+input:focus + label,
+textarea:focus + label {
   width: 100%;
 }
 
@@ -45,22 +54,37 @@ input:valid {
   padding-top: 35px;
 }
 
+textarea:valid,
+textarea:focus {
+  margin-top: 35px;
+}
+
 input:focus + label > span,
 input:valid + label > span {
-  top: -100px;
+  top: -80px;
   font-size: 22px;
   color: #333;
 }
 
-input:valid + label {
+textarea:focus + label > span,
+textarea:valid + label > span {
+  top: -220px;
+  font-size: 22px;
+  color: #333;
+}
+
+input:valid + label,
+textarea:valid + label {
   border-color: green;
 }
 
-input:invalid {
+input:invalid,
+textarea:invalid {
   box-shadow: none;
 }
 
-input + label > span {
+input + label > span,
+textarea + label > span {
   font-weight: 300;
   margin: 0;
   position: absolute;
@@ -68,7 +92,6 @@ input + label > span {
   font-size: 36px;
   top: -48px;
   left: 0px;
-  z-index: -1;
   transition: top 0.2s ease, font-size 0.2s ease, color 0.2s ease;
 }
 
@@ -90,18 +113,14 @@ input[type="submit"]:active {
   background: #999;
 }
 
-input:valid ~ input[type="submit"] {
+input:valid ~ input[type="submit"],
+textarea:valid ~ input[type="submit"] {
   animation: appear 1s forwards;
 }
 
-input:invalid ~ input[type="submit"] {
+input:invalid ~ input[type="submit"],
+textarea:invalid ~ input[type="submit"] {
   display: none;
-}
-
-@-webkit-keyframes appear {
-  100% {
-    opacity: 1;
-  }
 }
 
 @keyframes appear {

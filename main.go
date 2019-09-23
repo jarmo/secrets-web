@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/satori/go.uuid"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/memstore"
 	"github.com/gin-gonic/gin"
@@ -99,6 +100,30 @@ func setupRouter() *gin.Engine {
 			"filter":  filter,
 			"secrets": result,
 		})
+	})
+
+	protected.POST("/edit/:id", func(c *gin.Context) {
+		id, _ := uuid.FromString(c.Param("id"))
+		name := c.PostForm("name")
+		value := c.PostForm("value")
+		session := sessions.Default(c)
+		path := session.Get("vaultPath").(string)
+		password := []byte(session.Get("password").(string))
+
+		if secrets, readErr := storage.Read(path, password); readErr != nil {
+			c.HTML(http.StatusOK, "index.tmpl", gin.H{
+				"error": readErr,
+			})
+		} else {
+			if _, newSecrets, err := vault.Edit(secrets, id, name, value); err != nil {
+				c.HTML(http.StatusOK, "index.tmpl", gin.H{
+					"error": err,
+				})
+			} else {
+				storage.Write(path, password, newSecrets)
+				redirect(c, "/")
+			}
+		}
 	})
 
 	return router

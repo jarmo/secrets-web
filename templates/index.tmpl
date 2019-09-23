@@ -20,9 +20,28 @@
 				<div class="secrets">
 					{{range .secrets}}
 						<div class="secret">
-							<label for="secret-{{ .Id }}">
-								<h3>{{ .Name }}</h3>
-							</label>
+							<div class="header">
+								<label for="secret-{{ .Id }}">{{ .Name }}</label>
+								<label for="secret-{{ .Id }}-edit">[edit]</label>
+								<input id="secret-{{ .Id }}-edit" name="edit-modal" type="checkbox" />
+								<div class="edit-modal">
+									<div class="modal-container">
+										<div class="modal-header">
+											<label for="secret-{{ .Id }}-edit" class="close">×</label>
+											<div>Edit Secret</div>
+										</div>
+										<div class="modal-content">
+											<form action="/edit/{{ .Id }}" method="POST">
+											  <input id="secret-edit-name-{{ .Id }}" type="text" value="{{ .Name }}" name="name" required autocomplete="off">
+											  <label for="secret-edit-name-{{ .Id }}"><span>Name</span></label>
+											  <textarea id="secret-edit-value-{{ .Id }}" name="value" required autocomplete="off" rows="5">{{ .Value }}</textarea>
+											  <label for="secret-edit-value-{{ .Id }}"><span>Value</span></label>
+											  <input type="submit" value="Save" />
+											</form>
+										</div>
+								  </div>
+								</div>
+							</div>
 							<input id="secret-{{ .Id }}" type="checkbox" name="secret" />
 							<div class="value">{{ .Value}}</div>
 						</div>
