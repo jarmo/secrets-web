@@ -38,7 +38,7 @@ textarea + label {
   position: relative;
   white-space: nowrap;
   margin: 0;
-  width: 20%;
+  width: 10%;
   border-top: 1px solid red;
   transition: width 0.4s ease;
   height: 0px;

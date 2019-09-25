@@ -126,6 +126,28 @@ func setupRouter() *gin.Engine {
 		}
 	})
 
+	protected.POST("/delete/:id", func(c *gin.Context) {
+		id, _ := uuid.FromString(c.Param("id"))
+		session := sessions.Default(c)
+		path := session.Get("vaultPath").(string)
+		password := []byte(session.Get("password").(string))
+
+		if secrets, readErr := storage.Read(path, password); readErr != nil {
+			c.HTML(http.StatusOK, "index.tmpl", gin.H{
+				"error": readErr,
+			})
+		} else {
+			if _, newSecrets, err := vault.Delete(secrets, id); err != nil {
+				c.HTML(http.StatusOK, "index.tmpl", gin.H{
+					"error": err,
+				})
+			} else {
+				storage.Write(path, password, newSecrets)
+				redirect(c, "/")
+			}
+		}
+	})
+
 	return router
 }
 

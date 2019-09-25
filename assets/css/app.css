@@ -97,7 +97,7 @@ input[name=secret] {
   background-color: #fefefe;
   margin: auto;
   padding: 0;
-  width: 70%;
+  width: 60%;
   box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
   animation-name: animatetop;
   animation-duration: 0.4s
@@ -122,6 +122,21 @@ input[name=secret] {
 .edit-modal .close:focus {
   text-decoration: none;
   cursor: pointer;
+}
+
+.edit-modal form.delete, .edit-modal input.save {
+  width: 40%;
+}
+
+.edit-modal input.save {
+  float: right;
+}
+
+.edit-modal .delete input {
+  opacity: 1;
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
 }
 
 @keyframes animatetop {

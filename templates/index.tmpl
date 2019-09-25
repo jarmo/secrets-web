@@ -35,7 +35,10 @@
 											  <label for="secret-edit-name-{{ .Id }}"><span>Name</span></label>
 											  <textarea id="secret-edit-value-{{ .Id }}" name="value" required autocomplete="off" rows="5">{{ .Value }}</textarea>
 											  <label for="secret-edit-value-{{ .Id }}"><span>Value</span></label>
-											  <input type="submit" value="Save" />
+											  <input class="save" type="submit" value="Save" />
+											</form>
+											<form class="delete" action="/delete/{{ .Id }}" method="POST">
+												<input type="submit" value="Delete" />
 											</form>
 										</div>
 								  </div>
