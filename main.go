@@ -3,10 +3,12 @@ package main
 import (
 	"net/http"
 	"crypto/rand"
+	"time"
+	"strconv"
 
 	"github.com/satori/go.uuid"
 	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/cookie"
+	"github.com/gin-contrib/sessions/memstore"
 	"github.com/gin-gonic/gin"
 	"github.com/jarmo/secrets/v5/storage"
 	"github.com/jarmo/secrets/v5/storage/path"
@@ -56,9 +58,15 @@ func generateRandomBytes(length int) []byte {
   return result
 }
 
+const sessionMaxAgeInSeconds = 5 * 60
+
 func setupRouter() *gin.Engine {
 	router := gin.Default()
-	sessionStore := cookie.NewStore(generateRandomBytes(64), generateRandomBytes(32))
+	sessionStore := memstore.NewStore(generateRandomBytes(64))
+	sessionStore.Options(sessions.Options{
+		MaxAge: sessionMaxAgeInSeconds,
+		HttpOnly: true,
+	})
 
 	router.Use(sessions.Sessions("secrets", sessionStore))
 	router.LoadHTMLGlob("templates/*")
@@ -93,6 +101,11 @@ func setupRouter() *gin.Engine {
 				session.Set("vaultPath", path)
 				session.Set("password", password)
 				session.Save()
+				duration, _ := time.ParseDuration(strconv.Itoa(sessionMaxAgeInSeconds) + "s")
+				time.AfterFunc(duration, func() {
+					session.Clear()
+					session.Save()
+				})
 				redirectWithMessage(c, "/", "Logged in successfully")
 			}
 		}
