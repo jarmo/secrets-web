@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 	"crypto/rand"
+	"encoding/base64"
 	"time"
 	"strconv"
 
@@ -58,6 +59,30 @@ func generateRandomBytes(length int) []byte {
   return result
 }
 
+func csrfToken(session sessions.Session) string {
+	csrfToken := session.Get("csrfToken")
+	if csrfToken == nil {
+		newCsrfToken := base64.StdEncoding.EncodeToString(generateRandomBytes(128))
+		session.Set("csrfToken", newCsrfToken)
+		session.Save()
+		return newCsrfToken
+	} else {
+		return csrfToken.(string)
+	}
+}
+
+func csrfProtection() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if c.Request.Method != "HEAD" && c.Request.Method != "GET" {
+			if csrfToken(sessions.Default(c)) != c.PostForm("csrf-token") {
+				c.AbortWithStatus(http.StatusForbidden)
+				return
+			}
+		}
+		c.Next()
+	}
+}
+
 const sessionMaxAgeInSeconds = 5 * 60
 
 func setupRouter() *gin.Engine {
@@ -71,13 +96,16 @@ func setupRouter() *gin.Engine {
 	router.Use(sessions.Sessions("secrets", sessionStore))
 	router.LoadHTMLGlob("templates/*")
 	router.Static("/assets", "./assets")
+	router.Use(csrfProtection())
 
 	router.GET("/login", func(c *gin.Context) {
 		session := sessions.Default(c)
 		if session.Get("vaultPath") != nil {
 			redirect(c, "/")
 		} else {
-			c.HTML(http.StatusOK, "login.tmpl", gin.H{})
+			c.HTML(http.StatusOK, "login.tmpl", gin.H{
+				"csrfToken": csrfToken(sessions.Default(c)),
+			})
 		}
 	})
 
@@ -89,12 +117,14 @@ func setupRouter() *gin.Engine {
 			c.HTML(http.StatusOK, "login.tmpl", gin.H{
 				"error": aliasErr,
 				"user":  vaultAlias,
+				"csrfToken": csrfToken(sessions.Default(c)),
 			})
 		} else {
 			if _, vaultErr := storage.Read(path, []byte(password)); vaultErr != nil {
 				c.HTML(http.StatusOK, "login.tmpl", gin.H{
 					"error": vaultErr,
 					"user":  vaultAlias,
+					"csrfToken": csrfToken(sessions.Default(c)),
 				})
 			} else {
 				session := sessions.Default(c)
@@ -116,6 +146,7 @@ func setupRouter() *gin.Engine {
 	protected.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.tmpl", gin.H{
 			"message": redirectMessage(c),
+			"csrfToken": csrfToken(sessions.Default(c)),
 		})
 	})
 
@@ -136,6 +167,7 @@ func setupRouter() *gin.Engine {
 			"error":   readErr,
 			"filter":  filter,
 			"secrets": result,
+			"csrfToken": csrfToken(sessions.Default(c)),
 		})
 	})
 
@@ -149,6 +181,7 @@ func setupRouter() *gin.Engine {
 		if secrets, readErr := storage.Read(path, password); readErr != nil {
 			c.HTML(http.StatusOK, "index.tmpl", gin.H{
 				"error": readErr,
+				"csrfToken": csrfToken(sessions.Default(c)),
 			})
 		} else {
 		  _, newSecrets := vault.Add(secrets, name, value)
@@ -168,11 +201,13 @@ func setupRouter() *gin.Engine {
 		if secrets, readErr := storage.Read(path, password); readErr != nil {
 			c.HTML(http.StatusOK, "index.tmpl", gin.H{
 				"error": readErr,
+				"csrfToken": csrfToken(sessions.Default(c)),
 			})
 		} else {
 			if _, newSecrets, err := vault.Edit(secrets, id, name, value); err != nil {
 				c.HTML(http.StatusOK, "index.tmpl", gin.H{
 					"error": err,
+					"csrfToken": csrfToken(sessions.Default(c)),
 				})
 			} else {
 				storage.Write(path, password, newSecrets)
@@ -190,11 +225,13 @@ func setupRouter() *gin.Engine {
 		if secrets, readErr := storage.Read(path, password); readErr != nil {
 			c.HTML(http.StatusOK, "index.tmpl", gin.H{
 				"error": readErr,
+				"csrfToken": csrfToken(sessions.Default(c)),
 			})
 		} else {
 			if _, newSecrets, err := vault.Delete(secrets, id); err != nil {
 				c.HTML(http.StatusOK, "index.tmpl", gin.H{
 					"error": err,
+					"csrfToken": csrfToken(sessions.Default(c)),
 				})
 			} else {
 				storage.Write(path, password, newSecrets)
