@@ -1,13 +1,12 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
-	"os"
+	"crypto/rand"
 
 	"github.com/satori/go.uuid"
 	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/memstore"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"github.com/jarmo/secrets/v5/storage"
 	"github.com/jarmo/secrets/v5/storage/path"
@@ -47,16 +46,21 @@ func authenticated() gin.HandlerFunc {
 	}
 }
 
+func generateRandomBytes(length int) []byte {
+  result := make([]byte, length)
+  _, err := rand.Read(result)
+  if err != nil {
+    panic(err)
+  }
+
+  return result
+}
+
 func setupRouter() *gin.Engine {
 	router := gin.Default()
-	sessionSecret := os.Getenv("SECRETS_SESSION_SECRET")
-	if sessionSecret == "" {
-		fmt.Fprintln(os.Stderr, "SECRETS_SESSION_SECRET environment variable not set!")
-		os.Exit(1)
-	}
-	memstore := memstore.NewStore([]byte(sessionSecret))
+	sessionStore := cookie.NewStore(generateRandomBytes(64), generateRandomBytes(32))
 
-	router.Use(sessions.Sessions("secrets", memstore))
+	router.Use(sessions.Sessions("secrets", sessionStore))
 	router.LoadHTMLGlob("templates/*")
 	router.Static("/assets", "./assets")
 
