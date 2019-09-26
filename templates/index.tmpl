@@ -12,6 +12,9 @@
 						<button>X</button>
 					</form>
 				</aside>
+				{{ if .message }}
+					<div class="success">{{ .message }}</div>
+				{{ end }}
 				<form class="filter" action="/" method="POST">
 					<input id="filter" name="filter" type="text" value="{{ .filter }}" required autocomplete="off" {{ if not .filter }}autofocus{{ end }} />
 					<label for="filter"><span>Filter</span></label>

@@ -19,6 +19,24 @@ func redirect(c *gin.Context, path string) {
 	c.AbortWithStatus(http.StatusFound)
 }
 
+func redirectWithMessage(c *gin.Context, path string, message string) {
+	session := sessions.Default(c)
+	session.AddFlash(message)
+	session.Save()
+	redirect(c, path)
+}
+
+func redirectMessage(c *gin.Context) interface{} {
+		session := sessions.Default(c)
+		if flashes := session.Flashes(); len(flashes) > 0 {
+		  message := flashes[0].(string)
+			session.Save()
+			return message
+		} else {
+			return nil
+		}
+}
+
 func authenticated() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session := sessions.Default(c)
@@ -71,7 +89,7 @@ func setupRouter() *gin.Engine {
 				session.Set("vaultPath", path)
 				session.Set("password", password)
 				session.Save()
-				redirect(c, "/")
+				redirectWithMessage(c, "/", "Logged in successfully")
 			}
 		}
 	})
@@ -79,7 +97,9 @@ func setupRouter() *gin.Engine {
 	protected := router.Group("", authenticated())
 
 	protected.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.tmpl", gin.H{})
+		c.HTML(http.StatusOK, "index.tmpl", gin.H{
+			"message": redirectMessage(c),
+		})
 	})
 
 	protected.POST("/logout", func(c *gin.Context) {
@@ -121,7 +141,7 @@ func setupRouter() *gin.Engine {
 				})
 			} else {
 				storage.Write(path, password, newSecrets)
-				redirect(c, "/")
+				redirectWithMessage(c, "/", "Edited successfully")
 			}
 		}
 	})
@@ -143,7 +163,7 @@ func setupRouter() *gin.Engine {
 				})
 			} else {
 				storage.Write(path, password, newSecrets)
-				redirect(c, "/")
+				redirectWithMessage(c, "/", "Deleted successfully")
 			}
 		}
 	})
