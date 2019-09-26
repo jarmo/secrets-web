@@ -22,7 +22,7 @@
 									<label for="secret-add-name"><span>Name</span></label>
 									<textarea id="secret-add-value" name="value" required autocomplete="off" rows="5"></textarea>
 									<label for="secret-add-value"><span>Value</span></label>
-									<input type="submit" value="Add" />
+									<input type="submit" value="Add">
 								</form>
 							</div>
 						</div>
@@ -35,16 +35,16 @@
 					<div class="success">{{ .message }}</div>
 				{{ end }}
 				<form class="filter" action="/" method="POST">
-					<input id="filter" name="filter" type="text" value="{{ .filter }}" required autocomplete="off" {{ if not .filter }}autofocus{{ end }} />
+					<input id="filter" name="filter" type="text" value="{{ .filter }}" required autocomplete="off" {{ if not .filter }}autofocus{{ end }}>
 					<label for="filter"><span>Filter</span></label>
-					<input type="submit" value="Search" />
+					<input type="submit" value="Search">
 				</form>
 				<div class="secrets">
 					{{range .secrets}}
 						<div class="secret">
 							<div class="header">
 								<label for="secret-{{ .Id }}">{{ .Name }}</label>
-								<input id="secret-{{ .Id }}" name="edit-modal" type="checkbox" />
+								<input id="secret-{{ .Id }}" name="edit-modal" type="checkbox">
 								<div class="modal edit-modal">
 									<div class="modal-container">
 										<div class="modal-header">
@@ -57,10 +57,10 @@
 											  <label for="secret-edit-name-{{ .Id }}"><span>Name</span></label>
 											  <textarea id="secret-edit-value-{{ .Id }}" name="value" required autocomplete="off" rows="5">{{ .Value }}</textarea>
 											  <label for="secret-edit-value-{{ .Id }}"><span>Value</span></label>
-											  <input class="save" type="submit" value="Save Changes" />
+											  <input class="save" type="submit" value="Save Changes">
 											</form>
 											<form class="delete" action="/delete/{{ .Id }}" method="POST">
-												<input type="submit" value="Delete" />
+												<input type="submit" value="Delete">
 											</form>
 										</div>
 								  </div>
