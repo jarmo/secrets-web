@@ -1,7 +1,7 @@
 @import "nice-inputs.css";
 
 body {
-  font-family: Helvetica, 'Times New Roman', Times, sans-serif;
+  font-family: Helvetica Neue, Helvetica, sans-serif;
 }
 
 h1 {
@@ -37,14 +37,25 @@ label {
   border-color: #c3e6cb;
 }
 
+input[type="submit"] {
+  color: #0c5460;
+  background-color: rgba(209,236,241,.7);
+  border-color: #bee5eb;
+}
+
+input[type="submit"]:hover {
+  background-color: rgb(209,236,241);
+}
+
 .filter {
   margin-top: 5em;
 }
 
-.logout button {
+aside .add,
+aside .logout {
   transition: background 0.2s ease;
   display: block;
-  margin: 10px 0 0 0;
+  margin: 10px 0 0 .75em;
   padding: 10px;
   cursor: pointer;
   background: #eee;
@@ -52,8 +63,24 @@ label {
   font-size: 16px;
 }
 
-.logout button:hover {
-  background: #e2e3e5;
+aside .add {
+  color: #0c5460;
+  background-color: rgba(209,236,241,.7);
+  border-color: #bee5eb;
+}
+
+aside .add:hover {
+  background-color: rgb(209,236,241);
+}
+
+aside .logout {
+  color: #721c24;
+  background-color: rgba(248,215,218,.7);
+  border-color: #f5c6cb;
+}
+
+aside .logout:hover {
+  background-color: rgb(248,215,218);
 }
 
 @media (max-width: 767px) {
@@ -79,15 +106,17 @@ label {
   font-size: 26px;
 }
 
-input[name=secret] {
+input[name=edit-modal],
+input[name=add-modal] {
   display: none;
 }
 
-.secret input:checked ~ .edit-modal {
+input:checked ~ .edit-modal,
+input:checked ~ .add-modal {
   display: block;
 }
 
-.edit-modal {
+.modal {
   display: none;
   position: fixed;
   z-index: 1;
@@ -100,7 +129,7 @@ input[name=secret] {
   background-color: rgba(0,0,0,0.4);
 }
 
-.edit-modal .modal-container {
+.modal .modal-container {
   position: relative;
   background-color: #fefefe;
   margin: auto;
@@ -111,32 +140,35 @@ input[name=secret] {
   animation-duration: 0.4s
 }
 
-.edit-modal .modal-header {
+.modal .modal-header {
   background: #e2e3e5;
   font-size: 32px;
 }
 
-.edit-modal .modal-header,
-.edit-modal .modal-content {
+.modal .modal-header,
+.modal .modal-content {
   padding: 16px;
 }
 
-.edit-modal .close {
+.modal .close {
   float: right;
   font-weight: bold;
+  margin: 0;
+  padding: 0;
 }
 
-.edit-modal .close:hover,
-.edit-modal .close:focus {
+.modal .close:hover,
+.modal .close:focus {
   text-decoration: none;
   cursor: pointer;
 }
 
-.edit-modal form.delete, .edit-modal input.save {
+.modal form.delete,
+.modal input.save {
   width: 40%;
 }
 
-.edit-modal input.save {
+.modal input.save {
   float: right;
 }
 

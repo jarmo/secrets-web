@@ -122,6 +122,24 @@ func setupRouter() *gin.Engine {
 		})
 	})
 
+	protected.POST("/add", func(c *gin.Context) {
+		name := c.PostForm("name")
+		value := c.PostForm("value")
+		session := sessions.Default(c)
+		path := session.Get("vaultPath").(string)
+		password := []byte(session.Get("password").(string))
+
+		if secrets, readErr := storage.Read(path, password); readErr != nil {
+			c.HTML(http.StatusOK, "index.tmpl", gin.H{
+				"error": readErr,
+			})
+		} else {
+		  _, newSecrets := vault.Add(secrets, name, value)
+			storage.Write(path, password, newSecrets)
+			redirectWithMessage(c, "/", "Added successfully")
+		}
+	})
+
 	protected.POST("/edit/:id", func(c *gin.Context) {
 		id, _ := uuid.FromString(c.Param("id"))
 		name := c.PostForm("name")
