@@ -10,6 +10,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"fmt"
 
 	"github.com/satori/go.uuid"
 	"github.com/gin-contrib/sessions"
@@ -157,7 +158,7 @@ func enableReleaseMode() bool {
 const sessionMaxAgeInSeconds = 5 * 60
 
 func setupRouter() *gin.Engine {
-	if (enableReleaseMode()) {
+	if enableReleaseMode() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
@@ -254,6 +255,17 @@ func setupRouter() *gin.Engine {
 }
 
 func main() {
-	r := setupRouter()
-	r.Run("localhost:8080")
+	router := setupRouter()
+
+	if (enableReleaseMode()) {
+		tlsCertificate := os.Getenv("SECRETS_TLS_CERT")
+		tlsKey := os.Getenv("SECRETS_TLS_KEY")
+		if tlsCertificate == "" || tlsKey == "" {
+			fmt.Fprintln(os.Stderr, "SECRETS_TLS_CERT or SECRETS_TLS_KEY environment variables are not set!")
+			os.Exit(1)
+		}
+		router.RunTLS(":9090", tlsCertificate, tlsKey)
+	} else {
+		router.Run("localhost:8080")
+	}
 }
