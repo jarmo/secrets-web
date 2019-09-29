@@ -22,7 +22,7 @@ textarea:focus {
 
 input,
 textarea {
-  font-size: 36px;
+  font-size: 2.25em;
   font-weight: 300;
   border-radius: 2px;
   margin: 0;
@@ -41,7 +41,7 @@ textarea + label {
   width: 10%;
   border-top: 1px solid red;
   transition: width 0.4s ease;
-  height: 0px;
+  height: 0;
 }
 
 input:focus + label,
@@ -62,14 +62,14 @@ textarea:focus {
 input:focus + label > span,
 input:valid + label > span {
   top: -80px;
-  font-size: 22px;
+  font-size: 1.375em;
   color: #333;
 }
 
 textarea:focus + label > span,
 textarea:valid + label > span {
-  top: -220px;
-  font-size: 22px;
+  top: -9.25em;
+  font-size: 1.375em;
   color: #333;
 }
 
@@ -89,9 +89,9 @@ textarea + label > span {
   margin: 0;
   position: absolute;
   color: #8F8F8F;
-  font-size: 36px;
+  font-size: 2.25em;
   top: -48px;
-  left: 0px;
+  left: 0;
   transition: top 0.2s ease, font-size 0.2s ease, color 0.2s ease;
 }
 

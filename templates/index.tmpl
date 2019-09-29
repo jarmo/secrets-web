@@ -36,7 +36,7 @@
 			{{range .secrets}}
 				<div class="secret">
 					<div class="header">
-						<label for="secret-{{ .Id }}">{{ .Name }}</label>
+						<label class="name" for="secret-{{ .Id }}">{{ .Name }}</label>
 						<input id="secret-{{ .Id }}" name="edit-modal" type="checkbox">
 						<div class="modal edit-modal">
 							<div class="modal-container">
@@ -50,7 +50,7 @@
 										<label for="secret-edit-name-{{ .Id }}"><span>Name</span></label>
 										<textarea id="secret-edit-value-{{ .Id }}" name="value" required autocomplete="off" rows="5">{{ .Value }}</textarea>
 										<label for="secret-edit-value-{{ .Id }}"><span>Value</span></label>
-										<input class="save" type="submit" value="Save Changes">
+										<input class="save" type="submit" value="Save">
 									</form>
 									<form class="delete" action="/delete/{{ .Id }}" method="POST">
 										<input type="submit" value="Delete">

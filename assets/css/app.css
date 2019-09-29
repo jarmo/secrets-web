@@ -4,14 +4,30 @@ body {
   font-family: Helvetica Neue, Helvetica, sans-serif;
 }
 
+@media (max-width: 767px) {
+  body {
+    font-size: .8em;
+  }
+}
+
 h1 {
-  font-size: 48px;
+  font-size: 3em;
   font-weight: 400;
   margin-bottom: 1.5em;
 }
 
 label {
   cursor: pointer;
+}
+
+.container {
+  width: 40%;
+}
+
+@media (max-width: 767px) {
+  .container {
+    width: 95%;
+  }
 }
 
 .error, .success {
@@ -60,7 +76,7 @@ aside .logout {
   cursor: pointer;
   background: #eee;
   border: 0;
-  font-size: 16px;
+  font-size: 1em;
 }
 
 aside .add {
@@ -84,6 +100,10 @@ aside .logout:hover {
 }
 
 @media (max-width: 767px) {
+  main aside form {
+    width: initial;
+  }
+
   .error {
     width: 80%;
   }
@@ -97,13 +117,10 @@ aside .logout:hover {
   margin-bottom: 1em;
 }
 
-.secret label {
+.secret .name {
   margin: 0;
   padding: 0;
-}
-
-.secret .header {
-  font-size: 26px;
+  font-size: 1.5em;
 }
 
 input[name=edit-modal],
@@ -140,14 +157,24 @@ input:checked ~ .add-modal {
   animation-duration: 0.4s
 }
 
+@media(max-width: 767px) {
+  .modal {
+    padding-top: 0;
+  }
+
+  .modal .modal-container {
+    width: 100%;
+  }
+}
+
 .modal .modal-header {
   background: #e2e3e5;
-  font-size: 32px;
+  font-size: 1.5em;
 }
 
 .modal .modal-header,
 .modal .modal-content {
-  padding: 16px;
+  padding: 1em;
 }
 
 .modal .close {
@@ -208,6 +235,6 @@ main form {
 
 @media (max-width: 767px) {
   main form {
-    width: 100%;
+    max-width: 100%;
   }
 }
