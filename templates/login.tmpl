@@ -2,10 +2,10 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-		<link rel="stylesheet" href="/assets/css/app.css">
-		<link rel="icon" type="image/png" href="/assets/favicon.png">
-		<script src="/assets/js/session.js"></script>
-		<script src="/assets/js/app.js"></script>
+		<link rel="stylesheet" href="/public/assets/css/app.css">
+		<link rel="icon" type="image/png" href="/public/assets/favicon.png">
+		<script src="/public/assets/js/session.js"></script>
+		<script src="/public/assets/js/app.js"></script>
 		<script>new App("{{ .csrfToken }}", {{ .sessionMaxAgeInSeconds }}).initialize()</script>
 	</head>
 	<body>

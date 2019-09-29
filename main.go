@@ -2,6 +2,8 @@ package main
 
 import (
 	"net/http"
+	"html/template"
+	"io/ioutil"
 	"crypto/rand"
 	"encoding/base64"
 	"strings"
@@ -50,7 +52,7 @@ func redirectMessage(c *gin.Context) interface{} {
 func authenticated() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if session, err := createSession(c); err != nil {
-			c.HTML(http.StatusOK, "login.tmpl", gin.H{
+			c.HTML(http.StatusOK, "/templates/login.tmpl", gin.H{
 				"sessionMaxAgeInSeconds": sessionMaxAgeInSeconds,
 				"csrfToken": csrfToken(sessions.Default(c)),
 			})
@@ -122,6 +124,24 @@ func createSession(c *gin.Context) (session, error) {
 	}
 }
 
+func templates() (*template.Template, error) {
+	tmpl := template.New("")
+	for name, file := range Assets.Files {
+		if file.IsDir() || !strings.HasSuffix(name, ".tmpl") {
+			continue
+		}
+		content, err := ioutil.ReadAll(file)
+		if err != nil {
+			return nil, err
+		}
+		tmpl, err = tmpl.New(name).Parse(string(content))
+		if err != nil {
+			return nil, err
+		}
+	}
+	return tmpl, nil
+}
+
 const sessionMaxAgeInSeconds = 5 * 60
 
 func setupRouter() *gin.Engine {
@@ -134,13 +154,19 @@ func setupRouter() *gin.Engine {
 	})
 
 	router.Use(sessions.Sessions("secrets", sessionStore))
-	router.LoadHTMLGlob("templates/*")
-	router.Static("/assets", "./assets")
+
+	if tmpls, err := templates(); err != nil {
+		panic(err)
+	} else {
+		router.SetHTMLTemplate(tmpls)
+	}
+
+	router.StaticFS("/public", Assets)
 	router.Use(csrfProtection())
 
 	router.POST("/login", func(c *gin.Context) {
 		if session, err := createSession(c); err != nil {
-			c.HTML(http.StatusOK, "login.tmpl", gin.H{
+			c.HTML(http.StatusOK, "/templates/login.tmpl", gin.H{
 				"error": err,
 				"user": session.vaultAlias,
 			})
@@ -152,7 +178,7 @@ func setupRouter() *gin.Engine {
 	protected := router.Group("", authenticated())
 
 	protected.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.tmpl", gin.H{
+		c.HTML(http.StatusOK, "/templates/index.tmpl", gin.H{
 			"message": redirectMessage(c),
 		})
 	})
@@ -162,7 +188,7 @@ func setupRouter() *gin.Engine {
 		session := c.MustGet("session").(session)
 		result := vault.List(session.secrets, filter)
 
-		c.HTML(http.StatusOK, "index.tmpl", gin.H{
+		c.HTML(http.StatusOK, "/templates/index.tmpl", gin.H{
 			"filter":  filter,
 			"secrets": result,
 		})
@@ -185,7 +211,7 @@ func setupRouter() *gin.Engine {
 		session := c.MustGet("session").(session)
 
 		if _, newSecrets, err := vault.Edit(session.secrets, id, name, value); err != nil {
-			c.HTML(http.StatusOK, "index.tmpl", gin.H{
+			c.HTML(http.StatusOK, "/templates/index.tmpl", gin.H{
 				"error": err,
 			})
 		} else {
@@ -199,7 +225,7 @@ func setupRouter() *gin.Engine {
 		session := c.MustGet("session").(session)
 
 		if _, newSecrets, err := vault.Delete(session.secrets, id); err != nil {
-			c.HTML(http.StatusOK, "index.tmpl", gin.H{
+			c.HTML(http.StatusOK, "/templates/index.tmpl", gin.H{
 				"error": err,
 			})
 		} else {
