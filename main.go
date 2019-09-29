@@ -145,7 +145,7 @@ func templates() (*template.Template, error) {
 	return tmpl, nil
 }
 
-func enableReleaseMode() bool {
+func isProdMode() bool {
 	binary, err := os.Executable()
 	if err != nil {
 			panic(err)
@@ -157,8 +157,8 @@ func enableReleaseMode() bool {
 
 const sessionMaxAgeInSeconds = 5 * 60
 
-func setupRouter() *gin.Engine {
-	if enableReleaseMode() {
+func initialize(prodModeEnabled bool) *gin.Engine {
+	if prodModeEnabled {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
@@ -168,6 +168,7 @@ func setupRouter() *gin.Engine {
 		Path: "/",
 		MaxAge: sessionMaxAgeInSeconds,
 		HttpOnly: true,
+		Secure: prodModeEnabled,
 	})
 
 	router.Use(sessions.Sessions("secrets", sessionStore))
@@ -255,17 +256,18 @@ func setupRouter() *gin.Engine {
 }
 
 func main() {
-	router := setupRouter()
+	isProdMode := isProdMode()
+	app := initialize(isProdMode)
 
-	if (enableReleaseMode()) {
+	if isProdMode {
 		tlsCertificate := os.Getenv("SECRETS_TLS_CERT")
 		tlsKey := os.Getenv("SECRETS_TLS_KEY")
 		if tlsCertificate == "" || tlsKey == "" {
 			fmt.Fprintln(os.Stderr, "SECRETS_TLS_CERT or SECRETS_TLS_KEY environment variables are not set!")
 			os.Exit(1)
 		}
-		router.RunTLS(":9090", tlsCertificate, tlsKey)
+		app.RunTLS(":9090", tlsCertificate, tlsKey)
 	} else {
-		router.Run("localhost:8080")
+		app.Run("localhost:8080")
 	}
 }
