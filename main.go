@@ -8,6 +8,8 @@ import (
 	"encoding/base64"
 	"strings"
 	"errors"
+	"os"
+	"path/filepath"
 
 	"github.com/satori/go.uuid"
 	"github.com/gin-contrib/sessions"
@@ -142,9 +144,23 @@ func templates() (*template.Template, error) {
 	return tmpl, nil
 }
 
+func enableReleaseMode() bool {
+	binary, err := os.Executable()
+	if err != nil {
+			panic(err)
+	}
+	binaryDir := filepath.Dir(binary)
+
+	return !strings.HasPrefix(binaryDir, os.TempDir())
+}
+
 const sessionMaxAgeInSeconds = 5 * 60
 
 func setupRouter() *gin.Engine {
+	if (enableReleaseMode()) {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	router := gin.Default()
 	sessionStore := cookie.NewStore(generateRandomBytes(64), generateRandomBytes(32))
 	sessionStore.Options(sessions.Options{
