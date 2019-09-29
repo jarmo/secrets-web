@@ -16,6 +16,11 @@ h1 {
   margin-bottom: 1.5em;
 }
 
+#logo {
+  max-height: .7em;
+  margin-right: .2em;
+}
+
 label {
   cursor: pointer;
 }
