@@ -1,0 +1,60 @@
+# github.com/gin-contrib/sessions v0.0.1
+github.com/gin-contrib/sessions
+github.com/gin-contrib/sessions/cookie
+# github.com/gin-contrib/sse v0.1.0
+github.com/gin-contrib/sse
+# github.com/gin-gonic/gin v1.4.0
+github.com/gin-gonic/gin
+github.com/gin-gonic/gin/binding
+github.com/gin-gonic/gin/internal/json
+github.com/gin-gonic/gin/render
+# github.com/golang/protobuf v1.3.2
+github.com/golang/protobuf/proto
+# github.com/gorilla/context v1.1.1
+github.com/gorilla/context
+# github.com/gorilla/securecookie v1.1.1
+github.com/gorilla/securecookie
+# github.com/gorilla/sessions v1.1.3
+github.com/gorilla/sessions
+# github.com/jarmo/secrets/v5 v5.0.0
+github.com/jarmo/secrets/v5/secret
+github.com/jarmo/secrets/v5/storage
+github.com/jarmo/secrets/v5/storage/path
+github.com/jarmo/secrets/v5/vault
+github.com/jarmo/secrets/v5/crypto
+github.com/jarmo/secrets/v5/vault/add
+github.com/jarmo/secrets/v5/vault/delete
+github.com/jarmo/secrets/v5/vault/edit
+github.com/jarmo/secrets/v5/vault/list
+# github.com/jessevdk/go-assets v0.0.0-20160921144138-4f4301a06e15
+github.com/jessevdk/go-assets
+# github.com/json-iterator/go v1.1.7
+github.com/json-iterator/go
+# github.com/mattn/go-isatty v0.0.9
+github.com/mattn/go-isatty
+# github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd
+github.com/modern-go/concurrent
+# github.com/modern-go/reflect2 v1.0.1
+github.com/modern-go/reflect2
+# github.com/pinzolo/xdgdir v0.0.0-20180220135956-c5b4bdb0a9c4
+github.com/pinzolo/xdgdir
+# github.com/satori/go.uuid v1.2.0
+github.com/satori/go.uuid
+# github.com/ugorji/go/codec v1.1.7
+github.com/ugorji/go/codec
+# golang.org/x/crypto v0.0.0-20190820162420-60c769a6c586
+golang.org/x/crypto/argon2
+golang.org/x/crypto/nacl/secretbox
+golang.org/x/crypto/scrypt
+golang.org/x/crypto/blake2b
+golang.org/x/crypto/internal/subtle
+golang.org/x/crypto/poly1305
+golang.org/x/crypto/salsa20/salsa
+golang.org/x/crypto/pbkdf2
+# golang.org/x/sys v0.0.0-20190826190057-c7b8b68b1456
+golang.org/x/sys/unix
+golang.org/x/sys/cpu
+# gopkg.in/go-playground/validator.v8 v8.18.2
+gopkg.in/go-playground/validator.v8
+# gopkg.in/yaml.v2 v2.2.2
+gopkg.in/yaml.v2
