@@ -4,17 +4,25 @@ import (
 	"net/http"
 	"crypto/rand"
 	"encoding/base64"
-	"time"
-	"strconv"
+	"strings"
+	"errors"
 
 	"github.com/satori/go.uuid"
 	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/memstore"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
+	"github.com/jarmo/secrets/v5/secret"
 	"github.com/jarmo/secrets/v5/storage"
 	"github.com/jarmo/secrets/v5/storage/path"
 	"github.com/jarmo/secrets/v5/vault"
 )
+
+type session struct {
+	vaultAlias string
+	path string
+	password []byte
+	secrets []secret.Secret
+}
 
 func redirect(c *gin.Context, path string) {
 	c.Redirect(http.StatusFound, path)
@@ -41,10 +49,14 @@ func redirectMessage(c *gin.Context) interface{} {
 
 func authenticated() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		session := sessions.Default(c)
-
-		if session.Get("vaultPath") == nil {
-			redirect(c, "/login")
+		if session, err := createSession(c); err != nil {
+			c.HTML(http.StatusOK, "login.tmpl", gin.H{
+				"sessionMaxAgeInSeconds": sessionMaxAgeInSeconds,
+				"csrfToken": csrfToken(sessions.Default(c)),
+			})
+			c.AbortWithStatus(http.StatusOK)
+		} else {
+			c.Set("session", session)
 		}
 	}
 }
@@ -73,8 +85,9 @@ func csrfToken(session sessions.Session) string {
 
 func csrfProtection() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if c.Request.Method != "HEAD" && c.Request.Method != "GET" {
-			if csrfToken(sessions.Default(c)) != c.PostForm("csrf-token") {
+		request := c.Request
+		if request.Method != "HEAD" && request.Method != "GET" {
+			if csrfToken(sessions.Default(c)) != c.GetHeader("X-Csrf-Token") {
 				c.AbortWithStatus(http.StatusForbidden)
 				return
 			}
@@ -83,12 +96,39 @@ func csrfProtection() gin.HandlerFunc {
 	}
 }
 
+func createSession(c *gin.Context) (session, error) {
+	if decodedAuthorizationHeader, err := base64.StdEncoding.DecodeString(strings.Replace(c.GetHeader("Authorization"), "Bearer ", "", 1)); err != nil {
+		return session{}, errors.New("Invalid Authorization header")
+	} else if len(decodedAuthorizationHeader) == 0 {
+		return session{}, errors.New("Not logged in")
+	} else {
+		credentials := strings.Split(string(decodedAuthorizationHeader), ":")
+		vaultAlias := credentials[0]
+
+		if len(credentials) != 2 {
+			return session{vaultAlias: vaultAlias}, errors.New("Invalid Authorization header value")
+		} else {
+			password := credentials[1]
+			if path, aliasErr := path.Get(vaultAlias); aliasErr != nil {
+				return session{vaultAlias: vaultAlias}, aliasErr
+			} else {
+				if secrets, vaultErr := storage.Read(path, []byte(password)); vaultErr != nil {
+					return session{vaultAlias: vaultAlias}, vaultErr
+				} else {
+					return session{vaultAlias: vaultAlias, path: path, password: []byte(password), secrets: secrets}, nil
+				}
+			}
+		}
+	}
+}
+
 const sessionMaxAgeInSeconds = 5 * 60
 
 func setupRouter() *gin.Engine {
 	router := gin.Default()
-	sessionStore := memstore.NewStore(generateRandomBytes(64))
+	sessionStore := cookie.NewStore(generateRandomBytes(64), generateRandomBytes(32))
 	sessionStore.Options(sessions.Options{
+		Path: "/",
 		MaxAge: sessionMaxAgeInSeconds,
 		HttpOnly: true,
 	})
@@ -98,46 +138,14 @@ func setupRouter() *gin.Engine {
 	router.Static("/assets", "./assets")
 	router.Use(csrfProtection())
 
-	router.GET("/login", func(c *gin.Context) {
-		session := sessions.Default(c)
-		if session.Get("vaultPath") != nil {
-			redirect(c, "/")
-		} else {
-			c.HTML(http.StatusOK, "login.tmpl", gin.H{
-				"csrfToken": csrfToken(sessions.Default(c)),
-			})
-		}
-	})
-
 	router.POST("/login", func(c *gin.Context) {
-		vaultAlias := c.PostForm("vault-alias")
-		password := c.PostForm("password")
-
-		if path, aliasErr := path.Get(vaultAlias); aliasErr != nil {
+		if session, err := createSession(c); err != nil {
 			c.HTML(http.StatusOK, "login.tmpl", gin.H{
-				"error": aliasErr,
-				"user":  vaultAlias,
-				"csrfToken": csrfToken(sessions.Default(c)),
+				"error": err,
+				"user": session.vaultAlias,
 			})
 		} else {
-			if _, vaultErr := storage.Read(path, []byte(password)); vaultErr != nil {
-				c.HTML(http.StatusOK, "login.tmpl", gin.H{
-					"error": vaultErr,
-					"user":  vaultAlias,
-					"csrfToken": csrfToken(sessions.Default(c)),
-				})
-			} else {
-				session := sessions.Default(c)
-				session.Set("vaultPath", path)
-				session.Set("password", password)
-				session.Save()
-				duration, _ := time.ParseDuration(strconv.Itoa(sessionMaxAgeInSeconds) + "s")
-				time.AfterFunc(duration, func() {
-					session.Clear()
-					session.Save()
-				})
-				redirectWithMessage(c, "/", "Logged in successfully")
-			}
+			redirectWithMessage(c, "/", "Logged in successfully")
 		}
 	})
 
@@ -146,97 +154,57 @@ func setupRouter() *gin.Engine {
 	protected.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.tmpl", gin.H{
 			"message": redirectMessage(c),
-			"csrfToken": csrfToken(sessions.Default(c)),
 		})
-	})
-
-	protected.POST("/logout", func(c *gin.Context) {
-		session := sessions.Default(c)
-		session.Clear()
-		session.Save()
-		redirect(c, "/login")
 	})
 
 	protected.POST("/", func(c *gin.Context) {
 		filter := c.PostForm("filter")
-		session := sessions.Default(c)
-		secrets, readErr := storage.Read(session.Get("vaultPath").(string), []byte(session.Get("password").(string)))
-		result := vault.List(secrets, filter)
+		session := c.MustGet("session").(session)
+		result := vault.List(session.secrets, filter)
 
 		c.HTML(http.StatusOK, "index.tmpl", gin.H{
-			"error":   readErr,
 			"filter":  filter,
 			"secrets": result,
-			"csrfToken": csrfToken(sessions.Default(c)),
 		})
 	})
 
 	protected.POST("/add", func(c *gin.Context) {
 		name := c.PostForm("name")
 		value := c.PostForm("value")
-		session := sessions.Default(c)
-		path := session.Get("vaultPath").(string)
-		password := []byte(session.Get("password").(string))
+		session := c.MustGet("session").(session)
 
-		if secrets, readErr := storage.Read(path, password); readErr != nil {
-			c.HTML(http.StatusOK, "index.tmpl", gin.H{
-				"error": readErr,
-				"csrfToken": csrfToken(sessions.Default(c)),
-			})
-		} else {
-		  _, newSecrets := vault.Add(secrets, name, value)
-			storage.Write(path, password, newSecrets)
-			redirectWithMessage(c, "/", "Added successfully")
-		}
+		_, newSecrets := vault.Add(session.secrets, name, value)
+		storage.Write(session.path, session.password, newSecrets)
+		redirectWithMessage(c, "/", "Added successfully")
 	})
 
 	protected.POST("/edit/:id", func(c *gin.Context) {
 		id, _ := uuid.FromString(c.Param("id"))
 		name := c.PostForm("name")
 		value := c.PostForm("value")
-		session := sessions.Default(c)
-		path := session.Get("vaultPath").(string)
-		password := []byte(session.Get("password").(string))
+		session := c.MustGet("session").(session)
 
-		if secrets, readErr := storage.Read(path, password); readErr != nil {
+		if _, newSecrets, err := vault.Edit(session.secrets, id, name, value); err != nil {
 			c.HTML(http.StatusOK, "index.tmpl", gin.H{
-				"error": readErr,
-				"csrfToken": csrfToken(sessions.Default(c)),
+				"error": err,
 			})
 		} else {
-			if _, newSecrets, err := vault.Edit(secrets, id, name, value); err != nil {
-				c.HTML(http.StatusOK, "index.tmpl", gin.H{
-					"error": err,
-					"csrfToken": csrfToken(sessions.Default(c)),
-				})
-			} else {
-				storage.Write(path, password, newSecrets)
-				redirectWithMessage(c, "/", "Edited successfully")
-			}
+			storage.Write(session.path, session.password, newSecrets)
+			redirectWithMessage(c, "/", "Edited successfully")
 		}
 	})
 
 	protected.POST("/delete/:id", func(c *gin.Context) {
 		id, _ := uuid.FromString(c.Param("id"))
-		session := sessions.Default(c)
-		path := session.Get("vaultPath").(string)
-		password := []byte(session.Get("password").(string))
+		session := c.MustGet("session").(session)
 
-		if secrets, readErr := storage.Read(path, password); readErr != nil {
+		if _, newSecrets, err := vault.Delete(session.secrets, id); err != nil {
 			c.HTML(http.StatusOK, "index.tmpl", gin.H{
-				"error": readErr,
-				"csrfToken": csrfToken(sessions.Default(c)),
+				"error": err,
 			})
 		} else {
-			if _, newSecrets, err := vault.Delete(secrets, id); err != nil {
-				c.HTML(http.StatusOK, "index.tmpl", gin.H{
-					"error": err,
-					"csrfToken": csrfToken(sessions.Default(c)),
-				})
-			} else {
-				storage.Write(path, password, newSecrets)
-				redirectWithMessage(c, "/", "Deleted successfully")
-			}
+			storage.Write(session.path, session.password, newSecrets)
+			redirectWithMessage(c, "/", "Deleted successfully")
 		}
 	})
 

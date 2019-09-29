@@ -1,80 +1,66 @@
-<!DOCTYPE html>
-<html>
-	<head>
-		<meta charset="utf-8" />
-		<link rel="stylesheet" href="/assets/css/app.css" />
-	</head>
-	<body>
-		<main>
-			<div class="container">
-				<aside>
-					<label class="add" for="add-modal">+ Add</label>
-					<input type="checkbox" id="add-modal" name="add-modal">
-					<div class="modal add-modal">
-						<div class="modal-container">
-							<div class="modal-header">
-								<label for="add-modal" class="close">×</label>
-								<div>Add Secret</div>
-							</div>
-							<div class="modal-content">
-								<form action="/add" method="POST">
-									<input type="hidden" name="csrf-token" value="{{ .csrfToken }}">
-									<input id="secret-add-name" type="text" name="name" required autocomplete="off">
-									<label for="secret-add-name"><span>Name</span></label>
-									<textarea id="secret-add-value" name="value" required autocomplete="off" rows="5"></textarea>
-									<label for="secret-add-value"><span>Value</span></label>
-									<input type="submit" value="Add">
-								</form>
-							</div>
-						</div>
+<main>
+	<div class="container">
+		<aside>
+			<label class="add" for="add-modal">+ Add</label>
+			<input type="checkbox" id="add-modal" name="add-modal">
+			<div class="modal add-modal">
+				<div class="modal-container">
+					<div class="modal-header">
+						<label for="add-modal" class="close">×</label>
+						<div>Add Secret</div>
 					</div>
-					<form action="/logout" method="POST">
-						<input type="hidden" name="csrf-token" value="{{ .csrfToken }}">
-						<button class="logout">X</button>
-					</form>
-				</aside>
-				{{ if .message }}
-					<div class="success">{{ .message }}</div>
-				{{ end }}
-				<form class="filter" action="/" method="POST">
-					<input type="hidden" name="csrf-token" value="{{ .csrfToken }}">
-					<input id="filter" name="filter" type="text" value="{{ .filter }}" required autocomplete="off" {{ if not .filter }}autofocus{{ end }}>
-					<label for="filter"><span>Filter</span></label>
-					<input type="submit" value="Search">
-				</form>
-				<div class="secrets">
-					{{range .secrets}}
-						<div class="secret">
-							<div class="header">
-								<label for="secret-{{ .Id }}">{{ .Name }}</label>
-								<input id="secret-{{ .Id }}" name="edit-modal" type="checkbox">
-								<div class="modal edit-modal">
-									<div class="modal-container">
-										<div class="modal-header">
-											<label for="secret-{{ .Id }}" class="close">×</label>
-											<div>Edit Secret</div>
-										</div>
-										<div class="modal-content">
-											<form action="/edit/{{ .Id }}" method="POST">
-												<input type="hidden" name="csrf-token" value="{{ $.csrfToken }}">
-												<input id="secret-edit-name-{{ .Id }}" type="text" value="{{ .Name }}" name="name" required autocomplete="off">
-												<label for="secret-edit-name-{{ .Id }}"><span>Name</span></label>
-												<textarea id="secret-edit-value-{{ .Id }}" name="value" required autocomplete="off" rows="5">{{ .Value }}</textarea>
-												<label for="secret-edit-value-{{ .Id }}"><span>Value</span></label>
-												<input class="save" type="submit" value="Save Changes">
-											</form>
-											<form class="delete" action="/delete/{{ .Id }}" method="POST">
-												<input type="hidden" name="csrf-token" value="{{ $.csrfToken }}">
-												<input type="submit" value="Delete">
-											</form>
-										</div>
-									</div>
+					<div class="modal-content">
+						<form action="/add" method="POST">
+							<input id="secret-add-name" type="text" name="name" required autocomplete="off">
+							<label for="secret-add-name"><span>Name</span></label>
+							<textarea id="secret-add-value" name="value" required autocomplete="off" rows="5"></textarea>
+							<label for="secret-add-value"><span>Value</span></label>
+							<input type="submit" value="Add">
+						</form>
+					</div>
+				</div>
+			</div>
+			<form id="logout">
+				<button class="logout">X</button>
+			</form>
+		</aside>
+		{{ if .message }}
+			<div class="success">{{ .message }}</div>
+		{{ end }}
+		<form class="filter" action="/" method="POST">
+			<input id="filter" name="filter" type="text" value="{{ .filter }}" required autocomplete="off" {{ if not .filter }}autofocus{{ end }}>
+			<label for="filter"><span>Filter</span></label>
+			<input type="submit" value="Search">
+		</form>
+		<div class="secrets">
+			{{range .secrets}}
+				<div class="secret">
+					<div class="header">
+						<label for="secret-{{ .Id }}">{{ .Name }}</label>
+						<input id="secret-{{ .Id }}" name="edit-modal" type="checkbox">
+						<div class="modal edit-modal">
+							<div class="modal-container">
+								<div class="modal-header">
+									<label for="secret-{{ .Id }}" class="close">×</label>
+									<div>Edit Secret</div>
+								</div>
+								<div class="modal-content">
+									<form action="/edit/{{ .Id }}" method="POST">
+										<input id="secret-edit-name-{{ .Id }}" type="text" value="{{ .Name }}" name="name" required autocomplete="off">
+										<label for="secret-edit-name-{{ .Id }}"><span>Name</span></label>
+										<textarea id="secret-edit-value-{{ .Id }}" name="value" required autocomplete="off" rows="5">{{ .Value }}</textarea>
+										<label for="secret-edit-value-{{ .Id }}"><span>Value</span></label>
+										<input class="save" type="submit" value="Save Changes">
+									</form>
+									<form class="delete" action="/delete/{{ .Id }}" method="POST">
+										<input type="submit" value="Delete">
+									</form>
 								</div>
 							</div>
 						</div>
-					{{end}}
+					</div>
 				</div>
-			</div>
-	  </main>
-	</body>
-</html>
+			{{end}}
+		</div>
+	</div>
+</main>

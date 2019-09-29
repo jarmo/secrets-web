@@ -3,6 +3,9 @@
 	<head>
 		<meta charset="utf-8" />
 		<link rel="stylesheet" href="/assets/css/app.css" />
+		<script src="/assets/js/session.js"></script>
+		<script src="/assets/js/app.js"></script>
+		<script>new App("{{ .csrfToken }}", {{ .sessionMaxAgeInSeconds }}).initialize()</script>
 	</head>
 	<body>
 	  <main>
@@ -11,10 +14,9 @@
 					<div class="error">{{ .error }}</div>
 				{{ end }}
 				<h1>Secrets</h1>
-				<form action="/login" method="post">
-					<input type="hidden" name="csrf-token" value="{{ .csrfToken }}">
-					<input id="vault-alias" name="vault-alias" type="text" required autocomplete="off" value="{{ .user }}">
-					<label for="vault-alias"><span>User</span></label>
+				<form id="login" action="/login" method="post">
+					<input id="user" name="user" type="text" required autocomplete="off" value="{{ .user }}">
+					<label for="user"><span>User</span></label>
 					<input id="password" name="password" type="password" required autocomplete="off" {{ if .user }}autofocus{{ end }}>
 					<label for="password"><span>Password</span></label>
 					<input type="submit" value="Login">
