@@ -68,7 +68,7 @@ input:valid + label > span {
 
 textarea:focus + label > span,
 textarea:valid + label > span {
-  top: -9.25em;
+  top: -10em;
   font-size: 1.375em;
   color: #333;
 }
