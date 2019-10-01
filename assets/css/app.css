@@ -81,7 +81,7 @@ aside .add,
 aside .logout {
   transition: background 0.2s ease;
   display: block;
-  margin-left: .75em;
+  margin: 0 0 0 .75em;
   padding: 10px;
   cursor: pointer;
   background: #eee;
