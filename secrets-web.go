@@ -55,11 +55,11 @@ func redirectMessage(c *gin.Context) interface{} {
 func authenticated() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if session, err := createSession(c); err != nil {
-			c.HTML(http.StatusOK, "/templates/login.tmpl", gin.H{
-				"sessionMaxAgeInSeconds": sessionMaxAgeInSeconds,
-				"csrfToken": csrfToken(sessions.Default(c)),
+			c.HTML(http.StatusForbidden, "/templates/login.tmpl", gin.H{
+			  "sessionMaxAgeInSeconds": sessionMaxAgeInSeconds,
+			  "csrfToken": csrfToken(sessions.Default(c)),
 			})
-			c.AbortWithStatus(http.StatusOK)
+			c.AbortWithStatus(http.StatusForbidden)
 		} else {
 			c.Set("session", session)
 		}
@@ -102,16 +102,16 @@ func csrfProtection() gin.HandlerFunc {
 }
 
 func createSession(c *gin.Context) (session, error) {
-	if decodedAuthorizationHeader, err := base64.StdEncoding.DecodeString(strings.Replace(c.GetHeader("Authorization"), "Bearer ", "", 1)); err != nil {
-		return session{}, errors.New("Invalid Authorization header")
-	} else if len(decodedAuthorizationHeader) == 0 {
-		return session{}, errors.New("Not logged in")
+	if decodedCredentialsHeader, err := base64.StdEncoding.DecodeString(c.GetHeader("X-Credentials")); err != nil {
+		return session{}, errors.New("Invalid X-Credentials header")
+	} else if len(decodedCredentialsHeader) == 0 {
+		return session{}, errors.New("No X-Credentials header value")
 	} else {
-		credentials := strings.Split(string(decodedAuthorizationHeader), ":")
+		credentials := strings.Split(string(decodedCredentialsHeader), ":")
 		vaultAlias := credentials[0]
 
 		if len(credentials) != 2 {
-			return session{vaultAlias: vaultAlias}, errors.New("Invalid Authorization header value")
+			return session{vaultAlias: vaultAlias}, errors.New("Invalid X-Credentials header value")
 		} else {
 			password := credentials[1]
 			if path, aliasErr := path.Get(vaultAlias); aliasErr != nil {

@@ -26,7 +26,7 @@ function App(csrfToken, sessionMaxAgeInSeconds) {
       method: method,
       body: data,
       headers: {
-        "Authorization": "Bearer " + btoa(session.user + ":" + session.password),
+        "X-Credentials": btoa(session.user + ":" + session.password),
         "X-Csrf-Token": csrfToken
       }
     }).then(function(response) {
