@@ -61,14 +61,14 @@ textarea:focus {
 
 input:focus + label > span,
 input:valid + label > span {
-  top: -80px;
+  top: -4.5em;
   font-size: 1.375em;
   color: #333;
 }
 
 textarea:focus + label > span,
 textarea:valid + label > span {
-  top: -10em;
+  top: -14.5em;
   font-size: 1.375em;
   color: #333;
 }
@@ -90,7 +90,7 @@ textarea + label > span {
   position: absolute;
   color: #8F8F8F;
   font-size: 2.25em;
-  top: -48px;
+  top: -1.5em;
   left: 0;
   transition: top 0.2s ease, font-size 0.2s ease, color 0.2s ease;
 }
