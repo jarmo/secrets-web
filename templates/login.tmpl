@@ -17,7 +17,7 @@
 				{{ if .error }}
 					<div class="error">{{ .error }}</div>
 				{{ end }}
-				<h1><img id="logo" src="/public/assets/favicon.png">Secrets</h1>
+				<h1 id="title"><img src="/public/assets/favicon.png">ecrets</h1>
 				<form id="login" action="/login" method="post">
 					<input id="user" name="user" type="text" required autocomplete="off" value="{{ .user }}">
 					<label for="user"><span>User</span></label>

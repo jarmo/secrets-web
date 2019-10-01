@@ -16,9 +16,14 @@ h1 {
   margin-bottom: 1.5em;
 }
 
-#logo {
-  max-height: .7em;
-  margin-right: .2em;
+#title img {
+  max-height: 2.5em;
+}
+
+@media (max-width: 767px) {
+  #title {
+    text-align: center;
+  }
 }
 
 label {
@@ -76,7 +81,7 @@ aside .add,
 aside .logout {
   transition: background 0.2s ease;
   display: block;
-  margin: 10px 0 0 .75em;
+  margin-left: .75em;
   padding: 10px;
   cursor: pointer;
   background: #eee;

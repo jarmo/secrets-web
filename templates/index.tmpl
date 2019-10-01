@@ -1,5 +1,8 @@
 <main>
 	<div class="container">
+		{{ if .message }}
+			<div class="success">{{ .message }}</div>
+		{{ end }}
 		<aside>
 			<label class="add" for="add-modal">+ Add</label>
 			<input type="checkbox" id="add-modal" name="add-modal">
@@ -24,9 +27,6 @@
 				<button class="logout">X</button>
 			</form>
 		</aside>
-		{{ if .message }}
-			<div class="success">{{ .message }}</div>
-		{{ end }}
 		<form class="filter" action="/" method="POST">
 			<input id="filter" name="filter" type="text" value="{{ .filter }}" required autocomplete="off" {{ if not .filter }}autofocus{{ end }}>
 			<label for="filter"><span>Filter</span></label>
