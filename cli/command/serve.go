@@ -13,6 +13,7 @@ import (
 	"github.com/satori/go.uuid"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
+	"github.com/gin-contrib/secure"
 	"github.com/gin-gonic/gin"
 	"github.com/jarmo/secrets/secret"
 	"github.com/jarmo/secrets/storage"
@@ -170,6 +171,11 @@ func initialize(configurationPath string, prodModeEnabled bool) *gin.Engine {
 	}
 
 	router := gin.Default()
+
+	if prodModeEnabled {
+		router.Use(secure.New(secure.DefaultConfig()))
+	}
+
 	sessionStore := cookie.NewStore(crypto.GenerateRandomBytes(64), crypto.GenerateRandomBytes(32))
 	sessionStore.Options(sessions.Options{
 		Path: "/",

@@ -1,5 +1,7 @@
 # github.com/docopt/docopt-go v0.0.0-20180111231733-ee0de3bc6815
 github.com/docopt/docopt-go
+# github.com/gin-contrib/secure v0.0.0-20190913150500-0a1d39a681e3
+github.com/gin-contrib/secure
 # github.com/gin-contrib/sessions v0.0.1
 github.com/gin-contrib/sessions
 github.com/gin-contrib/sessions/cookie
