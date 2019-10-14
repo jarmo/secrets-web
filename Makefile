@@ -24,6 +24,6 @@ install:
 	cp -Rf bin/ "${PREFIX}/bin"
 
 dev:
-	chokidar "secrets-web.go" "assets/**/*" "templates/**/*" --initial -c "/usr/bin/pkill -f go; go-assets-builder -o assets.go assets templates && go run *.go"
+	chokidar "secrets-web.go" "assets/**/*" "templates/**/*" --initial -c "/usr/bin/pkill go; go-assets-builder -o assets.go assets templates && go run *.go"
 
 .PHONY: all clean vendor linux darwin windows install dev
