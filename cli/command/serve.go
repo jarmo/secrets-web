@@ -24,6 +24,8 @@ import (
 )
 
 type Serve struct {
+  CertificatePath string
+  CertificatePrivKeyPath string
 }
 
 type session struct {

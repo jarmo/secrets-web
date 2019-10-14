@@ -15,25 +15,29 @@ func createUsage() string {
 
 Usage:
   secrets-web initialize --vaults-config=CONFIG_PATH --path=VAULT_PATH --alias=VAULT_ALIAS
-  secrets-web serve
+  secrets-web serve --cert=CERT_PATH --cert-priv-key=CERT_PRIVATE_KEY_PATH
 
 Options:
-  --vaults-config CONFIG_PATH     Vaults configuration path.
-  --alias VAULT_ALIAS             Vault alias.
-  --path VAULT_PATH               Vault path.
-  -h --help                       Show this screen.
-  -v --version                    Show version.`
+  --vaults-config CONFIG_PATH               Vaults configuration path.
+  --alias VAULT_ALIAS                       Vault alias.
+  --path VAULT_PATH                         Vault path.
+  --cert CERT_PATH                          HTTPS certificate path.
+  --cert-priv-key CERT_PRIVATE_KEY_PATH     HTTPS certificate private key path.
+  -h --help                                 Show this screen.
+  -v --version                              Show version.`
 }
 
 func createCommand(arguments map[string]interface {}) command.Executable {
-  vaultsConfig := argument(arguments, "--vaults-config")
-  vaultAlias := argument(arguments, "--alias")
-  vaultPath := argument(arguments, "--path")
-
   if arguments["initialize"].(bool) {
+		vaultsConfig := argument(arguments, "--vaults-config")
+		vaultAlias := argument(arguments, "--alias")
+		vaultPath := argument(arguments, "--path")
+
 		return command.Initialize{VaultsConfig: vaultsConfig, VaultAlias: vaultAlias, VaultPath: vaultPath}
   } else if arguments["serve"].(bool) {
-  	return command.Serve{}
+		certificatePath := argument(arguments, "--cert")
+		certificatePrivKeyPath := argument(arguments, "--cert-priv-key")
+		return command.Serve{CertificatePath: certificatePath, CertificatePrivKeyPath: certificatePrivKeyPath}
   } else {
     return nil
   }

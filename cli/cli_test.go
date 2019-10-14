@@ -27,3 +27,20 @@ func TestExecute_Initialize(t *testing.T) {
       t.Fatalf("Got unexpected command: %T", parsedCommand)
   }
 }
+
+func TestExecute_Serve(t *testing.T) {
+  cert := "cert"
+  certKey := "cert-key"
+
+  switch parsedCommand := Command(version, []string{"serve", "--cert", cert, "--cert-priv-key", certKey}).(type) {
+    case command.Serve:
+      if parsedCommand.CertificatePath != cert {
+        t.Fatalf("Expected certificate path to be '%v', but was '%v'", cert, parsedCommand.CertificatePath)
+      }
+      if parsedCommand.CertificatePrivKeyPath != certKey {
+        t.Fatalf("Expected certificate private key path to be '%v', but was '%v'", certKey, parsedCommand.CertificatePrivKeyPath)
+      }
+    default:
+      t.Fatalf("Got unexpected command: %T", parsedCommand)
+  }
+}
