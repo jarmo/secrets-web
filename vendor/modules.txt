@@ -18,7 +18,7 @@ github.com/gorilla/context
 github.com/gorilla/securecookie
 # github.com/gorilla/sessions v1.1.3
 github.com/gorilla/sessions
-# github.com/jarmo/secrets v0.0.0-20191014133622-6acb73421aca
+# github.com/jarmo/secrets v0.0.0-20191014170141-abfed23becc9
 github.com/jarmo/secrets/crypto
 github.com/jarmo/secrets/secret
 github.com/jarmo/secrets/storage
@@ -38,8 +38,6 @@ github.com/mattn/go-isatty
 github.com/modern-go/concurrent
 # github.com/modern-go/reflect2 v1.0.1
 github.com/modern-go/reflect2
-# github.com/pinzolo/xdgdir v0.0.0-20181207033906-45fed2c52080
-github.com/pinzolo/xdgdir
 # github.com/satori/go.uuid v1.2.0
 github.com/satori/go.uuid
 # github.com/ugorji/go/codec v1.1.7

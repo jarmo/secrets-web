@@ -9,7 +9,6 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
-	"fmt"
 
 	"github.com/satori/go.uuid"
 	"github.com/gin-contrib/sessions"
@@ -24,6 +23,7 @@ import (
 )
 
 type Serve struct {
+  ConfigurationPath string
   CertificatePath string
   CertificatePrivKeyPath string
 }
@@ -37,16 +37,10 @@ type session struct {
 
 func (command Serve) Execute() {
 	isProdMode := isProdMode()
-	app := initialize(isProdMode)
+	app := initialize(command.ConfigurationPath, isProdMode)
 
 	if isProdMode {
-		tlsCertificate := os.Getenv("SECRETS_TLS_CERT")
-		tlsKey := os.Getenv("SECRETS_TLS_KEY")
-		if tlsCertificate == "" || tlsKey == "" {
-			fmt.Fprintln(os.Stderr, "SECRETS_TLS_CERT or SECRETS_TLS_KEY environment variables are not set!")
-			os.Exit(1)
-		}
-		app.RunTLS(":9090", tlsCertificate, tlsKey)
+		app.RunTLS(":9090", command.CertificatePath, command.CertificatePrivKeyPath)
 	} else {
 		app.Run("localhost:8080")
 	}
@@ -77,9 +71,9 @@ func redirectMessage(c *gin.Context) interface{} {
 		}
 }
 
-func authenticated() gin.HandlerFunc {
+func authenticated(configurationPath string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if session, err := createSession(c); err != nil {
+		if session, err := createSession(configurationPath, c); err != nil {
 			c.HTML(http.StatusForbidden, "/templates/login.tmpl", gin.H{
 			  "sessionMaxAgeInSeconds": sessionMaxAgeInSeconds,
 			  "csrfToken": csrfToken(sessions.Default(c)),
@@ -116,7 +110,7 @@ func csrfProtection() gin.HandlerFunc {
 	}
 }
 
-func createSession(c *gin.Context) (session, error) {
+func createSession(configurationPath string, c *gin.Context) (session, error) {
 	if decodedCredentialsHeader, err := base64.StdEncoding.DecodeString(c.GetHeader("X-Credentials")); err != nil {
 		return session{}, errors.New("Invalid X-Credentials header")
 	} else if len(decodedCredentialsHeader) == 0 {
@@ -129,7 +123,7 @@ func createSession(c *gin.Context) (session, error) {
 			return session{vaultAlias: vaultAlias}, errors.New("Invalid X-Credentials header value")
 		} else {
 			password := credentials[1]
-			if path, aliasErr := path.Get(vaultAlias); aliasErr != nil {
+			if path, aliasErr := path.Get(configurationPath, vaultAlias); aliasErr != nil {
 				return session{vaultAlias: vaultAlias}, aliasErr
 			} else {
 				if secrets, vaultErr := storage.Read(path, []byte(password)); vaultErr != nil {
@@ -170,7 +164,7 @@ func isProdMode() bool {
 	return !strings.HasPrefix(binaryDir, os.TempDir())
 }
 
-func initialize(prodModeEnabled bool) *gin.Engine {
+func initialize(configurationPath string, prodModeEnabled bool) *gin.Engine {
 	if prodModeEnabled {
 		gin.SetMode(gin.ReleaseMode)
 	}
@@ -196,7 +190,7 @@ func initialize(prodModeEnabled bool) *gin.Engine {
 	router.Use(csrfProtection())
 
 	router.POST("/login", func(c *gin.Context) {
-		if session, err := createSession(c); err != nil {
+		if session, err := createSession(configurationPath, c); err != nil {
 			c.HTML(http.StatusOK, "/templates/login.tmpl", gin.H{
 				"error": err,
 				"user": session.vaultAlias,
@@ -206,7 +200,7 @@ func initialize(prodModeEnabled bool) *gin.Engine {
 		}
 	})
 
-	protected := router.Group("", authenticated())
+	protected := router.Group("", authenticated(configurationPath))
 
 	protected.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "/templates/index.tmpl", gin.H{

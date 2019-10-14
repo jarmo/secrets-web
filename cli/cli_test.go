@@ -29,11 +29,15 @@ func TestExecute_Initialize(t *testing.T) {
 }
 
 func TestExecute_Serve(t *testing.T) {
+  configPath := "config-path"
   cert := "cert"
   certKey := "cert-key"
 
-  switch parsedCommand := Command(version, []string{"serve", "--cert", cert, "--cert-priv-key", certKey}).(type) {
+  switch parsedCommand := Command(version, []string{"serve", "--config", configPath, "--cert", cert, "--cert-priv-key", certKey}).(type) {
     case command.Serve:
+      if parsedCommand.ConfigurationPath != configPath {
+        t.Fatalf("Expected configuration path to be '%v', but was '%v'", configPath, parsedCommand.ConfigurationPath)
+      }
       if parsedCommand.CertificatePath != cert {
         t.Fatalf("Expected certificate path to be '%v', but was '%v'", cert, parsedCommand.CertificatePath)
       }
