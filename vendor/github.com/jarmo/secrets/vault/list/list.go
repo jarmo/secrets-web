@@ -3,7 +3,7 @@ package list
 import (
   "strings"
   "sort"
-  "github.com/jarmo/secrets/v5/secret"
+  "github.com/jarmo/secrets/secret"
 )
 
 func Execute(secrets []secret.Secret, filter string) []secret.Secret {

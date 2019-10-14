@@ -4,8 +4,8 @@ import(
   "os"
   "io/ioutil"
   "encoding/json"
-  "github.com/jarmo/secrets/v5/crypto"
-  "github.com/jarmo/secrets/v5/secret"
+  "github.com/jarmo/secrets/crypto"
+  "github.com/jarmo/secrets/secret"
 )
 
 func Read(path string, password []byte) ([]secret.Secret, error) {

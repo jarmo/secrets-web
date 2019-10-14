@@ -1,7 +1,7 @@
 package edit
 
 import (
-  "github.com/jarmo/secrets/v5/secret"
+  "github.com/jarmo/secrets/secret"
 )
 
 func Execute(secrets []secret.Secret, index int, newName, newValue string) (secret.Secret, []secret.Secret) {

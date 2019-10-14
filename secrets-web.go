@@ -16,10 +16,10 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
-	"github.com/jarmo/secrets/v5/secret"
-	"github.com/jarmo/secrets/v5/storage"
-	"github.com/jarmo/secrets/v5/storage/path"
-	"github.com/jarmo/secrets/v5/vault"
+	"github.com/jarmo/secrets/secret"
+	"github.com/jarmo/secrets/storage"
+	"github.com/jarmo/secrets/storage/path"
+	"github.com/jarmo/secrets/vault"
 )
 
 type session struct {

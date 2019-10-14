@@ -1,22 +1,14 @@
 package crypto
 
 import (
-  "math"
   "encoding/base64"
   "crypto/rand"
   "encoding/json"
   "errors"
-  "golang.org/x/crypto/scrypt"
   "golang.org/x/crypto/argon2"
   "golang.org/x/crypto/nacl/secretbox"
-  "github.com/jarmo/secrets/v5/secret"
+  "github.com/jarmo/secrets/secret"
 )
-
-type scryptParams struct {
-  N int
-  R int
-  P int
-}
 
 type argon2idParams struct {
   Time int
@@ -73,41 +65,11 @@ func Decrypt(password []byte, encryptedSecrets Encrypted) ([]secret.Secret, erro
 }
 
 func secretKey(password, salt []byte, params map[string]int) [32]byte {
-  if _, hasValue := params["Time"]; hasValue {
-    return argon2idSecretKey(
-      password,
-      []byte(salt),
-      argon2idParams{Time: params["Time"], Memory: params["Memory"], Threads: params["Threads"]},
-    )
-  } else {
-    return scryptSecretKey(
-      password,
-      []byte(salt),
-      scryptParams{N: params["N"], R: params["R"], P: params["p"]},
-    )
-  }
-}
-
-func scryptSecretKey(password, salt []byte, params scryptParams) [32]byte {
-  keyLength := 32
-
-  secretKeyBytes, err := scrypt.Key(
+  return argon2idSecretKey(
     password,
-    salt,
-    int(math.Max(float64(params.N), 16384)),
-    int(math.Max(float64(params.R), 8)),
-    int(math.Max(float64(params.P), 2)),
-    keyLength,
+    []byte(salt),
+    argon2idParams{Time: params["Time"], Memory: params["Memory"], Threads: params["Threads"]},
   )
-
-  if err != nil {
-    panic(err)
-  }
-
-  var secretKey [32]byte
-  copy(secretKey[:], secretKeyBytes)
-
-  return secretKey
 }
 
 func argon2idSecretKey(password, salt []byte, params argon2idParams) [32]byte {

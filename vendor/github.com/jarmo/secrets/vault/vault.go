@@ -3,12 +3,12 @@ package vault
 import (
   "errors"
   "bytes"
-  "github.com/jarmo/secrets/v5/secret"
-  "github.com/jarmo/secrets/v5/storage"
-  "github.com/jarmo/secrets/v5/vault/add"
-  "github.com/jarmo/secrets/v5/vault/list"
-  "github.com/jarmo/secrets/v5/vault/delete"
-  "github.com/jarmo/secrets/v5/vault/edit"
+  "github.com/jarmo/secrets/secret"
+  "github.com/jarmo/secrets/storage"
+  "github.com/jarmo/secrets/vault/add"
+  "github.com/jarmo/secrets/vault/list"
+  "github.com/jarmo/secrets/vault/delete"
+  "github.com/jarmo/secrets/vault/edit"
   "github.com/satori/go.uuid"
 )
 
