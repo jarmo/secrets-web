@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"html/template"
 	"io/ioutil"
-	"crypto/rand"
 	"encoding/base64"
 	"strings"
 	"errors"
@@ -20,6 +19,7 @@ import (
 	"github.com/jarmo/secrets/storage"
 	"github.com/jarmo/secrets/storage/path"
 	"github.com/jarmo/secrets/vault"
+	"github.com/jarmo/secrets/crypto"
 )
 
 type session struct {
@@ -66,20 +66,10 @@ func authenticated() gin.HandlerFunc {
 	}
 }
 
-func generateRandomBytes(length int) []byte {
-  result := make([]byte, length)
-  _, err := rand.Read(result)
-  if err != nil {
-    panic(err)
-  }
-
-  return result
-}
-
 func csrfToken(session sessions.Session) string {
 	csrfToken := session.Get("csrfToken")
 	if csrfToken == nil {
-		newCsrfToken := base64.StdEncoding.EncodeToString(generateRandomBytes(128))
+		newCsrfToken := base64.StdEncoding.EncodeToString(crypto.GenerateRandomBytes(128))
 		session.Set("csrfToken", newCsrfToken)
 		session.Save()
 		return newCsrfToken
@@ -163,7 +153,7 @@ func initialize(prodModeEnabled bool) *gin.Engine {
 	}
 
 	router := gin.Default()
-	sessionStore := cookie.NewStore(generateRandomBytes(64), generateRandomBytes(32))
+	sessionStore := cookie.NewStore(crypto.GenerateRandomBytes(64), crypto.GenerateRandomBytes(32))
 	sessionStore.Options(sessions.Options{
 		Path: "/",
 		MaxAge: sessionMaxAgeInSeconds,
