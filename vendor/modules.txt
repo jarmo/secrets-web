@@ -1,3 +1,5 @@
+# github.com/docopt/docopt-go v0.0.0-20180111231733-ee0de3bc6815
+github.com/docopt/docopt-go
 # github.com/gin-contrib/sessions v0.0.1
 github.com/gin-contrib/sessions
 github.com/gin-contrib/sessions/cookie
@@ -16,12 +18,12 @@ github.com/gorilla/context
 github.com/gorilla/securecookie
 # github.com/gorilla/sessions v1.1.3
 github.com/gorilla/sessions
-# github.com/jarmo/secrets v0.0.0-20191014090833-f3bfba0dd72c
+# github.com/jarmo/secrets v0.0.0-20191014104752-b558f3700326
+github.com/jarmo/secrets/crypto
 github.com/jarmo/secrets/secret
 github.com/jarmo/secrets/storage
 github.com/jarmo/secrets/storage/path
 github.com/jarmo/secrets/vault
-github.com/jarmo/secrets/crypto
 github.com/jarmo/secrets/vault/add
 github.com/jarmo/secrets/vault/delete
 github.com/jarmo/secrets/vault/edit
@@ -36,20 +38,20 @@ github.com/mattn/go-isatty
 github.com/modern-go/concurrent
 # github.com/modern-go/reflect2 v1.0.1
 github.com/modern-go/reflect2
-# github.com/pinzolo/xdgdir v0.0.0-20180220135956-c5b4bdb0a9c4
+# github.com/pinzolo/xdgdir v0.0.0-20181207033906-45fed2c52080
 github.com/pinzolo/xdgdir
 # github.com/satori/go.uuid v1.2.0
 github.com/satori/go.uuid
 # github.com/ugorji/go/codec v1.1.7
 github.com/ugorji/go/codec
-# golang.org/x/crypto v0.0.0-20190820162420-60c769a6c586
+# golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550
 golang.org/x/crypto/argon2
 golang.org/x/crypto/nacl/secretbox
 golang.org/x/crypto/blake2b
 golang.org/x/crypto/internal/subtle
 golang.org/x/crypto/poly1305
 golang.org/x/crypto/salsa20/salsa
-# golang.org/x/sys v0.0.0-20190826190057-c7b8b68b1456
+# golang.org/x/sys v0.0.0-20191010194322-b09406accb47
 golang.org/x/sys/unix
 golang.org/x/sys/cpu
 # gopkg.in/go-playground/validator.v8 v8.18.2

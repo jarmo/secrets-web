@@ -3,7 +3,7 @@ GOARCH = amd64
 GO_BUILD = GOARCH=${GOARCH} go build -mod=vendor
 PREFIX ?= ${GOPATH}
 
-all: clean linux darwin windows
+all: clean test linux darwin windows
 
 clean:
 	rm -rf bin/
@@ -20,10 +20,13 @@ darwin: vendor
 windows: vendor
 	GOOS=windows ${GO_BUILD} -o bin/windows_${GOARCH}/${BINARY}.exe
 
+test: vendor
+	script/run_tests.sh
+
 install:
 	cp -Rf bin/ "${PREFIX}/bin"
 
 dev:
-	chokidar "secrets-web.go" "assets/**/*" "templates/**/*" --initial -c "/usr/bin/pkill go; go-assets-builder -o assets.go assets templates && go run *.go"
+	chokidar "**/*.go" "assets/**/*" "templates/**/*" -i "assets/assets.go" --initial -c "/usr/bin/pkill -f secrets-web; go-assets-builder -p assets -o assets/assets.go assets templates && go run secrets-web.go serve"
 
-.PHONY: all clean vendor linux darwin windows install dev
+.PHONY: all test clean vendor linux darwin windows install dev
