@@ -20,7 +20,7 @@ import (
 	"github.com/jarmo/secrets/storage/path"
 	"github.com/jarmo/secrets/vault"
 	"github.com/jarmo/secrets/crypto"
-	web "github.com/jarmo/secrets-web/assets"
+	"github.com/jarmo/secrets-web/generated"
 )
 
 type Serve struct {
@@ -142,7 +142,7 @@ func createSession(c *gin.Context) (session, error) {
 
 func templates() (*template.Template, error) {
 	tmpl := template.New("")
-	for name, file := range web.Assets.Files {
+	for name, file := range generated.Assets.Files {
 		if file.IsDir() || !strings.HasSuffix(name, ".tmpl") {
 			continue
 		}
@@ -190,7 +190,7 @@ func initialize(prodModeEnabled bool) *gin.Engine {
 		router.SetHTMLTemplate(tmpls)
 	}
 
-	router.StaticFS("/public", web.Assets)
+	router.StaticFS("/public", generated.Assets)
 	router.Use(csrfProtection())
 
 	router.POST("/login", func(c *gin.Context) {
