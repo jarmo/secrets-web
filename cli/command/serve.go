@@ -21,19 +21,13 @@ import (
 	"github.com/jarmo/secrets/vault"
 	"github.com/jarmo/secrets/crypto"
 	"github.com/jarmo/secrets-web/generated"
+	"github.com/jarmo/secrets-web/redirect"
 )
 
 type Serve struct {
   ConfigurationPath string
   CertificatePath string
   CertificatePrivKeyPath string
-}
-
-type session struct {
-	vaultAlias string
-	path string
-	password []byte
-	secrets []secret.Secret
 }
 
 func (command Serve) Execute() {
@@ -47,30 +41,14 @@ func (command Serve) Execute() {
 	}
 }
 
+type session struct {
+	vaultAlias string
+	path string
+	password []byte
+	secrets []secret.Secret
+}
+
 const sessionMaxAgeInSeconds = 5 * 60
-
-func redirect(c *gin.Context, path string) {
-	c.Redirect(http.StatusFound, path)
-	c.AbortWithStatus(http.StatusFound)
-}
-
-func redirectWithMessage(c *gin.Context, path string, message string) {
-	session := sessions.Default(c)
-	session.AddFlash(message)
-	session.Save()
-	redirect(c, path)
-}
-
-func redirectMessage(c *gin.Context) interface{} {
-		session := sessions.Default(c)
-		if flashes := session.Flashes(); len(flashes) > 0 {
-		  message := flashes[0].(string)
-			session.Save()
-			return message
-		} else {
-			return nil
-		}
-}
 
 func authenticated(configurationPath string) gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -202,7 +180,7 @@ func initialize(configurationPath string, prodModeEnabled bool) *gin.Engine {
 				"user": session.vaultAlias,
 			})
 		} else {
-			redirectWithMessage(c, "/", "Logged in successfully")
+			redirect.WithMessage(c, "/", "Logged in successfully")
 		}
 	})
 
@@ -210,7 +188,7 @@ func initialize(configurationPath string, prodModeEnabled bool) *gin.Engine {
 
 	protected.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "/templates/index.tmpl", gin.H{
-			"message": redirectMessage(c),
+			"message": redirect.Message(c),
 		})
 	})
 
@@ -232,7 +210,7 @@ func initialize(configurationPath string, prodModeEnabled bool) *gin.Engine {
 
 		_, newSecrets := vault.Add(session.secrets, name, value)
 		storage.Write(session.path, session.password, newSecrets)
-		redirectWithMessage(c, "/", "Added successfully")
+		redirect.WithMessage(c, "/", "Added successfully")
 	})
 
 	protected.POST("/edit/:id", func(c *gin.Context) {
@@ -247,7 +225,7 @@ func initialize(configurationPath string, prodModeEnabled bool) *gin.Engine {
 			})
 		} else {
 			storage.Write(session.path, session.password, newSecrets)
-			redirectWithMessage(c, "/", "Edited successfully")
+			redirect.WithMessage(c, "/", "Edited successfully")
 		}
 	})
 
@@ -261,7 +239,7 @@ func initialize(configurationPath string, prodModeEnabled bool) *gin.Engine {
 			})
 		} else {
 			storage.Write(session.path, session.password, newSecrets)
-			redirectWithMessage(c, "/", "Deleted successfully")
+			redirect.WithMessage(c, "/", "Deleted successfully")
 		}
 	})
 
