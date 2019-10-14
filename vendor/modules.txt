@@ -18,7 +18,7 @@ github.com/gorilla/context
 github.com/gorilla/securecookie
 # github.com/gorilla/sessions v1.1.3
 github.com/gorilla/sessions
-# github.com/jarmo/secrets v0.0.0-20191014104752-b558f3700326
+# github.com/jarmo/secrets v0.0.0-20191014133622-6acb73421aca
 github.com/jarmo/secrets/crypto
 github.com/jarmo/secrets/secret
 github.com/jarmo/secrets/storage

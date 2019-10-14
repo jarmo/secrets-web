@@ -8,14 +8,14 @@ import (
 const version = "1.3.3.7"
 
 func TestExecute_Initialize(t *testing.T) {
-  vaultsConfig := "/vaults"
+  configPath := "/vaults"
   vaultPath := "/foo/bar/baz"
   vaultAlias := "foo-bar"
 
-  switch parsedCommand := Command(version, []string{"initialize", "--vaults-config", vaultsConfig, "--path", vaultPath, "--alias", vaultAlias}).(type) {
+  switch parsedCommand := Command(version, []string{"initialize", "--config", configPath, "--path", vaultPath, "--alias", vaultAlias}).(type) {
     case command.Initialize:
-      if parsedCommand.VaultsConfig != vaultsConfig {
-        t.Fatalf("Expected vaults config to be '%v', but was '%v'", vaultsConfig, parsedCommand.VaultsConfig)
+      if parsedCommand.ConfigurationPath !=  configPath {
+        t.Fatalf("Expected config path to be '%v', but was '%v'", configPath, parsedCommand.ConfigurationPath)
       }
       if parsedCommand.VaultPath != vaultPath {
         t.Fatalf("Expected vault path to be '%v', but was '%v'", vaultPath, parsedCommand.VaultPath)

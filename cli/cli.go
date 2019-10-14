@@ -14,11 +14,11 @@ func createUsage() string {
   return `secrets-web COMMAND [OPTIONS]
 
 Usage:
-  secrets-web initialize --vaults-config=CONFIG_PATH --path=VAULT_PATH --alias=VAULT_ALIAS
+  secrets-web initialize --config=CONFIG_PATH --path=VAULT_PATH --alias=VAULT_ALIAS
   secrets-web serve --cert=CERT_PATH --cert-priv-key=CERT_PRIVATE_KEY_PATH
 
 Options:
-  --vaults-config CONFIG_PATH               Vaults configuration path.
+  --config CONFIG_PATH                      Configuration path for vaults.
   --alias VAULT_ALIAS                       Vault alias.
   --path VAULT_PATH                         Vault path.
   --cert CERT_PATH                          HTTPS certificate path.
@@ -29,11 +29,11 @@ Options:
 
 func createCommand(arguments map[string]interface {}) command.Executable {
   if arguments["initialize"].(bool) {
-		vaultsConfig := argument(arguments, "--vaults-config")
+		configPath := argument(arguments, "--config")
 		vaultAlias := argument(arguments, "--alias")
 		vaultPath := argument(arguments, "--path")
 
-		return command.Initialize{VaultsConfig: vaultsConfig, VaultAlias: vaultAlias, VaultPath: vaultPath}
+		return command.Initialize{ConfigurationPath: configPath, VaultAlias: vaultAlias, VaultPath: vaultPath}
   } else if arguments["serve"].(bool) {
 		certificatePath := argument(arguments, "--cert")
 		certificatePrivKeyPath := argument(arguments, "--cert-priv-key")
