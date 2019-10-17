@@ -4,7 +4,6 @@ import (
   "net/http"
   "html/template"
   "io/ioutil"
-  "encoding/base64"
   "strings"
   "os"
   "path/filepath"
@@ -17,6 +16,7 @@ import (
   "github.com/jarmo/secrets/storage"
   "github.com/jarmo/secrets/vault"
   "github.com/jarmo/secrets/crypto"
+  "github.com/jarmo/secrets-web/middleware"
   "github.com/jarmo/secrets-web/session"
   "github.com/jarmo/secrets-web/generated"
   "github.com/jarmo/secrets-web/redirect"
@@ -36,50 +36,6 @@ func (command Serve) Execute() {
     app.RunTLS(":9090", command.CertificatePath, command.CertificatePrivKeyPath)
   } else {
     app.Run("localhost:8080")
-  }
-}
-
-func authenticated(configurationPath string) gin.HandlerFunc {
-  return func(c *gin.Context) {
-    if sessionVault, err := session.Create(configurationPath, c); err != nil {
-      c.HTML(http.StatusForbidden, "/templates/login.tmpl", gin.H{
-	"sessionMaxAgeInSeconds": session.MaxAgeInSeconds,
-	"csrfToken": csrfToken(sessions.Default(c)),
-      })
-      c.AbortWithStatus(http.StatusForbidden)
-    } else {
-      c.Set("session", sessionVault)
-    }
-  }
-}
-
-func csrfToken(session sessions.Session) string {
-  csrfToken := session.Get("csrfToken")
-  if csrfToken == nil {
-    newCsrfToken := base64.StdEncoding.EncodeToString(crypto.GenerateRandomBytes(128))
-    session.Set("csrfToken", newCsrfToken)
-    session.Save()
-    return newCsrfToken
-  } else {
-    return csrfToken.(string)
-  }
-}
-
-func csrfProtection() gin.HandlerFunc {
-  return func(c *gin.Context) {
-    request := c.Request
-    if request.Method != "HEAD" && request.Method != "GET" {
-      token := csrfToken(sessions.Default(c))
-      if token != c.GetHeader("X-Csrf-Token") {
-	c.HTML(http.StatusForbidden, "/templates/login.tmpl", gin.H{
-	  "sessionMaxAgeInSeconds": session.MaxAgeInSeconds,
-	  "csrfToken": token,
-	})
-	c.AbortWithStatus(http.StatusForbidden)
-	return
-      }
-    }
-    c.Next()
   }
 }
 
@@ -139,7 +95,7 @@ func initialize(configurationPath string, prodModeEnabled bool) *gin.Engine {
   }
 
   router.StaticFS("/public", generated.Assets)
-  router.Use(csrfProtection())
+  router.Use(middleware.CsrfProtection())
 
   router.POST("/login", func(c *gin.Context) {
     if vault, err := session.Create(configurationPath, c); err != nil {
@@ -152,7 +108,7 @@ func initialize(configurationPath string, prodModeEnabled bool) *gin.Engine {
     }
   })
 
-  protected := router.Group("", authenticated(configurationPath))
+  protected := router.Group("", middleware.Authenticated(configurationPath))
 
   protected.GET("/", func(c *gin.Context) {
     c.HTML(http.StatusOK, "/templates/index.tmpl", gin.H{

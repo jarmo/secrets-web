@@ -1,0 +1,24 @@
+package middleware
+
+import (
+  "net/http"
+
+  "github.com/gin-gonic/gin"
+  "github.com/gin-contrib/sessions"
+  "github.com/jarmo/secrets-web/session"
+)
+
+func Authenticated(configurationPath string) gin.HandlerFunc {
+  return func(c *gin.Context) {
+    if sessionVault, err := session.Create(configurationPath, c); err != nil {
+      c.HTML(http.StatusForbidden, "/templates/login.tmpl", gin.H{
+        "sessionMaxAgeInSeconds": session.MaxAgeInSeconds,
+        "csrfToken": CsrfToken(sessions.Default(c)),
+      })
+      c.AbortWithStatus(http.StatusForbidden)
+    } else {
+      c.Set("session", sessionVault)
+    }
+  }
+}
+
