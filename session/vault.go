@@ -20,7 +20,7 @@ type Vault struct {
 
 const MaxAgeInSeconds = 15 * 60
 
-func Create(configurationPath string, c *gin.Context) (Vault, error) {
+func CreateVault(configurationPath string, c *gin.Context) (Vault, error) {
   if decodedCredentialsHeader, err := base64.StdEncoding.DecodeString(c.GetHeader("X-Credentials")); err != nil {
     return Vault{}, errors.New("Invalid X-Credentials header")
   } else if len(decodedCredentialsHeader) == 0 {

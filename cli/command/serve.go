@@ -5,11 +5,8 @@ import (
   "os"
   "path/filepath"
 
-  "github.com/gin-contrib/sessions"
-  "github.com/gin-contrib/sessions/cookie"
   "github.com/gin-contrib/secure"
   "github.com/gin-gonic/gin"
-  "github.com/jarmo/secrets/crypto"
   "github.com/jarmo/secrets-web/middleware"
   "github.com/jarmo/secrets-web/handlers"
   "github.com/jarmo/secrets-web/session"
@@ -55,15 +52,7 @@ func initialize(configurationPath string, prodModeEnabled bool) *gin.Engine {
     router.Use(secure.New(secure.DefaultConfig()))
   }
 
-  sessionStore := cookie.NewStore(crypto.GenerateRandomBytes(64), crypto.GenerateRandomBytes(32))
-  sessionStore.Options(sessions.Options{
-    Path: "/",
-    MaxAge: session.MaxAgeInSeconds,
-    HttpOnly: true,
-    Secure: prodModeEnabled,
-  })
-
-  router.Use(sessions.Sessions("secrets", sessionStore))
+  router.Use(session.CreateCookie(prodModeEnabled))
 
   if templates, err := templates.Create(); err != nil {
     panic(err)

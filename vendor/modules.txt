@@ -21,10 +21,10 @@ github.com/gorilla/securecookie
 # github.com/gorilla/sessions v1.1.3
 github.com/gorilla/sessions
 # github.com/jarmo/secrets v0.0.0-20191014170141-abfed23becc9
-github.com/jarmo/secrets/crypto
 github.com/jarmo/secrets/storage/path
 github.com/jarmo/secrets/storage
 github.com/jarmo/secrets/vault
+github.com/jarmo/secrets/crypto
 github.com/jarmo/secrets/secret
 github.com/jarmo/secrets/vault/add
 github.com/jarmo/secrets/vault/delete

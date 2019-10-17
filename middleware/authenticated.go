@@ -11,7 +11,7 @@ import (
 
 func Authenticated(configurationPath string) gin.HandlerFunc {
   return func(c *gin.Context) {
-    if sessionVault, err := session.Create(configurationPath, c); err != nil {
+    if sessionVault, err := session.CreateVault(configurationPath, c); err != nil {
       c.HTML(http.StatusForbidden, templates.Path("login"), gin.H{
         "sessionMaxAgeInSeconds": session.MaxAgeInSeconds,
         "csrfToken": CsrfToken(sessions.Default(c)),
