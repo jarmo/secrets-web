@@ -8,6 +8,7 @@ import (
   "github.com/gin-contrib/sessions"
   "github.com/jarmo/secrets/crypto"
   "github.com/jarmo/secrets-web/session"
+  "github.com/jarmo/secrets-web/templates"
 )
 
 func CsrfToken(session sessions.Session) string {
@@ -28,7 +29,7 @@ func CsrfProtection() gin.HandlerFunc {
     if request.Method != "HEAD" && request.Method != "GET" {
       token := CsrfToken(sessions.Default(c))
       if token != c.GetHeader("X-Csrf-Token") {
-        c.HTML(http.StatusForbidden, "/templates/login.tmpl", gin.H{
+        c.HTML(http.StatusForbidden, templates.Path("login"), gin.H{
           "sessionMaxAgeInSeconds": session.MaxAgeInSeconds,
           "csrfToken": token,
         })

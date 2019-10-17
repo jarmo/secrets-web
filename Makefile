@@ -12,7 +12,7 @@ vendor:
 	go mod vendor
 
 assets: vendor
-	go-assets-builder -p generated -o generated/assets.go assets templates
+	go-assets-builder -p generated -o generated/assets.go assets templates/views
 
 linux: assets
 	GOOS=linux ${GO_BUILD} -o bin/linux_${GOARCH}/${BINARY}
@@ -30,6 +30,6 @@ install:
 	cp -Rf bin/ "${PREFIX}/bin"
 
 dev:
-	chokidar "**/*.go" "assets/**/*" "templates/**/*" -i "generated/assets.go" -i "vendor/**/*.go" --initial -c "/usr/bin/pkill -f secrets-web; make assets && go run secrets-web.go serve --config tmp/config.json --cert dev --cert-priv-key dev"
+	chokidar "**/*.go" "assets/**/*" "templates/views/**/*.tmpl" -i "generated/assets.go" -i "vendor/**/*.go" --initial -c "/usr/bin/pkill -f secrets-web; make assets && go run secrets-web.go serve --config tmp/config.json --cert dev --cert-priv-key dev"
 
 .PHONY: all test clean vendor assets linux darwin windows install dev

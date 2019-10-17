@@ -18,7 +18,7 @@ import (
   "github.com/jarmo/secrets-web/session"
   "github.com/jarmo/secrets-web/generated"
   "github.com/jarmo/secrets-web/redirect"
-  "github.com/jarmo/secrets-web/views"
+  "github.com/jarmo/secrets-web/templates"
 )
 
 type Serve struct {
@@ -69,10 +69,10 @@ func initialize(configurationPath string, prodModeEnabled bool) *gin.Engine {
 
   router.Use(sessions.Sessions("secrets", sessionStore))
 
-  if views, err := views.Initialize(); err != nil {
+  if templates, err := templates.Create(); err != nil {
     panic(err)
   } else {
-    router.SetHTMLTemplate(views)
+    router.SetHTMLTemplate(templates)
   }
 
   router.StaticFS("/public", generated.Assets)
@@ -80,7 +80,7 @@ func initialize(configurationPath string, prodModeEnabled bool) *gin.Engine {
 
   router.POST("/login", func(c *gin.Context) {
     if vault, err := session.Create(configurationPath, c); err != nil {
-      c.HTML(http.StatusOK, "/templates/login.tmpl", gin.H{
+      c.HTML(http.StatusOK, templates.Path("login"), gin.H{
 	"error": err,
 	"user": vault.Alias,
       })
@@ -92,7 +92,7 @@ func initialize(configurationPath string, prodModeEnabled bool) *gin.Engine {
   protected := router.Group("", middleware.Authenticated(configurationPath))
 
   protected.GET("/", func(c *gin.Context) {
-    c.HTML(http.StatusOK, "/templates/index.tmpl", gin.H{
+    c.HTML(http.StatusOK, templates.Path("index"), gin.H{
       "message": redirect.Message(c),
     })
   })
@@ -102,7 +102,7 @@ func initialize(configurationPath string, prodModeEnabled bool) *gin.Engine {
     vaultSession := c.MustGet("session").(session.Vault)
     result := vault.List(vaultSession.Secrets, filter)
 
-    c.HTML(http.StatusOK, "/templates/index.tmpl", gin.H{
+    c.HTML(http.StatusOK, templates.Path("index"), gin.H{
       "filter":  filter,
       "secrets": result,
     })
@@ -125,7 +125,7 @@ func initialize(configurationPath string, prodModeEnabled bool) *gin.Engine {
     sessionVault := c.MustGet("session").(session.Vault)
 
     if _, newSecrets, err := vault.Edit(sessionVault.Secrets, id, name, value); err != nil {
-      c.HTML(http.StatusOK, "/templates/index.tmpl", gin.H{
+      c.HTML(http.StatusOK, templates.Path("index"), gin.H{
 	"error": err,
       })
     } else {
@@ -139,7 +139,7 @@ func initialize(configurationPath string, prodModeEnabled bool) *gin.Engine {
     sessionVault := c.MustGet("session").(session.Vault)
 
     if _, newSecrets, err := vault.Delete(sessionVault.Secrets, id); err != nil {
-      c.HTML(http.StatusOK, "/templates/index.tmpl", gin.H{
+      c.HTML(http.StatusOK, templates.Path("index"), gin.H{
 	"error": err,
       })
     } else {
