@@ -2,8 +2,6 @@ package command
 
 import (
   "net/http"
-  "html/template"
-  "io/ioutil"
   "strings"
   "os"
   "path/filepath"
@@ -20,6 +18,7 @@ import (
   "github.com/jarmo/secrets-web/session"
   "github.com/jarmo/secrets-web/generated"
   "github.com/jarmo/secrets-web/redirect"
+  "github.com/jarmo/secrets-web/views"
 )
 
 type Serve struct {
@@ -37,24 +36,6 @@ func (command Serve) Execute() {
   } else {
     app.Run("localhost:8080")
   }
-}
-
-func templates() (*template.Template, error) {
-  tmpl := template.New("")
-  for name, file := range generated.Assets.Files {
-    if file.IsDir() || !strings.HasSuffix(name, ".tmpl") {
-      continue
-    }
-    content, err := ioutil.ReadAll(file)
-    if err != nil {
-      return nil, err
-    }
-    tmpl, err = tmpl.New(name).Parse(string(content))
-    if err != nil {
-      return nil, err
-    }
-  }
-  return tmpl, nil
 }
 
 func isProdMode() bool {
@@ -88,10 +69,10 @@ func initialize(configurationPath string, prodModeEnabled bool) *gin.Engine {
 
   router.Use(sessions.Sessions("secrets", sessionStore))
 
-  if tmpls, err := templates(); err != nil {
+  if views, err := views.Initialize(); err != nil {
     panic(err)
   } else {
-    router.SetHTMLTemplate(tmpls)
+    router.SetHTMLTemplate(views)
   }
 
   router.StaticFS("/public", generated.Assets)
