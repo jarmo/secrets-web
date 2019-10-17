@@ -31,13 +31,13 @@ func createCommand(arguments map[string]interface {}) command.Executable {
   configPath := argument(arguments, "--config")
 
   if arguments["initialize"].(bool) {
-		vaultAlias := argument(arguments, "--alias")
-		vaultPath := argument(arguments, "--path")
-		return command.Initialize{ConfigurationPath: configPath, VaultAlias: vaultAlias, VaultPath: vaultPath}
+    vaultAlias := argument(arguments, "--alias")
+    vaultPath := argument(arguments, "--path")
+    return command.Initialize{ConfigurationPath: configPath, VaultAlias: vaultAlias, VaultPath: vaultPath}
   } else if arguments["serve"].(bool) {
-		certificatePath := argument(arguments, "--cert")
-		certificatePrivKeyPath := argument(arguments, "--cert-priv-key")
-		return command.Serve{ConfigurationPath: configPath, CertificatePath: certificatePath, CertificatePrivKeyPath: certificatePrivKeyPath}
+    certificatePath := argument(arguments, "--cert")
+    certificatePrivKeyPath := argument(arguments, "--cert-priv-key")
+    return command.Serve{ConfigurationPath: configPath, CertificatePath: certificatePath, CertificatePrivKeyPath: certificatePrivKeyPath}
   } else {
     return nil
   }
