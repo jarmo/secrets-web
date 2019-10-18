@@ -44,6 +44,40 @@ func TestExecute_Serve(t *testing.T) {
       if parsedCommand.CertificatePrivKeyPath != certKey {
         t.Fatalf("Expected certificate private key path to be '%v', but was '%v'", certKey, parsedCommand.CertificatePrivKeyPath)
       }
+      if parsedCommand.Host != "" {
+        t.Fatalf("Expected host to be not set, but was '%v'", parsedCommand.Host)
+      }
+      if parsedCommand.Port != "" {
+        t.Fatalf("Expected port to be not set, but was '%v'", parsedCommand.Port)
+      }
+    default:
+      t.Fatalf("Got unexpected command: %T", parsedCommand)
+  }
+}
+
+func TestExecute_ServeWithHost(t *testing.T) {
+  configPath := "config-path"
+  cert := "cert"
+  certKey := "cert-key"
+  host := "1.2.3.4"
+
+  switch parsedCommand := Command(version, []string{"serve", "--config", configPath, "--cert", cert, "--cert-priv-key", certKey, "--host", host}).(type) {
+    case command.Serve:
+      if parsedCommand.ConfigurationPath != configPath {
+        t.Fatalf("Expected configuration path to be '%v', but was '%v'", configPath, parsedCommand.ConfigurationPath)
+      }
+      if parsedCommand.CertificatePath != cert {
+        t.Fatalf("Expected certificate path to be '%v', but was '%v'", cert, parsedCommand.CertificatePath)
+      }
+      if parsedCommand.CertificatePrivKeyPath != certKey {
+        t.Fatalf("Expected certificate private key path to be '%v', but was '%v'", certKey, parsedCommand.CertificatePrivKeyPath)
+      }
+      if parsedCommand.Host != host {
+        t.Fatalf("Expected host to be '%v', but was '%v'", host, parsedCommand.Host)
+      }
+      if parsedCommand.Port != "" {
+        t.Fatalf("Expected port to be not set, but was '%v'", parsedCommand.Port)
+      }
     default:
       t.Fatalf("Got unexpected command: %T", parsedCommand)
   }

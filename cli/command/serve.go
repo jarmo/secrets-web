@@ -19,20 +19,21 @@ type Serve struct {
 func (command Serve) Execute() {
   isProdMode := isProdMode()
   router := router.Create(command.ConfigurationPath, isProdMode)
-  port := port(command.Port)
+  port := argumentOrDefault(command.Port, "9090")
 
   if isProdMode {
-    router.RunTLS(":" + port, command.CertificatePath, command.CertificatePrivKeyPath)
+    host := argumentOrDefault(command.Host, "0.0.0.0")
+    router.RunTLS(host + ":" + port, command.CertificatePath, command.CertificatePrivKeyPath)
   } else {
     router.Run("localhost:" + port)
   }
 }
 
-func port(portFromCommandLine string) string {
-  if portFromCommandLine != "" {
-    return portFromCommandLine
+func argumentOrDefault(argument, defaultArgument string) string {
+  if argument != "" {
+    return argument
   } else {
-    return "9090"
+    return defaultArgument
   }
 }
 
