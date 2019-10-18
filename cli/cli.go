@@ -15,7 +15,7 @@ func createUsage() string {
 
 Usage:
   secrets-web initialize --config=CONFIG_PATH --path=VAULT_PATH --alias=VAULT_ALIAS
-  secrets-web serve --config=CONFIG_PATH --cert=CERT_PATH --cert-priv-key=CERT_PRIVATE_KEY_PATH
+  secrets-web serve --config=CONFIG_PATH --cert=CERT_PATH --cert-priv-key=CERT_PRIVATE_KEY_PATH [--port=PORT]
 
 Options:
   --config CONFIG_PATH                      Configuration path for vaults.
@@ -23,6 +23,7 @@ Options:
   --path VAULT_PATH                         Vault path.
   --cert CERT_PATH                          HTTPS certificate path.
   --cert-priv-key CERT_PRIVATE_KEY_PATH     HTTPS certificate private key path.
+  --port PORT                               Port to listen on. Defaults to 9090.
   -h --help                                 Show this screen.
   -v --version                              Show version.`
 }
@@ -37,7 +38,8 @@ func createCommand(arguments map[string]interface {}) command.Executable {
   } else if arguments["serve"].(bool) {
     certificatePath := argument(arguments, "--cert")
     certificatePrivKeyPath := argument(arguments, "--cert-priv-key")
-    return command.Serve{ConfigurationPath: configPath, CertificatePath: certificatePath, CertificatePrivKeyPath: certificatePrivKeyPath}
+    port := argument(arguments, "--port")
+    return command.Serve{ConfigurationPath: configPath, CertificatePath: certificatePath, CertificatePrivKeyPath: certificatePrivKeyPath, Port: port}
   } else {
     return nil
   }

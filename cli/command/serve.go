@@ -12,16 +12,27 @@ type Serve struct {
   ConfigurationPath string
   CertificatePath string
   CertificatePrivKeyPath string
+  Host string
+  Port string
 }
 
 func (command Serve) Execute() {
   isProdMode := isProdMode()
   router := router.Create(command.ConfigurationPath, isProdMode)
+  port := port(command.Port)
 
   if isProdMode {
-    router.RunTLS(":9090", command.CertificatePath, command.CertificatePrivKeyPath)
+    router.RunTLS(":" + port, command.CertificatePath, command.CertificatePrivKeyPath)
   } else {
-    router.Run("localhost:8080")
+    router.Run("localhost:" + port)
+  }
+}
+
+func port(portFromCommandLine string) string {
+  if portFromCommandLine != "" {
+    return portFromCommandLine
+  } else {
+    return "9090"
   }
 }
 

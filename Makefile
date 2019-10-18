@@ -30,6 +30,6 @@ install:
 	cp -Rf bin/ "${PREFIX}/bin"
 
 dev:
-	chokidar "**/*.go" "assets/**/*" "templates/views/**/*.tmpl" -i "generated/assets.go" -i "vendor/**/*.go" --initial -c "/usr/bin/pkill -f secrets-web; make assets && go run secrets-web.go serve --config tmp/config.json --cert dev --cert-priv-key dev"
+	chokidar "**/*.go" "assets/**/*" "templates/views/**/*.tmpl" -i "generated/assets.go" -i "vendor/**/*.go" --initial -c "/usr/bin/pkill -f secrets-web; make assets && go run secrets-web.go serve --config tmp/config.json --cert dev --cert-priv-key dev --port 8080"
 
 .PHONY: all test clean vendor assets linux darwin windows install dev
