@@ -10,6 +10,7 @@ clean:
 
 vendor:
 	go mod vendor
+	go mod tidy
 
 assets: vendor
 	go-assets-builder -p generated -o generated/assets.go assets templates/views
