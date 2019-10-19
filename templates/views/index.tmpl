@@ -1,5 +1,8 @@
 <main>
 	<div class="container">
+		{{ if .error }}
+			<div class="error">{{ .error }}</div>
+		{{ end }}
 		{{ if .message }}
 			<div class="success">{{ .message }}</div>
 		{{ end }}
