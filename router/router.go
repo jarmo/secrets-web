@@ -1,6 +1,8 @@
 package router
 
 import (
+  "html/template"
+
   "github.com/gin-contrib/secure"
   "github.com/gin-gonic/gin"
   "github.com/jarmo/secrets-web/middleware"
@@ -22,16 +24,15 @@ func Create(configurationPath string, prodModeEnabled bool) *gin.Engine {
   }
 
   router.Use(session.CreateCookie(prodModeEnabled))
-
-  if templates, err := templates.Create(); err != nil {
-    panic(err)
-  } else {
-    router.SetHTMLTemplate(templates)
-  }
-
-  router.StaticFS("/public", generated.Assets)
   router.Use(middleware.CsrfProtection())
+  router.StaticFS("/public", generated.Assets)
+  router.SetHTMLTemplate(initTemplates())
+  initRoutes(router, configurationPath)
 
+  return router
+}
+
+func initRoutes(router *gin.Engine, configurationPath string) {
   router.POST("/login", handlers.Login(configurationPath))
 
   authenticated := router.Group("", middleware.Authenticated(configurationPath))
@@ -40,6 +41,12 @@ func Create(configurationPath string, prodModeEnabled bool) *gin.Engine {
   authenticated.POST("/add", handlers.Add)
   authenticated.POST("/edit/:id", handlers.Edit)
   authenticated.POST("/delete/:id", handlers.Delete)
+}
 
-  return router
+func initTemplates() *template.Template {
+  if templates, err := templates.Create(); err != nil {
+    panic(err)
+  } else {
+    return templates
+  }
 }
