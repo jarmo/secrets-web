@@ -7,7 +7,7 @@ import (
 
 const version = "1.3.3.7"
 
-func TestExecute_Initialize(t *testing.T) {
+func TestCommand_Initialize(t *testing.T) {
   configPath := "/vaults"
   vaultPath := "/foo/bar/baz"
   vaultAlias := "foo-bar"
@@ -28,7 +28,7 @@ func TestExecute_Initialize(t *testing.T) {
   }
 }
 
-func TestExecute_Serve(t *testing.T) {
+func TestCommand_Serve(t *testing.T) {
   configPath := "config-path"
   cert := "cert"
   certKey := "cert-key"
@@ -55,7 +55,7 @@ func TestExecute_Serve(t *testing.T) {
   }
 }
 
-func TestExecute_ServeWithHost(t *testing.T) {
+func TestCommand_ServeWithHost(t *testing.T) {
   configPath := "config-path"
   cert := "cert"
   certKey := "cert-key"
@@ -83,7 +83,7 @@ func TestExecute_ServeWithHost(t *testing.T) {
   }
 }
 
-func TestExecute_ServeWithPort(t *testing.T) {
+func TestCommand_ServeWithPort(t *testing.T) {
   configPath := "config-path"
   cert := "cert"
   certKey := "cert-key"
