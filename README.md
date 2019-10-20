@@ -1,12 +1,14 @@
-# secrets-cli
+# secrets-web
 
 **Secure** and simple passwords manager written in [Go](https://golang.org/). It aims to be *NYAPM* (Not Yet Another Password Manager), but tries to be different from others by following UNIX philosophy of doing only one thing and doing it well.
 
 This repository is for self-hosted web solution. There exists also a [command-line client](https://github.com/jarmo/secrets-cli). Read more about [secrets](https://github.com/jarmo/secrets) in here.
 
+![screen.png](https://raw.githubusercontent.com/jarmo/secrets-web/master/assets/img/screen.png)
+
 ## Installation
 
-Download latest binary from [releases](https://github.com/jarmo/secrets-web/releases), extract it, initialize a vault configuration file and start the server. That's it.
+Download latest binary from [releases](https://github.com/jarmo/secrets-web/releases), extract it, initialize a vault configuration and start the server. That's it.
 
 *Of course, you're free to compile your own version of binary to be 100% sure that it has not been tampered with, since this is an open-source project after all.*
 
@@ -36,6 +38,7 @@ Options:
 ### Initializing Vault
 
 Vault needs to be initialized for each user. Initializing vault just stores location and alias to your vault into a configuration file. Alias will be used for logging in from the login form.
+
 When using [command-line client](https://github.com/jarmo/secrets-cli) then it is possible to reuse the same configuration file.
 
 ```
@@ -45,13 +48,13 @@ Vault successfully initialized!
 
 ### Starting the Server
 
-Starting the server requires a certificate for serving over https! It is
+Starting the server **requires a certificate** for serving over HTTPS! It is
 required even when using Nginx/Apache as a proxy-pass to avoid moving private
 data as unencrypted in the server. It is safe to run server on a custom open
 port directly avoiding any proxy-pass.
 
-You can get valid SSL certificates from [Let's Encrypt](https://letsencrypt.org) or
-use self-signed certificates if that's not possible.
+You can get a free valid SSL certificates from [Let's Encrypt](https://letsencrypt.org) or
+use a self-signed certificates if that's not possible.
 
 Start the server:
 
@@ -61,13 +64,13 @@ $ secrets-web serve --config ~/vault-conf.json --cert cert.crt --cert-priv-key c
 
 Now open browser at [https://localhost:9090](https://localhost:9090) to be greeted with a login form.
 
-Log-in with previously created alias and enter some strong passphrase! It is
+Log-in with previously created **alias** as user and enter some **strong passphrase**! It is
 recommended to write that password somewhere for the first login and then
-copy-paste it to the login form so that there would be no typos.
+copy-paste it so that there would be no typos.
 
-Add some secret via *Add* button to actually create your vault!
+Add some secret via **Add** button to actually create your vault!
 
-*PS!* Remember that passphrase since there is no "forgot my password"
+**PS!** Remember that passphrase since there is no "forgot my password"
 functionality (and if there would be then it would defeat the purpose) and it
 is impossible to retrieve any of your secrets in case you should forget it.
 
@@ -89,7 +92,7 @@ location!
 
 ## Development
 
-* Clone repository, retrieve dependencies and run tests:
+1. Clone repository, retrieve dependencies and run tests:
 
 ```
 git clone https://github.com/jarmo/secrets-cli.git
@@ -97,29 +100,29 @@ cd secrets-web
 make test
 ```
 
-* Create a self-signed certificate:
+2. Create a self-signed certificate:
 
 ```
 $ openssl req -new -newkey rsa:4096 -x509 -sha256 -days 365 -nodes -out certs/self-signed.crt -keyout certs/self-signed.key
 ```
 
-* Initialize vault as described above.
+3. Initialize vault as described above.
 
-* Install file-system watcher used for development:
+4. Install file-system watcher used for development:
 
 ```
 $ npm install -g chokidar-cli
 ```
 
-* Run server with file-system changes detection:
+5. Run server with file-system changes detection:
 
 ```
 $ make dev
 ```
 
-* Open browser at [https://localhost:8080](https://localhost:8080)
+6. Open browser at [https://localhost:8080](https://localhost:8080)
 
-* Build and install binaries to `$GOPATH/bin/`
+7. Build and install binaries to `$GOPATH/bin/`
 
 ```
 make
