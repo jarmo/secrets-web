@@ -108,10 +108,17 @@ $ openssl req -new -newkey rsa:4096 -x509 -sha256 -days 365 -nodes -out certs/se
 
 3. Initialize vault as described above.
 
-4. Install file-system watcher used for development:
+4. Install [fswatch](https://emcrisostomo.github.io/fswatch/) for watching file-system changes used for development:
+
+macOS:
+```
+$ brew install fswatch
+```
+
+Linux:
 
 ```
-$ npm install -g chokidar-cli
+$ sudo apt install fswatch
 ```
 
 5. Run server with file-system changes detection:
