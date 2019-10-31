@@ -3,7 +3,9 @@ package command
 import (
   "strings"
   "os"
+  "io/ioutil"
   "path/filepath"
+  "strconv"
 
   "github.com/jarmo/secrets-web/router"
 )
@@ -14,6 +16,7 @@ type Serve struct {
   CertificatePrivKeyPath string
   Host string
   Port string
+  Pid string
 }
 
 func (command Serve) Execute() {
@@ -21,11 +24,21 @@ func (command Serve) Execute() {
   router := router.Create(command.ConfigurationPath, isProdMode)
   port := argumentOrDefault(command.Port, "9090")
 
+  if command.Pid != "" {
+    writePidToFile(command.Pid)
+  }
+
   if isProdMode {
     host := argumentOrDefault(command.Host, "0.0.0.0")
     router.RunTLS(host + ":" + port, command.CertificatePath, command.CertificatePrivKeyPath)
   } else {
     router.Run("localhost:" + port)
+  }
+}
+
+func writePidToFile(path string) {
+  if err := ioutil.WriteFile(path, []byte(strconv.Itoa(os.Getpid())), 0644); err != nil {
+    panic(err)
   }
 }
 
