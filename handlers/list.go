@@ -9,8 +9,8 @@ import (
   "github.com/jarmo/secrets-web/templates"
 )
 
-func Filter(c *gin.Context) {
-  filter := c.PostForm("filter")
+func List(c *gin.Context) {
+  filter := c.DefaultQuery("filter", "")
   vaultSession := c.MustGet("session").(session.Vault)
   result := vault.List(vaultSession.Secrets, filter)
 

@@ -10,6 +10,8 @@ function App(csrfToken, sessionMaxAgeInSeconds) {
         login(form).then(logoutAfterSessionExpiration)
       } else if (form.id == "logout") {
         window.location.reload()
+      } else if (form.method.toUpperCase() === "GET") {
+        get(form.action, new FormData(form))
       } else {
         request(form.action, form.method, new FormData(form))
       }
@@ -21,10 +23,14 @@ function App(csrfToken, sessionMaxAgeInSeconds) {
     return request(form.action, form.method)
   }
 
-  function request(path, method, data) {
+  function get(path, data) {
+    return request([path, new URLSearchParams(data)].join("?"), "GET")
+  }
+
+  function request(path, method, body) {
     return fetch(path, {
       method: method,
-      body: data,
+      body: body,
       headers: {
         "X-Credentials": btoa(session.user + ":" + session.password),
         "X-Csrf-Token": csrfToken

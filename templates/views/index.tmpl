@@ -30,7 +30,7 @@
 				<button class="logout">X</button>
 			</form>
 		</aside>
-		<form class="filter" action="/" method="POST">
+		<form class="filter" action="/secrets" method="GET">
 			<input id="filter" name="filter" type="text" value="{{ .filter }}" required autocomplete="off" {{ if not .filter }}autofocus{{ end }}>
 			<label for="filter"><span>Filter</span></label>
 			<input type="submit" value="Search">
