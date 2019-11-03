@@ -5,22 +5,23 @@ function App(csrfToken, sessionMaxAgeInSeconds) {
     document.addEventListener("submit", function(event) {
       event.preventDefault()
       var form = event.target
+      var formMethod = form.getAttribute("method").toUpperCase()
 
       if (form.id === "login") {
         login(form).then(logoutAfterSessionExpiration)
       } else if (form.id == "logout") {
         window.location.reload()
-      } else if (form.method.toUpperCase() === "GET") {
+      } else if (formMethod === "GET") {
         get(form.action, new FormData(form))
       } else {
-        request(form.action, form.method, new FormData(form))
+        request(form.action, formMethod, new FormData(form))
       }
     })
   }
 
   function login(form) {
     session = new Session(document.getElementById("user").value, document.getElementById("password").value)
-    return request(form.action, form.method)
+    return request(form.action, "POST")
   }
 
   function get(path, data) {

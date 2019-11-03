@@ -49,8 +49,8 @@ func Test_Router(t *testing.T) {
   assertBody(t, res.Body.String(), "ok")
   session := res.Header().Get("Set-Cookie")
 
-  t.Run("GET / => No authenticated header", func(t *testing.T) {
-    req, _ := http.NewRequest("GET", "/", nil)
+  t.Run("GET /secrets => No authenticated header", func(t *testing.T) {
+    req, _ := http.NewRequest("GET", "/secrets", nil)
     res := httptest.NewRecorder()
     router.ServeHTTP(res, req)
 
@@ -59,8 +59,8 @@ func Test_Router(t *testing.T) {
     assertBody(t, res.Body.String(), "Password")
   })
 
-  t.Run("GET / => Authenticated", func(t *testing.T) {
-    req, _ := http.NewRequest("GET", "/", nil)
+  t.Run("GET /secrets => Authenticated", func(t *testing.T) {
+    req, _ := http.NewRequest("GET", "/secrets", nil)
     authenticate(req, user, password)
     res := httptest.NewRecorder()
     router.ServeHTTP(res, req)
@@ -69,8 +69,8 @@ func Test_Router(t *testing.T) {
     assertBody(t, res.Body.String(), "Filter")
   })
 
-  t.Run("GET / => Authenticated with invalid user", func(t *testing.T) {
-    req, _ := http.NewRequest("GET", "/", nil)
+  t.Run("GET /secrets => Authenticated with invalid user", func(t *testing.T) {
+    req, _ := http.NewRequest("GET", "/secrets", nil)
     authenticate(req, "invalid-user", password)
     res := httptest.NewRecorder()
     router.ServeHTTP(res, req)
@@ -80,8 +80,8 @@ func Test_Router(t *testing.T) {
     assertBody(t, res.Body.String(), "Password")
   })
 
-  t.Run("GET / => Authenticated with invalid password", func(t *testing.T) {
-    req, _ := http.NewRequest("GET", "/", nil)
+  t.Run("GET /secrets => Authenticated with invalid password", func(t *testing.T) {
+    req, _ := http.NewRequest("GET", "/secrets", nil)
     authenticate(req, user, "invalid-password")
     res := httptest.NewRecorder()
     router.ServeHTTP(res, req)
@@ -91,8 +91,40 @@ func Test_Router(t *testing.T) {
     assertBody(t, res.Body.String(), "Password")
   })
 
-  t.Run("POST / => No CSRF header", func(t *testing.T) {
-    req, _ := http.NewRequest("POST", "/", nil)
+  t.Run("GET /secrets => Secret not found", func(t *testing.T) {
+    secret1 := secret.New("secret-1-name", "secret-1-value")
+    secret2 := secret.New("secret-2-name", "secret-2-value")
+    secrets := []secret.Secret{secret1, secret2}
+    storage.Write(vaultPath, []byte(password), secrets[:])
+
+    res := request(router, "GET", "/secrets?filter=no-secret", "", session)
+
+    assertCode(t, 200, res.Code)
+    assertNotInBody(t, res.Body.String(), "secret-1-name")
+    assertNotInBody(t, res.Body.String(), "secret-1-value")
+    assertNotInBody(t, res.Body.String(), "secret-2-name")
+    assertNotInBody(t, res.Body.String(), "secret-2-value")
+    assertBody(t, res.Body.String(), "Filter")
+  })
+
+  t.Run("GET /secrets => Secret found", func(t *testing.T) {
+    secret1 := secret.New("secret-1-name", "secret-1-value")
+    secret2 := secret.New("secret-2-name", "secret-2-value")
+    secrets := []secret.Secret{secret1, secret2}
+    storage.Write(vaultPath, []byte(password), secrets[:])
+
+    res := request(router, "GET", "/secrets?filter=secret-2-name", "", session)
+
+    assertCode(t, 200, res.Code)
+    assertNotInBody(t, res.Body.String(), "secret-1-name")
+    assertNotInBody(t, res.Body.String(), "secret-1-value")
+    assertBody(t, res.Body.String(), "secret-2-name")
+    assertBody(t, res.Body.String(), "secret-2-value")
+    assertBody(t, res.Body.String(), "Filter")
+  })
+
+  t.Run("POST /secrets => No CSRF header", func(t *testing.T) {
+    req, _ := http.NewRequest("POST", "/secrets", nil)
     authenticate(req, user, password)
     res := httptest.NewRecorder()
     router.ServeHTTP(res, req)
@@ -102,8 +134,8 @@ func Test_Router(t *testing.T) {
     assertBody(t, res.Body.String(), "Password")
   })
 
-  t.Run("POST / => Invalid CSRF header", func(t *testing.T) {
-    req, _ := http.NewRequest("POST", "/", nil)
+  t.Run("POST /secrets => Invalid CSRF header", func(t *testing.T) {
+    req, _ := http.NewRequest("POST", "/secrets", nil)
     authenticate(req, user, password)
     req.Header.Set("Cookie", session)
     req.Header.Set("X-Csrf-Token", "invalid-token")
@@ -115,45 +147,13 @@ func Test_Router(t *testing.T) {
     assertBody(t, res.Body.String(), "Password")
   })
 
-  t.Run("POST / => Secret not found", func(t *testing.T) {
-    secret1 := secret.New("secret-1-name", "secret-1-value")
-    secret2 := secret.New("secret-2-name", "secret-2-value")
-    secrets := []secret.Secret{secret1, secret2}
-    storage.Write(vaultPath, []byte(password), secrets[:])
-
-    res := request(router, "POST", "/", "filter=no-secret", session)
-
-    assertCode(t, 200, res.Code)
-    assertNotInBody(t, res.Body.String(), "secret-1-name")
-    assertNotInBody(t, res.Body.String(), "secret-1-value")
-    assertNotInBody(t, res.Body.String(), "secret-2-name")
-    assertNotInBody(t, res.Body.String(), "secret-2-value")
-    assertBody(t, res.Body.String(), "Filter")
-  })
-
-  t.Run("POST / => Secret found", func(t *testing.T) {
-    secret1 := secret.New("secret-1-name", "secret-1-value")
-    secret2 := secret.New("secret-2-name", "secret-2-value")
-    secrets := []secret.Secret{secret1, secret2}
-    storage.Write(vaultPath, []byte(password), secrets[:])
-
-    res := request(router, "POST", "/", "filter=secret-2-name", session)
-
-    assertCode(t, 200, res.Code)
-    assertNotInBody(t, res.Body.String(), "secret-1-name")
-    assertNotInBody(t, res.Body.String(), "secret-1-value")
-    assertBody(t, res.Body.String(), "secret-2-name")
-    assertBody(t, res.Body.String(), "secret-2-value")
-    assertBody(t, res.Body.String(), "Filter")
-  })
-
-  t.Run("POST /add", func(t *testing.T) {
+  t.Run("POST /secrets", func(t *testing.T) {
     secrets := make([]secret.Secret, 0)
     storage.Write(vaultPath, []byte(password), secrets[:])
 
-    res := request(router, "POST", "/add", "name=new-secret-name&value=new-secret-value", session)
+    res := request(router, "POST", "/secrets", "name=new-secret-name&value=new-secret-value", session)
 
-    assertCode(t, 302, res.Code)
+    assertCode(t, 303, res.Code)
     secrets, err := storage.Read(vaultPath, []byte(password))
 
     if err != nil {
@@ -172,11 +172,11 @@ func Test_Router(t *testing.T) {
     }
   })
 
-  t.Run("POST /edit/:id => Unknown id", func(t *testing.T) {
+  t.Run("PUT /secrets/:id => Unknown id", func(t *testing.T) {
     secrets := make([]secret.Secret, 0)
     storage.Write(vaultPath, []byte(password), secrets[:])
 
-    res := request(router, "POST", "/edit/3ea1cd70-da37-444a-bfc1-f9ca70881f96", "name=new-secret-name&value=new-secret-value", session)
+    res := request(router, "PUT", "/secrets/3ea1cd70-da37-444a-bfc1-f9ca70881f96", "name=new-secret-name&value=new-secret-value", session)
 
     assertCode(t, 200, res.Code)
     assertBody(t, res.Body.String(), "Secret by specified id not found!")
@@ -191,14 +191,14 @@ func Test_Router(t *testing.T) {
     }
   })
 
-  t.Run("POST /edit/:id", func(t *testing.T) {
+  t.Run("PUT /secrets/:id", func(t *testing.T) {
     existingSecret := secret.New("secret-1-name", "secret-1-value")
     secrets := []secret.Secret{existingSecret}
     storage.Write(vaultPath, []byte(password), secrets[:])
 
-    res := request(router, "POST", "/edit/" + existingSecret.Id.String(), "name=new-secret-name&value=new-secret-value", session)
+    res := request(router, "PUT", "/secrets/" + existingSecret.Id.String(), "name=new-secret-name&value=new-secret-value", session)
 
-    assertCode(t, 302, res.Code)
+    assertCode(t, 303, res.Code)
     secrets, err := storage.Read(vaultPath, []byte(password))
 
     if err != nil {
@@ -217,11 +217,11 @@ func Test_Router(t *testing.T) {
     }
   })
 
-  t.Run("POST /delete/:id => Unknown id", func(t *testing.T) {
+  t.Run("DELETE /secrets/:id => Unknown id", func(t *testing.T) {
     secrets := make([]secret.Secret, 0)
     storage.Write(vaultPath, []byte(password), secrets[:])
 
-    res := request(router, "POST", "/delete/3ea1cd70-da37-444a-bfc1-f9ca70881f96", "", session)
+    res := request(router, "DELETE", "/secrets/3ea1cd70-da37-444a-bfc1-f9ca70881f96", "", session)
 
     assertCode(t, 200, res.Code)
     assertBody(t, res.Body.String(), "Secret by specified id not found!")
@@ -236,14 +236,14 @@ func Test_Router(t *testing.T) {
     }
   })
 
-  t.Run("POST /delete/:id", func(t *testing.T) {
+  t.Run("DELETE /secrets/:id", func(t *testing.T) {
     existingSecret := secret.New("secret-1-name", "secret-1-value")
     secrets := []secret.Secret{existingSecret}
     storage.Write(vaultPath, []byte(password), secrets[:])
 
-    res := request(router, "POST", "/delete/" + existingSecret.Id.String(), "", session)
+    res := request(router, "DELETE", "/secrets/" + existingSecret.Id.String(), "", session)
 
-    assertCode(t, 302, res.Code)
+    assertCode(t, 303, res.Code)
     secrets, err := storage.Read(vaultPath, []byte(password))
 
     if err != nil {

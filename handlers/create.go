@@ -8,7 +8,7 @@ import (
   "github.com/jarmo/secrets-web/redirect"
 )
 
-func Add(c *gin.Context) {
+func Create(c *gin.Context) {
   name := c.PostForm("name")
   value := c.PostForm("value")
   sessionVault := c.MustGet("session").(session.Vault)

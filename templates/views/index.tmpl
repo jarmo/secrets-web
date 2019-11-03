@@ -16,7 +16,7 @@
 						<div>Add Secret</div>
 					</div>
 					<div class="modal-content">
-						<form action="/add" method="POST">
+						<form action="/secrets" method="POST">
 							<input id="secret-add-name" type="text" name="name" required autocomplete="off">
 							<label for="secret-add-name"><span>Name</span></label>
 							<textarea id="secret-add-value" name="value" required autocomplete="off" rows="5"></textarea>
@@ -48,14 +48,14 @@
 									<div>Edit Secret</div>
 								</div>
 								<div class="modal-content">
-									<form action="/edit/{{ .Id }}" method="POST">
+									<form action="/secrets/{{ .Id }}" method="PUT">
 										<input id="secret-edit-name-{{ .Id }}" type="text" value="{{ .Name }}" name="name" required autocomplete="off">
 										<label for="secret-edit-name-{{ .Id }}"><span>Name</span></label>
 										<textarea id="secret-edit-value-{{ .Id }}" name="value" required autocomplete="off" rows="5">{{ .Value }}</textarea>
 										<label for="secret-edit-value-{{ .Id }}"><span>Value</span></label>
 										<input class="save" type="submit" value="Save">
 									</form>
-									<form class="delete" action="/delete/{{ .Id }}" method="POST">
+									<form class="delete" action="/secrets/{{ .Id }}" method="DELETE">
 										<input type="submit" value="Delete">
 									</form>
 								</div>

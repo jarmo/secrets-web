@@ -25,6 +25,6 @@ func Message(c *gin.Context) interface{} {
 }
 
 func redirect(c *gin.Context, path string) {
-	c.Redirect(http.StatusFound, path)
-	c.AbortWithStatus(http.StatusFound)
+	c.Redirect(http.StatusSeeOther, path)
+	c.AbortWithStatus(http.StatusSeeOther)
 }

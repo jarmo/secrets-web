@@ -37,9 +37,9 @@ func initRoutes(router *gin.Engine, configurationPath string) {
   authenticated := router.Group("", middleware.Authenticated(configurationPath))
   authenticated.GET("/", handlers.Index)
   authenticated.GET("/secrets", handlers.List)
-  authenticated.POST("/add", handlers.Add)
-  authenticated.POST("/edit/:id", handlers.Edit)
-  authenticated.POST("/delete/:id", handlers.Delete)
+  authenticated.POST("/secrets", handlers.Create)
+  authenticated.PUT("/secrets/:id", handlers.Edit)
+  authenticated.DELETE("/secrets/:id", handlers.Delete)
 }
 
 func initTemplates() *template.Template {
