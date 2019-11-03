@@ -29,11 +29,11 @@ func CsrfProtection() gin.HandlerFunc {
     if request.Method != "HEAD" && request.Method != "GET" {
       token := CsrfToken(sessions.Default(c))
       if token != c.GetHeader("X-Csrf-Token") {
-        c.HTML(http.StatusForbidden, templates.Path("login"), gin.H{
+        c.HTML(http.StatusPreconditionFailed, templates.Path("login"), gin.H{
           "sessionMaxAgeInSeconds": session.MaxAgeInSeconds,
           "csrfToken": token,
         })
-        c.AbortWithStatus(http.StatusForbidden)
+        c.AbortWithStatus(http.StatusPreconditionFailed)
         return
       }
     }

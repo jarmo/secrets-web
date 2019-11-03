@@ -37,12 +37,15 @@ function App(csrfToken, sessionMaxAgeInSeconds) {
         "X-Csrf-Token": csrfToken
       }
     }).then(function(response) {
-      if (!response.ok && response.status !== 403) throw "Request failed! Please try again."
+      if (!response.ok && response.status !== 401) throw "Request failed! Please try again."
 
       return response.text()
     }).then(function(body) {
       document.body.innerHTML = body
-    }).catch(alert)
+    }).catch(function(error) {
+      alert(error)
+      location.reload()
+    })
   }
 
   var logoutTimeoutId

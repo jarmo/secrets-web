@@ -12,11 +12,11 @@ import (
 func Authenticated(configurationPath string) gin.HandlerFunc {
   return func(c *gin.Context) {
     if sessionVault, err := session.CreateVault(configurationPath, c); err != nil {
-      c.HTML(http.StatusForbidden, templates.Path("login"), gin.H{
+      c.HTML(http.StatusUnauthorized, templates.Path("login"), gin.H{
         "sessionMaxAgeInSeconds": session.MaxAgeInSeconds,
         "csrfToken": CsrfToken(sessions.Default(c)),
       })
-      c.AbortWithStatus(http.StatusForbidden)
+      c.AbortWithStatus(http.StatusUnauthorized)
     } else {
       c.Set("session", sessionVault)
     }

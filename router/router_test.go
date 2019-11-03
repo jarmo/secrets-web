@@ -54,7 +54,7 @@ func Test_Router(t *testing.T) {
     res := httptest.NewRecorder()
     router.ServeHTTP(res, req)
 
-    assertCode(t, 403, res.Code)
+    assertCode(t, 401, res.Code)
     assertBody(t, res.Body.String(), "User")
     assertBody(t, res.Body.String(), "Password")
   })
@@ -75,7 +75,7 @@ func Test_Router(t *testing.T) {
     res := httptest.NewRecorder()
     router.ServeHTTP(res, req)
 
-    assertCode(t, 403, res.Code)
+    assertCode(t, 401, res.Code)
     assertBody(t, res.Body.String(), "User")
     assertBody(t, res.Body.String(), "Password")
   })
@@ -86,7 +86,7 @@ func Test_Router(t *testing.T) {
     res := httptest.NewRecorder()
     router.ServeHTTP(res, req)
 
-    assertCode(t, 403, res.Code)
+    assertCode(t, 401, res.Code)
     assertBody(t, res.Body.String(), "User")
     assertBody(t, res.Body.String(), "Password")
   })
@@ -129,7 +129,7 @@ func Test_Router(t *testing.T) {
     res := httptest.NewRecorder()
     router.ServeHTTP(res, req)
 
-    assertCode(t, 403, res.Code)
+    assertCode(t, 412, res.Code)
     assertBody(t, res.Body.String(), "User")
     assertBody(t, res.Body.String(), "Password")
   })
@@ -142,7 +142,7 @@ func Test_Router(t *testing.T) {
     res := httptest.NewRecorder()
     router.ServeHTTP(res, req)
 
-    assertCode(t, 403, res.Code)
+    assertCode(t, 412, res.Code)
     assertBody(t, res.Body.String(), "User")
     assertBody(t, res.Body.String(), "Password")
   })
