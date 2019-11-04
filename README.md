@@ -101,15 +101,13 @@ cd secrets-web
 make test
 ```
 
-2. Create a self-signed certificate:
+2. Initialize vault configuration:
 
 ```
-$ openssl req -new -newkey rsa:4096 -x509 -sha256 -days 365 -nodes -out certs/self-signed.crt -keyout certs/self-signed.key
+$ echo '[{"Path": "tmp/secrets-dev.json", "Alias": "user"}]' > tmp/conf-dev.json
 ```
 
-3. Initialize vault as described above.
-
-4. Install [fswatch](https://emcrisostomo.github.io/fswatch/) for watching file-system changes used for development:
+3. Install [fswatch](https://emcrisostomo.github.io/fswatch/) for watching file-system changes used for development:
 
 macOS:
 ```
@@ -117,22 +115,29 @@ $ brew install fswatch
 ```
 
 Linux:
-
 ```
 $ sudo apt install fswatch
 ```
 
-5. Run server with file-system changes detection:
+4. Run server with automatic restarts on code changes:
 
 ```
 $ make dev
 ```
 
-6. Open browser at [https://localhost:8080](https://localhost:8080)
+5. Open browser at [http://localhost:8080](http://localhost:8080)
 
-7. Build and install binaries to `$GOPATH/bin/`
+6. Login with **user** and whatever password
+
+7. Add some secret to create a vault encrypted with previously entered password
+
+8. Change code as needed
+
+9. Build and install binaries to `$GOPATH/bin/`
 
 ```
 make
 make install
 ```
+
+PS! Don't forget to send me a [PR](https://github.com/jarmo/secrets-web/pulls)!
