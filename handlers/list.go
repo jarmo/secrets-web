@@ -14,8 +14,7 @@ func List(c *gin.Context) {
   vaultSession := c.MustGet("session").(session.Vault)
   result := vault.List(vaultSession.Secrets, filter)
 
-  c.HTML(http.StatusOK, templates.Path("index"), gin.H{
-    "filter":  filter,
+  c.HTML(http.StatusOK, templates.Path("_secrets"), gin.H{
     "secrets": result,
   })
 }

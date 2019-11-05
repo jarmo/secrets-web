@@ -12,9 +12,9 @@ function App(csrfToken, sessionMaxAgeInSeconds) {
       } else if (form.id == "logout") {
         window.location.reload()
       } else if (formMethod === "GET") {
-        get(form.action, new FormData(form))
+        get(form.action, new FormData(form), form.dataset.container)
       } else {
-        request(form.action, formMethod, new FormData(form))
+        request(form.action, formMethod, new FormData(form), form.dataset.container)
       }
     })
   }
@@ -24,11 +24,11 @@ function App(csrfToken, sessionMaxAgeInSeconds) {
     return request(form.action, "POST")
   }
 
-  function get(path, data) {
-    return request([path, new URLSearchParams(data)].join("?"), "GET")
+  function get(path, data, container) {
+    return request([path, new URLSearchParams(data)].join("?"), "GET", undefined, container)
   }
 
-  function request(path, method, body) {
+  function request(path, method, body, container) {
     return fetch(path, {
       method: method,
       body: body,
@@ -41,7 +41,8 @@ function App(csrfToken, sessionMaxAgeInSeconds) {
 
       return response.text()
     }).then(function(body) {
-      document.body.innerHTML = body
+      var resultContainer = container ? document.querySelector(container) : document.body
+      resultContainer.innerHTML = body
     }).catch(function(error) {
       alert(error)
       location.reload()
