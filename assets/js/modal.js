@@ -7,6 +7,7 @@ function Modal() {
   function showModal(event) {
     var target = event.target
     if (target.classList.contains("btn-modal")) {
+      event.preventDefault()
       setTimeout(function() {
         show(document.querySelector(target.dataset.target))
       }, 0)

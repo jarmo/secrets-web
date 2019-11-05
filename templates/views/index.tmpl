@@ -7,11 +7,11 @@
 			<div class="success">{{ .message }}</div>
 		{{ end }}
 		<aside>
-			<label class="add btn-modal" data-target="#add-modal">+ Add</label>
+			<a href="#" class="add btn btn-modal" data-target="#add-modal">+ Add</a>
 			<div id="add-modal" class="modal">
 				<div class="modal-container">
 					<div class="modal-header">
-						<label for="add-modal" class="close">×</label>
+						<a href="#" class="close btn">×</a>
 						<div>Add Secret</div>
 					</div>
 					<div class="modal-content">
@@ -25,9 +25,7 @@
 					</div>
 				</div>
 			</div>
-			<form id="logout" method="GET">
-				<button class="logout">X</button>
-			</form>
+			<a href="/" class="logout btn">× Logout</a>
 		</aside>
 		<form class="filter" action="/secrets" method="GET">
 			<input id="filter" name="filter" type="text" value="{{ .filter }}" required autocomplete="off" {{ if not .filter }}autofocus{{ end }}>
@@ -38,11 +36,11 @@
 			{{range .secrets}}
 				<div class="secret">
 					<div class="header">
-						<label class="name btn-modal" data-target=".edit-modal-{{ .Id }}">{{ .Name }}</label>
+						<a href="#" class="name btn btn-modal" data-target=".edit-modal-{{ .Id }}">{{ .Name }}</a>
 						<div class="modal edit-modal-{{ .Id }}">
 							<div class="modal-container">
 								<div class="modal-header">
-									<label for="secret-{{ .Id }}" class="close">×</label>
+									<a href="#" class="close btn">×</a>
 									<div>Edit Secret</div>
 								</div>
 								<div class="modal-content">

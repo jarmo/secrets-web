@@ -16,6 +16,10 @@ h1 {
   margin-bottom: 1.5em;
 }
 
+a.btn {
+  text-decoration: none;
+}
+
 #title img {
   max-height: 2.5em;
 }
@@ -182,6 +186,7 @@ aside .logout:hover {
   font-weight: bold;
   margin: 0;
   padding: 0;
+  color: #212529;
 }
 
 .modal .close:hover,
