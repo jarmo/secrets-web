@@ -9,7 +9,13 @@
 		<link rel="icon" type="image/png" href="/public/assets/favicon.png">
 		<script src="/public/assets/js/session.js"></script>
 		<script src="/public/assets/js/app.js"></script>
-		<script>new App("{{ .csrfToken }}", {{ .sessionMaxAgeInSeconds }}).initialize()</script>
+		<script src="/public/assets/js/modal.js"></script>
+		<script>
+			document.addEventListener("DOMContentLoaded", function() {
+				new App("{{ .csrfToken }}", {{ .sessionMaxAgeInSeconds }}).initialize()
+				Modal()
+			})
+		</script>
 	</head>
 	<body>
 	  <main>

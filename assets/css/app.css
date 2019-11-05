@@ -133,16 +133,6 @@ aside .logout:hover {
   font-size: 1.5em;
 }
 
-input[name=edit-modal],
-input[name=add-modal] {
-  display: none;
-}
-
-input:checked ~ .edit-modal,
-input:checked ~ .add-modal {
-  display: block;
-}
-
 .modal {
   display: none;
   position: fixed;
@@ -209,7 +199,7 @@ input:checked ~ .add-modal {
   float: right;
 }
 
-.edit-modal .delete input {
+.delete input {
   opacity: 1;
   color: #721c24;
   background-color: #f8d7da;
@@ -239,7 +229,7 @@ main form {
   max-width: 60vw;
 }
 
-.edit-modal form {
+.modal form {
   max-width: 100%;
 }
 

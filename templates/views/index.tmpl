@@ -7,9 +7,8 @@
 			<div class="success">{{ .message }}</div>
 		{{ end }}
 		<aside>
-			<label class="add" for="add-modal">+ Add</label>
-			<input type="checkbox" id="add-modal" name="add-modal">
-			<div class="modal add-modal">
+			<label class="add btn-modal" data-target="#add-modal">+ Add</label>
+			<div id="add-modal" class="modal">
 				<div class="modal-container">
 					<div class="modal-header">
 						<label for="add-modal" class="close">×</label>
@@ -39,9 +38,8 @@
 			{{range .secrets}}
 				<div class="secret">
 					<div class="header">
-						<label class="name" for="secret-{{ .Id }}">{{ .Name }}</label>
-						<input id="secret-{{ .Id }}" name="edit-modal" type="checkbox">
-						<div class="modal edit-modal">
+						<label class="name btn-modal" data-target=".edit-modal-{{ .Id }}">{{ .Name }}</label>
+						<div class="modal edit-modal-{{ .Id }}">
 							<div class="modal-container">
 								<div class="modal-header">
 									<label for="secret-{{ .Id }}" class="close">×</label>
