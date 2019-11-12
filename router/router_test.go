@@ -49,8 +49,8 @@ func Test_Router(t *testing.T) {
   assertBody(t, res.Body.String(), "ok")
   session := res.Header().Get("Set-Cookie")
 
-  t.Run("GET /secrets => No authenticated header", func(t *testing.T) {
-    req, _ := http.NewRequest("GET", "/secrets", nil)
+  t.Run("GET / => No authenticated header", func(t *testing.T) {
+    req, _ := http.NewRequest("GET", "/", nil)
     res := httptest.NewRecorder()
     router.ServeHTTP(res, req)
 
@@ -59,8 +59,8 @@ func Test_Router(t *testing.T) {
     assertBody(t, res.Body.String(), "Password")
   })
 
-  t.Run("GET /secrets => Authenticated", func(t *testing.T) {
-    req, _ := http.NewRequest("GET", "/secrets", nil)
+  t.Run("GET / => Authenticated", func(t *testing.T) {
+    req, _ := http.NewRequest("GET", "/", nil)
     authenticate(req, user, password)
     res := httptest.NewRecorder()
     router.ServeHTTP(res, req)
@@ -69,8 +69,8 @@ func Test_Router(t *testing.T) {
     assertBody(t, res.Body.String(), "Filter")
   })
 
-  t.Run("GET /secrets => Authenticated with invalid user", func(t *testing.T) {
-    req, _ := http.NewRequest("GET", "/secrets", nil)
+  t.Run("GET / => Authenticated with invalid user", func(t *testing.T) {
+    req, _ := http.NewRequest("GET", "/", nil)
     authenticate(req, "invalid-user", password)
     res := httptest.NewRecorder()
     router.ServeHTTP(res, req)
@@ -80,8 +80,8 @@ func Test_Router(t *testing.T) {
     assertBody(t, res.Body.String(), "Password")
   })
 
-  t.Run("GET /secrets => Authenticated with invalid password", func(t *testing.T) {
-    req, _ := http.NewRequest("GET", "/secrets", nil)
+  t.Run("GET / => Authenticated with invalid password", func(t *testing.T) {
+    req, _ := http.NewRequest("GET", "/", nil)
     authenticate(req, user, "invalid-password")
     res := httptest.NewRecorder()
     router.ServeHTTP(res, req)
@@ -104,7 +104,7 @@ func Test_Router(t *testing.T) {
     assertNotInBody(t, res.Body.String(), "secret-1-value")
     assertNotInBody(t, res.Body.String(), "secret-2-name")
     assertNotInBody(t, res.Body.String(), "secret-2-value")
-    assertBody(t, res.Body.String(), "Filter")
+    assertBody(t, strings.TrimSpace(res.Body.String()), "")
   })
 
   t.Run("GET /secrets => Secret found", func(t *testing.T) {
@@ -120,7 +120,7 @@ func Test_Router(t *testing.T) {
     assertNotInBody(t, res.Body.String(), "secret-1-value")
     assertBody(t, res.Body.String(), "secret-2-name")
     assertBody(t, res.Body.String(), "secret-2-value")
-    assertBody(t, res.Body.String(), "Filter")
+    assertBody(t, res.Body.String(), "Edit Secret")
   })
 
   t.Run("POST /secrets => No CSRF header", func(t *testing.T) {
