@@ -23,7 +23,10 @@
 	  <main>
 			<div class="container">
 				{{ if .error }}
-					<div class="error">{{ .error }}</div>
+					<div class="toast toast-error">
+					  <p>{{ .error }}</p>
+					  <div class="toast-progress"></div>
+					</div>
 				{{ end }}
 				<h1 id="title"><img src="/public/assets/favicon.png">ecrets</h1>
 				<form id="login" action="/login" method="post">

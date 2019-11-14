@@ -1,4 +1,5 @@
 @import "nice-inputs.css";
+@import "toast.css";
 
 body {
   font-family: Helvetica Neue, Helvetica, sans-serif;
@@ -42,29 +43,6 @@ label {
   .container {
     width: 95%;
   }
-}
-
-.error, .success {
-  font-size: 1.2em;
-  text-align: center;
-
-  position: relative;
-  padding: .75em 1.25em;
-  border: 1px solid transparent;
-  border-radius: .25em;
-  margin: 2em auto;
-}
-
-.error {
-  color: #721c24;
-  background-color: #f8d7da;
-  border-color: #f5c6cb;
-}
-
-.success {
-  color: #155724;
-  background-color: #d4edda;
-  border-color: #c3e6cb;
 }
 
 input[type="submit"] {
@@ -208,8 +186,12 @@ aside .logout:hover {
 .delete input {
   opacity: 1;
   color: #721c24;
-  background-color: #f8d7da;
+  background-color: rgba(248, 215, 218, .7);
   border-color: #f5c6cb;
+}
+
+.delete input:hover {
+  background-color: rgb(248, 215, 218);
 }
 
 @keyframes animatetop {
