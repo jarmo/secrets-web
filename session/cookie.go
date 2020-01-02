@@ -11,7 +11,6 @@ func CreateCookie(prodModeEnabled bool) gin.HandlerFunc {
   sessionStore := cookie.NewStore(crypto.GenerateRandomBytes(64), crypto.GenerateRandomBytes(32))
   sessionStore.Options(sessions.Options{
     Path: "/",
-    MaxAge: MaxAgeInSeconds,
     HttpOnly: true,
     Secure: prodModeEnabled,
   })

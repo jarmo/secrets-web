@@ -8,7 +8,7 @@ function App(csrfToken, sessionMaxAgeInSeconds) {
       var formMethod = form.getAttribute("method").toUpperCase()
 
       if (form.id === "login") {
-        login(form).then(logoutAfterSessionExpiration)
+        login(form)
       } else if (form.id == "logout") {
         window.location.reload()
       } else if (formMethod === "GET") {
@@ -43,10 +43,11 @@ function App(csrfToken, sessionMaxAgeInSeconds) {
     }).then(function(body) {
       var resultContainer = container ? document.querySelector(container) : document.body
       resultContainer.innerHTML = body
-    }).catch(function(error) {
-      alert(error)
-      location.reload()
-    })
+    }).then(logoutAfterSessionExpiration)
+      .catch(function(error) {
+        alert(error)
+        location.reload()
+      })
   }
 
   var logoutTimeoutId
