@@ -33,4 +33,7 @@ install:
 dev:
 	script/dev.sh
 
-.PHONY: all test clean vendor assets linux darwin windows install dev
+release: all
+	script/release.sh
+
+.PHONY: all test clean release vendor assets linux darwin windows install dev
