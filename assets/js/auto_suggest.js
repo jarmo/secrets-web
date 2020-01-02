@@ -13,7 +13,7 @@ function AutoSuggest() {
     return function() {
       var args = arguments
       clearTimeout(deferTimeoutId)
-      deferTimeoutId = setTimeout(function() { fn.apply(this, args) }, 300)
+      deferTimeoutId = setTimeout(function() { fn.apply(this, args) }, 500)
     }
   }
 }
