@@ -4,6 +4,8 @@
 		<title>Secrets</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="x-csrf-token" content="{{ .csrfToken }}">
+		<meta name="x-session-max-age-in-seconds" content="{{ .sessionMaxAgeInSeconds }}">
 		<link rel="stylesheet" href="/public/assets/css/bootstrap-reboot.min.css">
 		<link rel="stylesheet" href="/public/assets/css/app.css">
 		<link rel="icon" type="image/png" href="/public/assets/favicon.png">
@@ -11,13 +13,7 @@
 		<script src="/public/assets/js/app.js"></script>
 		<script src="/public/assets/js/modal.js"></script>
 		<script src="/public/assets/js/auto_suggest.js"></script>
-		<script>
-			document.addEventListener("DOMContentLoaded", function() {
-				new App("{{ .csrfToken }}", {{ .sessionMaxAgeInSeconds }}).initialize()
-				Modal()
-				AutoSuggest()
-			})
-		</script>
+		<script src="/public/assets/js/initialize_app.js"></script>
 	</head>
 	<body>
 	  <main>

@@ -18,15 +18,16 @@ func Create(configurationPath string, prodModeEnabled bool) *gin.Engine {
   }
 
   router := gin.Default()
+
+  if prodModeEnabled {
+    router.Use(secure.New(secure.DefaultConfig()))
+  }
+
   router.SetHTMLTemplate(initTemplates())
   router.Use(session.CreateCookie(prodModeEnabled))
   router.Use(middleware.CsrfProtection())
   router.StaticFS("/public", generated.Assets)
   initRoutes(router, configurationPath)
-
-  if prodModeEnabled {
-    router.Use(secure.New(secure.DefaultConfig()))
-  }
 
   return router
 }
