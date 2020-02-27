@@ -4,7 +4,7 @@
 
 This repository is for self-hosted web solution. There exists also a [command-line client](https://github.com/jarmo/secrets-cli). Read more about [secrets](https://github.com/jarmo/secrets) in here.
 
-![screen.png](https://raw.githubusercontent.com/jarmo/secrets-web/master/assets/img/screen.png)
+![screen.png](assets/img/screen.png)
 
 ## Installation
 
