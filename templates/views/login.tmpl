@@ -26,7 +26,7 @@
 				{{ end }}
 				<h1 id="title"><img src="/public/assets/favicon.png">ecrets</h1>
 				<form id="login" action="/login" method="post">
-					<input id="user" name="user" type="text" required autocomplete="off" value="{{ .user }}">
+					<input id="user" name="user" type="text" required autocomplete="off" autofocus value="{{ .user }}">
 					<label for="user"><span>User</span></label>
 					<input id="password" name="password" type="password" required autocomplete="off" {{ if .user }}autofocus{{ end }}>
 					<label for="password"><span>Password</span></label>

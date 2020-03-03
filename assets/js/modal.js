@@ -9,7 +9,13 @@ function Modal() {
     if (target.classList.contains("btn-modal")) {
       event.preventDefault()
       setTimeout(function() {
-        show(document.querySelector(target.dataset.target))
+        var modalContainer = document.querySelector(target.dataset.target)
+        show(modalContainer)
+        var firstVisibleAutofocusableField = Array
+          .from(modalContainer.querySelectorAll("input[autofocus]"))
+          .find(input => input.offsetParent)
+
+        if (firstVisibleAutofocusableField) firstVisibleAutofocusableField.focus()
       }, 0)
     }
   }

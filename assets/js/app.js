@@ -43,6 +43,11 @@ function App(csrfToken, sessionMaxAgeInSeconds) {
     }).then(function(body) {
       var resultContainer = container ? document.querySelector(container) : document.body
       resultContainer.innerHTML = body
+      var firstVisibleAutofocusableField = Array
+        .from(resultContainer.querySelectorAll("input[autofocus]"))
+        .find(input => input.offsetParent)
+
+      if (firstVisibleAutofocusableField) firstVisibleAutofocusableField.focus()
     }).then(logoutAfterSessionExpiration)
       .catch(function(error) {
         alert(error)
