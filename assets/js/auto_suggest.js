@@ -2,7 +2,9 @@ function AutoSuggest() {
   var search = defer(function(event) {
     var target = event.target
     if (target.id === "filter") {
-      target.closest("form").querySelector("input[type='submit']").click()
+      var form = target.closest("form")
+      if (!target.value) document.querySelector(form.dataset.container).innerHTML = ""
+      form.querySelector("input[type='submit']").click()
     }
   })
 
