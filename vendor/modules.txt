@@ -20,7 +20,7 @@ github.com/gorilla/context
 github.com/gorilla/securecookie
 # github.com/gorilla/sessions v1.1.3
 github.com/gorilla/sessions
-# github.com/jarmo/secrets v0.0.0-20200102120744-d736e32b886f
+# github.com/jarmo/secrets v0.0.0-20200303043228-ac68c21e4300
 github.com/jarmo/secrets/storage/path
 github.com/jarmo/secrets/storage
 github.com/jarmo/secrets/vault
@@ -34,6 +34,8 @@ github.com/jarmo/secrets/vault/list
 github.com/jessevdk/go-assets
 # github.com/json-iterator/go v1.1.7
 github.com/json-iterator/go
+# github.com/juju/fslock v0.0.0-20160525022230-4d5c94c67b4b
+github.com/juju/fslock
 # github.com/mattn/go-isatty v0.0.9
 github.com/mattn/go-isatty
 # github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd

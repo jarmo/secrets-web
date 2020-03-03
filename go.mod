@@ -9,7 +9,7 @@ require (
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/gin-gonic/gin v1.4.0
 	github.com/golang/protobuf v1.3.2 // indirect
-	github.com/jarmo/secrets v0.0.0-20200102120744-d736e32b886f
+	github.com/jarmo/secrets v0.0.0-20200303043228-ac68c21e4300
 	github.com/jessevdk/go-assets v0.0.0-20160921144138-4f4301a06e15
 	github.com/json-iterator/go v1.1.7 // indirect
 	github.com/kr/pretty v0.2.0 // indirect
