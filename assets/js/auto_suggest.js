@@ -3,7 +3,6 @@ function AutoSuggest() {
     var target = event.target
     if (target.id === "filter") {
       var form = target.closest("form")
-      if (!target.value) document.querySelector(form.dataset.container).innerHTML = ""
       form.querySelector("input[type='submit']").click()
     }
   })

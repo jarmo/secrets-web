@@ -34,10 +34,12 @@
 			<a href="/" class="logout btn">× Logout</a>
 		</aside>
 		<form class="filter" action="/secrets" method="GET" data-container="#secrets">
-			<input id="filter" name="filter" type="text" required autocomplete="off" autofocus>
+			<input id="filter" name="filter" type="text" autocomplete="off" autofocus>
 			<label for="filter"><span>Filter</span></label>
 			<input type="submit" value="Search" hidden>
 		</form>
-		<div id="secrets"></div>
+		<div id="secrets">
+		  {{ template "/templates/views/_secrets.tmpl" . }}
+		</div>
 	</div>
 </main>
