@@ -21,11 +21,11 @@ github.com/gorilla/securecookie
 # github.com/gorilla/sessions v1.1.3
 github.com/gorilla/sessions
 # github.com/jarmo/secrets v0.0.0-20200303043228-ac68c21e4300
-github.com/jarmo/secrets/storage/path
-github.com/jarmo/secrets/storage
-github.com/jarmo/secrets/vault
 github.com/jarmo/secrets/crypto
 github.com/jarmo/secrets/secret
+github.com/jarmo/secrets/storage
+github.com/jarmo/secrets/storage/path
+github.com/jarmo/secrets/vault
 github.com/jarmo/secrets/vault/add
 github.com/jarmo/secrets/vault/delete
 github.com/jarmo/secrets/vault/edit
@@ -48,14 +48,14 @@ github.com/satori/go.uuid
 github.com/ugorji/go/codec
 # golang.org/x/crypto v0.0.0-20191227163750-53104e6ec876
 golang.org/x/crypto/argon2
-golang.org/x/crypto/nacl/secretbox
 golang.org/x/crypto/blake2b
 golang.org/x/crypto/internal/subtle
+golang.org/x/crypto/nacl/secretbox
 golang.org/x/crypto/poly1305
 golang.org/x/crypto/salsa20/salsa
 # golang.org/x/sys v0.0.0-20191228213918-04cbcbbfeed8
-golang.org/x/sys/unix
 golang.org/x/sys/cpu
+golang.org/x/sys/unix
 # gopkg.in/go-playground/validator.v8 v8.18.2
 gopkg.in/go-playground/validator.v8
 # gopkg.in/yaml.v2 v2.2.2
