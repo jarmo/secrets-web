@@ -47,7 +47,7 @@ function Modal() {
   }
 
   function isShown(modal) {
-    return modal.style.display !== "none"
+    return modal.style.display === "block"
   }
 
   function show(modal) {
