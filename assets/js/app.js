@@ -21,7 +21,7 @@ function App(csrfToken, sessionMaxAgeInSeconds) {
 
   function login(form) {
     session = new Session(document.getElementById("user").value, document.getElementById("password").value)
-    return request(form.action, "POST")
+    return request(form.action, "POST").then(logoutAfterSessionExpiration)
   }
 
   function get(path, data, container) {
@@ -48,17 +48,23 @@ function App(csrfToken, sessionMaxAgeInSeconds) {
         .find(input => input.offsetParent)
 
       if (firstVisibleAutofocusableField) firstVisibleAutofocusableField.focus()
-    }).then(logoutAfterSessionExpiration)
+    }).then(setLastActivityAt)
       .catch(function(error) {
-        alert(error)
-        location.reload()
-      })
+      alert(error)
+      location.reload()
+    })
   }
 
-  var logoutTimeoutId
+  var lastActivityAt
+
+  function setLastActivityAt() {
+    lastActivityAt = Date.now()
+  }
 
   function logoutAfterSessionExpiration() {
-    clearTimeout(logoutTimeoutId)
-    logoutTimeoutId = setTimeout(function() { window.location.reload() }, sessionMaxAgeInSeconds * 1000)
+    var sessionMaxAgeInMillis = sessionMaxAgeInSeconds * 1000
+    setInterval(function() {
+      if (Date.now() - lastActivityAt > sessionMaxAgeInMillis) window.location.reload()
+    }, 5 * 1000)
   }
 }
