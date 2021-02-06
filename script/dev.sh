@@ -8,4 +8,4 @@ runApp() {
 }
 
 runApp
-fswatch --event Created --event Removed --event Updated -r -e "/generated" -e "/vendor" -e "README.md" -e ".git/" -e "todo" -e "/script" -e "bin/" -e "/tmp" -e "go\\.mod" . | while read -r path; do echo "Changed: $path"; runApp; done
+fswatch -o --event Created --event Removed --event Updated -r -e "/generated" -e "/vendor" -e "README.md" -e ".git/" -e "todo" -e "/script" -e "bin/" -e "/tmp" -e "go\\.mod" . | while read -r path; do echo "Changed: $path"; runApp; done
