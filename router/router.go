@@ -25,6 +25,7 @@ func Create(configurationPath string, prodModeEnabled bool) *gin.Engine {
 
   router.SetHTMLTemplate(initTemplates())
   router.Use(session.CreateCookie(prodModeEnabled))
+  router.Use(middleware.CacheControl())
   router.Use(middleware.CsrfProtection())
   router.StaticFS("/public", generated.Assets)
   initRoutes(router, configurationPath)
