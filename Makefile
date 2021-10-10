@@ -33,7 +33,10 @@ install:
 dev:
 	script/dev.sh
 
+dev_run: assets
+	go run secrets-web.go serve --config tmp/conf-dev.json --cert none --cert-priv-key none --port 8080 --pid tmp/dev.pid
+
 release: all
 	script/release.sh
 
-.PHONY: all test clean release vendor assets linux darwin windows install dev
+.PHONY: all test clean release vendor assets linux darwin windows install dev dev_run

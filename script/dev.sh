@@ -4,7 +4,7 @@ runApp() {
   if [[ -f tmp/dev.pid ]]; then
     kill `cat tmp/dev.pid` 2>/dev/null || echo "Process not running"
   fi
-  make assets && go run secrets-web.go serve --config tmp/conf-dev.json --cert none --cert-priv-key none --port 8080 --pid tmp/dev.pid &
+  make dev_run &
 }
 
 runApp
