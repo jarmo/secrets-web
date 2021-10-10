@@ -16,7 +16,7 @@ RESPONSE=`http -b "https://api.github.com/repos/jarmo/secrets-web/releases" Auth
 rm -rf dist
 mkdir -p dist
 
-for file in `find bin -type file`; do
+for file in `find bin -type f`; do
   DIST_FILE_BASE=`echo $file | awk -F "/" '{name=$3 "-" $2; print name}'`
   DIST_FILE_PATH=dist/$DIST_FILE_BASE-$VERSION.zip
   zip -j $DIST_FILE_PATH $file
