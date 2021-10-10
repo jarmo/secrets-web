@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/env/bin bash
 
 runApp() {
   if [[ -f tmp/dev.pid ]]; then

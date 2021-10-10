@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 set -e
 
 if [[ $(git status --porcelain | wc -c) -ne 0 ]]; then
