@@ -98,6 +98,7 @@ location!
 ```
 git clone https://github.com/jarmo/secrets-cli.git
 cd secrets-web
+go get github.com/jessevdk/go-assets-builder@v0.0.0-20130903091706-b8483521738f
 make test
 ```
 
