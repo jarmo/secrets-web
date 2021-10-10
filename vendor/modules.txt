@@ -1,13 +1,17 @@
 # github.com/docopt/docopt-go v0.0.0-20180111231733-ee0de3bc6815
+## explicit
 github.com/docopt/docopt-go
 # github.com/gin-contrib/secure v0.0.0-20190913150500-0a1d39a681e3
+## explicit
 github.com/gin-contrib/secure
 # github.com/gin-contrib/sessions v0.0.1
+## explicit
 github.com/gin-contrib/sessions
 github.com/gin-contrib/sessions/cookie
 # github.com/gin-contrib/sse v0.1.0
 github.com/gin-contrib/sse
 # github.com/gin-gonic/gin v1.7.2
+## explicit
 github.com/gin-gonic/gin
 github.com/gin-gonic/gin/binding
 github.com/gin-gonic/gin/internal/bytesconv
@@ -29,6 +33,7 @@ github.com/gorilla/securecookie
 # github.com/gorilla/sessions v1.1.3
 github.com/gorilla/sessions
 # github.com/jarmo/secrets v0.0.0-20211009175914-e0f3102462cf
+## explicit
 github.com/jarmo/secrets/crypto
 github.com/jarmo/secrets/secret
 github.com/jarmo/secrets/storage
@@ -39,11 +44,14 @@ github.com/jarmo/secrets/vault/delete
 github.com/jarmo/secrets/vault/edit
 github.com/jarmo/secrets/vault/list
 # github.com/jessevdk/go-assets v0.0.0-20160921144138-4f4301a06e15
+## explicit
 github.com/jessevdk/go-assets
 # github.com/json-iterator/go v1.1.9
 github.com/json-iterator/go
 # github.com/juju/fslock v0.0.0-20160525022230-4d5c94c67b4b
 github.com/juju/fslock
+# github.com/kr/pretty v0.2.0
+## explicit
 # github.com/leodido/go-urn v1.2.0
 github.com/leodido/go-urn
 # github.com/mattn/go-isatty v0.0.12
@@ -53,6 +61,7 @@ github.com/modern-go/concurrent
 # github.com/modern-go/reflect2 v1.0.1
 github.com/modern-go/reflect2
 # github.com/satori/go.uuid v1.2.0
+## explicit
 github.com/satori/go.uuid
 # github.com/ugorji/go/codec v1.1.7
 github.com/ugorji/go/codec
@@ -67,5 +76,7 @@ golang.org/x/crypto/sha3
 # golang.org/x/sys v0.0.0-20200116001909-b77594299b42
 golang.org/x/sys/cpu
 golang.org/x/sys/unix
+# gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15
+## explicit
 # gopkg.in/yaml.v2 v2.2.8
 gopkg.in/yaml.v2

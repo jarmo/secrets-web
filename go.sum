@@ -38,8 +38,6 @@ github.com/gorilla/securecookie v1.1.1/go.mod h1:ra0sb63/xPlUeL+yeDciTfxMRAA+MP+
 github.com/gorilla/sessions v1.1.1/go.mod h1:8KCfur6+4Mqcc6S0FEfKuN15Vl5MgXW92AE8ovaJD0w=
 github.com/gorilla/sessions v1.1.3 h1:uXoZdcdA5XdXF3QzuSlheVRUvjl+1rKY7zBXL68L9RU=
 github.com/gorilla/sessions v1.1.3/go.mod h1:8KCfur6+4Mqcc6S0FEfKuN15Vl5MgXW92AE8ovaJD0w=
-github.com/jarmo/secrets v0.0.0-20200303043228-ac68c21e4300 h1:Hb+qgjNZvRgaYrPb59MQtoz265LQRhkXupEAF8MF6s8=
-github.com/jarmo/secrets v0.0.0-20200303043228-ac68c21e4300/go.mod h1:6/PKcpQgUJio+mw+Pz7YGS74GuSJrNo0MQUZDxIwl/U=
 github.com/jarmo/secrets v0.0.0-20211009175914-e0f3102462cf h1:u4Q+sBP3MWN817B9eGEZteqVSOwcwGg9rsHUH2dSoqE=
 github.com/jarmo/secrets v0.0.0-20211009175914-e0f3102462cf/go.mod h1:6/PKcpQgUJio+mw+Pz7YGS74GuSJrNo0MQUZDxIwl/U=
 github.com/jessevdk/go-assets v0.0.0-20160921144138-4f4301a06e15 h1:cW/amwGEJK5MSKntPXRjX4dxs/nGxGT8gXKIsKFmHGc=
