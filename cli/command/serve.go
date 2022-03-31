@@ -20,6 +20,12 @@ type Serve struct {
 }
 
 func (command Serve) Execute() {
+  if err := serveUntilExit(command); err != nil {
+    panic(err)
+  }
+}
+
+func serveUntilExit(command Serve) error {
   isProdMode := isProdMode()
   router := router.Create(command.ConfigurationPath, isProdMode)
   port := argumentOrDefault(command.Port, "9090")
@@ -30,10 +36,11 @@ func (command Serve) Execute() {
 
   if isProdMode {
     host := argumentOrDefault(command.Host, "0.0.0.0")
-    router.RunTLS(host + ":" + port, command.CertificatePath, command.CertificatePrivKeyPath)
+    return router.RunTLS(host + ":" + port, command.CertificatePath, command.CertificatePrivKeyPath)
   } else {
-    router.Run("localhost:" + port)
+    return router.Run("localhost:" + port)
   }
+
 }
 
 func writePidToFile(path string) {
