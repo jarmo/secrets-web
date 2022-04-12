@@ -3,28 +3,29 @@ GOARCH = amd64
 GO_BUILD = GOARCH=${GOARCH} go build -mod=vendor
 PREFIX ?= ${GOPATH}
 
-all: clean assets test linux darwin windows
+all: clean vendor test linux darwin windows
 
 clean:
 	rm -rf bin/
+	rm -rf generated/assets.go
 
-vendor:
+vendor: assets
 	go mod vendor
 	go mod tidy
 
-assets: vendor
+assets:
 	go-assets-builder -p generated -o generated/assets.go assets templates/views
 
-linux: assets
+linux: vendor
 	GOOS=linux ${GO_BUILD} -o bin/linux_${GOARCH}/${BINARY}
 
-darwin: assets
+darwin: vendor
 	GOOS=darwin ${GO_BUILD} -o bin/darwin_${GOARCH}/${BINARY}
 
-windows: assets
+windows: vendor
 	GOOS=windows ${GO_BUILD} -o bin/windows_${GOARCH}/${BINARY}.exe
 
-test: assets
+test: vendor
 	script/run_tests.sh
 
 install:
@@ -33,7 +34,7 @@ install:
 dev:
 	script/dev.sh
 
-dev_run: assets
+dev_run: vendor
 	go run secrets-web.go serve --config tmp/conf-dev.json --cert none --cert-priv-key none --port 8080 --pid tmp/dev.pid
 
 release: all
