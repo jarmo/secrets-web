@@ -96,7 +96,7 @@ location!
 1. Clone repository, retrieve dependencies and run tests:
 
 ```
-git clone https://github.com/jarmo/secrets-cli.git
+git clone https://github.com/jarmo/secrets-web.git
 cd secrets-web
 go get github.com/jessevdk/go-assets-builder@v0.0.0-20130903091706-b8483521738f
 make test
