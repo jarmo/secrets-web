@@ -28,7 +28,7 @@ func Encrypt(password []byte, secrets []secret.Secret) Encrypted {
     panic(err)
   } else {
     salt := GenerateRandomBytes(32)
-    time := 1
+    time := 3
     memory := 64*1024
     threads := 4
     secretKey := argon2idSecretKey(password, salt, argon2idParams{Time: time, Memory: memory, Threads: threads})
