@@ -3,7 +3,7 @@ GOARCH = amd64
 GO_BUILD = GOARCH=${GOARCH} go build -mod=vendor
 PREFIX ?= ${GOPATH}
 
-all: clean vendor test linux darwin windows
+all: clean vendor test linux freebsd openbsd darwin windows
 
 clean:
 	rm -rf bin/
@@ -18,6 +18,12 @@ assets:
 
 linux: vendor
 	GOOS=linux ${GO_BUILD} -o bin/linux_${GOARCH}/${BINARY}
+
+freebsd: vendor
+	GOOS=freebsd ${GO_BUILD} -o bin/freebsd_${GOARCH}/${BINARY}
+
+openbsd: vendor
+	GOOS=openbsd ${GO_BUILD} -o bin/openbsd_${GOARCH}/${BINARY}
 
 darwin: vendor
 	GOOS=darwin ${GO_BUILD} -o bin/darwin_${GOARCH}/${BINARY}
@@ -40,4 +46,4 @@ dev_run: vendor
 release: all
 	script/release.sh
 
-.PHONY: all test clean release vendor assets linux darwin windows install dev dev_run
+.PHONY: all clean vendor assets linux freebsd openbsd darwin windows test install dev dev_run release
