@@ -82,8 +82,10 @@ vault and member files as the CLI, including when running under a different OS u
 
 Members log in using their username and password at `/`. The vault list shows
 only vaults they can access, granted through the CLI `member-add` command.
-Members can view and manage secrets in each authorized vault. Existing vault alias
-and password login remains available temporarily for legacy compatibility.
+Members can view and manage secrets in each authorized vault. Settings allows
+members to change their password for all vaults and logs out their web sessions
+afterward. Existing vault alias and password login remains available temporarily
+for legacy compatibility.
 
 ## Using multiple vaults
 

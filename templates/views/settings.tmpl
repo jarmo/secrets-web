@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Settings - Secrets</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="x-csrf-token" content="{{ .csrfToken }}">
+    <meta name="x-session-max-age-in-seconds" content="{{ .sessionMaxAgeInSeconds }}">
+    <link rel="stylesheet" href="/public/assets/css/bootstrap-reboot.min.css">
+    <link rel="stylesheet" href="/public/assets/css/app.css">
+    <link rel="icon" type="image/png" href="/public/assets/favicon.png">
+    <script src="/public/assets/js/app.js"></script>
+    <script src="/public/assets/js/modal.js"></script>
+    <script src="/public/assets/js/auto_suggest.js"></script>
+    <script src="/public/assets/js/initialize_app.js"></script>
+  </head>
+  <body>
+    <main>
+      <div class="container">
+        <h1>Settings</h1>
+        <p>Change password for {{ .username }}</p>
+        <form action="/settings/password" method="post">
+          <input id="current-password" name="currentPassword" type="password" required autocomplete="current-password" autofocus>
+          <label for="current-password"><span>Current password</span></label>
+          <input id="new-password" name="newPassword" type="password" required minlength="12" autocomplete="new-password">
+          <label for="new-password"><span>New password</span></label>
+          <input id="confirm-password" name="confirmation" type="password" required minlength="12" autocomplete="new-password">
+          <label for="confirm-password"><span>Confirm new password</span></label>
+          <input type="submit" value="Change password">
+        </form>
+        <p><a href="/vaults">Back to vaults</a></p>
+      </div>
+    </main>
+  </body>
+</html>

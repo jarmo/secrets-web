@@ -44,7 +44,7 @@ function App(csrfToken, sessionMaxAgeInSeconds) {
     return fetch(path, {method: method, body: body, headers: headers}).then(function(response) {
       if (response.status === 204) {
         session = null
-        window.location.assign(path.endsWith("/logout") ? "/" : "/vaults")
+        window.location.assign(path.endsWith("/logout") || path === "/settings/password" ? "/" : "/vaults")
         return null
       }
       if (response.redirected && !session) {
@@ -52,6 +52,9 @@ function App(csrfToken, sessionMaxAgeInSeconds) {
         return null
       }
       if (response.status === 401) session = null
+      if (path === "/settings/password" && response.status === 400) {
+        return response.text().then(function(message) { throw message })
+      }
       if (!response.ok && response.status !== 401) throw "Request failed! Please try again."
       return response.text()
     }).then(function(body) {

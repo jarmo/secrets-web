@@ -44,6 +44,8 @@ func initRoutes(router *gin.Engine, configurationPath, membersDirectory string, 
     }
     c.Set("memberSession", memberSession)
   })
+  memberRoutes.GET("/settings", handlers.Settings)
+  memberRoutes.POST("/settings/password", handlers.ChangeMemberPassword(membersDirectory, members))
   memberRoutes.GET("/vaults", handlers.Vaults(configurationPath))
   memberVault := memberRoutes.Group("/vaults/:alias", middleware.VaultAccess(configurationPath))
   memberVault.GET("", handlers.Index)

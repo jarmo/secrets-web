@@ -16,9 +16,12 @@
   <body>
     <main>
       <div class="container">
+        <aside>
+          <a href="/settings" class="btn">Settings</a>
+          <form id="logout" action="/logout" method="post"><button class="logout btn" type="submit">× Logout</button></form>
+        </aside>
         <h1>Your vaults</h1>
         {{ range .vaults }}<p><a href="/vaults/{{ . | urlquery }}">{{ . }}</a></p>{{ else }}<p>No vaults available.</p>{{ end }}
-        <form id="logout" action="/logout" method="post"><input type="submit" value="Logout"></form>
       </div>
     </main>
   </body>
