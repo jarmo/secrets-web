@@ -1,7 +1,7 @@
 BINARY = secrets-web
+INSTALL_DIR ?= $(or $(shell go env GOBIN),$(shell go env GOPATH)/bin)
 GOARCH = amd64
 GO_BUILD = GOARCH=${GOARCH} go build -mod=vendor
-PREFIX ?= ${GOPATH}
 
 all: clean vendor test linux freebsd openbsd darwin windows
 
@@ -34,8 +34,9 @@ windows: vendor
 test: vendor
 	script/run_tests.sh
 
-install:
-	cp -Rf bin/ "${PREFIX}/bin"
+install: vendor
+	install -d "$(INSTALL_DIR)"
+	go build -mod=vendor -o "$(INSTALL_DIR)/$(BINARY)" .
 
 dev:
 	script/dev.sh
