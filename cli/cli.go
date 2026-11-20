@@ -14,19 +14,16 @@ func createUsage() string {
   return `secrets-web COMMAND [OPTIONS]
 
 Usage:
-  secrets-web initialize --config=CONFIG_PATH --path=VAULT_PATH --alias=VAULT_ALIAS
-  secrets-web serve --config=CONFIG_PATH --cert=CERT_PATH --cert-priv-key=CERT_PRIVATE_KEY_PATH [--host=HOST] [--port=PORT] [--pid=PID_PATH] [--members-dir=MEMBERS_DIR]
+  secrets-web serve --cert=CERT_PATH --cert-priv-key=CERT_PRIVATE_KEY_PATH [--config=CONFIG_PATH] [--host=HOST] [--port=PORT] [--pid=PID_PATH] [--members-dir=MEMBERS_DIR]
 
 Options:
-  --config CONFIG_PATH                      Configuration path for vaults.
-  --alias VAULT_ALIAS                       Vault alias.
-  --path VAULT_PATH                         Vault path.
+  --config CONFIG_PATH                      Vault configuration file (defaults to the CLI configuration).
   --cert CERT_PATH                          HTTPS certificate path.
   --cert-priv-key CERT_PRIVATE_KEY_PATH     HTTPS certificate private key path.
   --host HOST                               Host to bind to. Defaults to 0.0.0.0.
   --port PORT                               Port to listen on. Defaults to 9090.
   --pid PID_PATH                            Save PID to file.
-  --members-dir MEMBERS_DIR                 Member account directory. Defaults to members/ beside the configuration file.
+  --members-dir MEMBERS_DIR                 Member account directory (defaults to the CLI member directory).
   -h --help                                 Show this screen.
   -v --version                              Show version.`
 }
@@ -34,11 +31,7 @@ Options:
 func createCommand(arguments map[string]interface {}) command.Executable {
   configPath := argument(arguments, "--config")
 
-  if arguments["initialize"].(bool) {
-    vaultAlias := argument(arguments, "--alias")
-    vaultPath := argument(arguments, "--path")
-    return command.Initialize{ConfigurationPath: configPath, VaultAlias: vaultAlias, VaultPath: vaultPath}
-  } else if arguments["serve"].(bool) {
+  if arguments["serve"].(bool) {
     certificatePath := argument(arguments, "--cert")
     certificatePrivKeyPath := argument(arguments, "--cert-priv-key")
     host := argument(arguments, "--host")

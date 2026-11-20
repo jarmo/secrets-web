@@ -1,6 +1,7 @@
 package command
 
 import (
+  "errors"
   "strings"
   "os"
   "io/ioutil"
@@ -28,11 +29,11 @@ func (command Serve) Execute() {
 
 func serveUntilExit(command Serve) error {
   isProdMode := isProdMode()
-  membersDirectory := command.MembersDirectory
-  if membersDirectory == "" {
-    membersDirectory = filepath.Join(filepath.Dir(command.ConfigurationPath), "members")
+  configurationPath, membersDirectory, err := resolveStoragePaths(command.ConfigurationPath, command.MembersDirectory)
+  if err != nil {
+    return err
   }
-  router := router.Create(command.ConfigurationPath, membersDirectory, isProdMode)
+  router := router.Create(configurationPath, membersDirectory, isProdMode)
   port := argumentOrDefault(command.Port, "9090")
 
   if command.Pid != "" {
@@ -46,6 +47,33 @@ func serveUntilExit(command Serve) error {
     return router.Run("localhost:" + port)
   }
 
+}
+
+func resolveStoragePaths(configurationPath, membersDirectory string) (string, string, error) {
+  if configurationPath != "" && membersDirectory != "" {
+    return configurationPath, membersDirectory, nil
+  }
+
+  configHome := os.Getenv("XDG_CONFIG_HOME")
+  if configHome == "" {
+    home := os.Getenv("HOME")
+    if home == "" {
+      home = os.Getenv("USERPROFILE")
+    }
+    if home == "" {
+      return "", "", errors.New("cannot determine secrets configuration directory")
+    }
+    configHome = filepath.Join(home, ".config")
+  }
+
+  secretsDirectory := filepath.Join(configHome, "secrets")
+  if configurationPath == "" {
+    configurationPath = filepath.Join(secretsDirectory, "config.json")
+  }
+  if membersDirectory == "" {
+    membersDirectory = filepath.Join(secretsDirectory, "members")
+  }
+  return configurationPath, membersDirectory, nil
 }
 
 func writePidToFile(path string) {

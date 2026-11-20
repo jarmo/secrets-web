@@ -41,7 +41,7 @@ dev:
 	script/dev.sh
 
 dev_run: vendor
-	go run secrets-web.go serve --config tmp/conf-dev.json --cert none --cert-priv-key none --port 8080 --pid tmp/dev.pid
+	XDG_CONFIG_HOME=$(CURDIR)/tmp go run secrets-web.go serve --cert none --cert-priv-key none --port 8080 --pid tmp/dev.pid
 
 release: all
 	script/release.sh
