@@ -49,7 +49,7 @@ func CreateVault(configurationPath string, c *gin.Context) (Vault, error) {
   } else if len(decodedCredentialsHeader) == 0 {
     return Vault{}, errors.New("No X-Credentials header value")
   } else {
-    credentials := strings.Split(string(decodedCredentialsHeader), ":")
+    credentials := strings.SplitN(string(decodedCredentialsHeader), ":", 2)
     vaultAlias := credentials[0]
 
     if len(credentials) != 2 {
