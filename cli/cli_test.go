@@ -12,8 +12,8 @@ func TestCommand_ServeWithoutConfig(t *testing.T) {
   if parsedCommand.ConfigurationPath != "" {
     t.Fatalf("Expected default configuration path, got %q", parsedCommand.ConfigurationPath)
   }
-  if parsedCommand.MembersDirectory != "" {
-    t.Fatalf("Expected default member directory, got %q", parsedCommand.MembersDirectory)
+  if parsedCommand.UsersDirectory != "" {
+    t.Fatalf("Expected default user directory, got %q", parsedCommand.UsersDirectory)
   }
 }
 
@@ -134,11 +134,11 @@ func TestCommand_ServeWithPid(t *testing.T) {
   }
 }
 
-func TestCommand_ServeWithMembersDirectory(t *testing.T) {
+func TestCommand_ServeWithUsersDirectory(t *testing.T) {
   parsedCommand := Command(version, []string{
-    "serve", "--config", "config-path", "--cert", "cert", "--cert-priv-key", "key", "--members-dir", "/private/members",
+    "serve", "--config", "config-path", "--cert", "cert", "--cert-priv-key", "key", "--users-dir", "/private/users",
   }).(command.Serve)
-  if parsedCommand.MembersDirectory != "/private/members" {
-    t.Fatalf("Expected member directory, got %q", parsedCommand.MembersDirectory)
+  if parsedCommand.UsersDirectory != "/private/users" {
+    t.Fatalf("Expected user directory, got %q", parsedCommand.UsersDirectory)
   }
 }

@@ -5,7 +5,7 @@ import (
 
   "github.com/gin-contrib/sessions"
   "github.com/gin-gonic/gin"
-  "github.com/jarmo/secrets/member"
+  "github.com/jarmo/secrets/user"
   "github.com/jarmo/secrets-web/middleware"
   "github.com/jarmo/secrets-web/templates"
 )
@@ -14,7 +14,7 @@ func ActivationForm(c *gin.Context) {
   showActivation(c, http.StatusOK, "", false)
 }
 
-func Activate(membersDirectory string) gin.HandlerFunc {
+func Activate(usersDirectory string) gin.HandlerFunc {
   return func(c *gin.Context) {
     c.Request.Body = http.MaxBytesReader(c.Writer, c.Request.Body, 4096)
     if err := c.Request.ParseForm(); err != nil {
@@ -37,7 +37,7 @@ func Activate(membersDirectory string) gin.HandlerFunc {
       showActivation(c, http.StatusBadRequest, "Password must be between 12 and 1024 bytes", false)
       return
     }
-    if err := member.Activate(membersDirectory, username, setupCode, []byte(password)); err != nil {
+    if err := user.Activate(usersDirectory, username, setupCode, []byte(password)); err != nil {
       showActivation(c, http.StatusBadRequest, "Unable to activate account. Check the username and setup code.", false)
       return
     }

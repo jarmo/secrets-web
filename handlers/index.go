@@ -20,7 +20,7 @@ func renderVault(c *gin.Context, displayError error) {
   vaultSession := c.MustGet("session").(session.Vault)
   result := vault.List(vaultSession.Secrets, "")
   view := "index"
-  if vaultSession.MemberKey != nil {
+  if vaultSession.UserKey != nil {
     view = "vault"
   }
 
@@ -29,7 +29,7 @@ func renderVault(c *gin.Context, displayError error) {
     "error": displayError,
     "secrets": result,
     "vaultPath": vaultSession.URL(),
-    "member": vaultSession.MemberKey != nil,
+    "user": vaultSession.UserKey != nil,
     "alias": vaultSession.Alias,
     "csrfToken": middleware.CsrfToken(sessions.Default(c)),
     "sessionMaxAgeInSeconds": session.MaxAgeInSeconds,

@@ -31,7 +31,7 @@
 					</div>
 				</div>
 			</div>
-			{{ if .member }}
+			{{ if .user }}
 				<a href="/vaults" class="btn">All vaults</a>
 				<a href="/settings" class="btn">Settings</a>
 				<form id="logout" action="/logout" method="POST"><button class="logout btn" type="submit">× Logout</button></form>
@@ -39,7 +39,7 @@
 				<a href="/" class="logout btn">× Logout</a>
 			{{ end }}
 		</aside>
-		<form class="filter" action="{{ .vaultPath }}{{ if .member }}/secrets{{ end }}" method="GET" data-container="#secrets">
+		<form class="filter" action="{{ .vaultPath }}{{ if .user }}/secrets{{ end }}" method="GET" data-container="#secrets">
 			<input id="filter" name="filter" type="text" autocomplete="off" autofocus>
 			<label for="filter"><span>Filter</span></label>
 			<input type="submit" value="Search" hidden>

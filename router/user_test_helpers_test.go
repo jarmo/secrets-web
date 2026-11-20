@@ -12,37 +12,37 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/jarmo/secrets/member"
+	"github.com/jarmo/secrets/user"
 	"github.com/jarmo/secrets/secret"
 	"github.com/jarmo/secrets/storage"
 	"github.com/jarmo/secrets/storage/path"
 )
 
-type memberWebTestFixture struct {
+type userWebTestFixture struct {
 	t               *testing.T
 	router          http.Handler
-	memberPassword  string
-	bob             member.Member
+	userPassword  string
+	bob             user.User
 	productionPath  string
 	developmentPath string
 	otherPath       string
 }
 
-func newMemberWebTestFixture(t *testing.T) *memberWebTestFixture {
+func newUserWebTestFixture(t *testing.T) *userWebTestFixture {
 	t.Helper()
 	directory := t.TempDir()
-	membersDirectory := filepath.Join(directory, "members")
-	if err := os.Mkdir(membersDirectory, 0700); err != nil {
+	usersDirectory := filepath.Join(directory, "users")
+	if err := os.Mkdir(usersDirectory, 0700); err != nil {
 		t.Fatal(err)
 	}
-	memberPassword := "member private password 123"
-	if err := member.Register(membersDirectory, "bob", []byte(memberPassword)); err != nil {
+	userPassword := "user private password 123"
+	if err := user.Register(usersDirectory, "bob", []byte(userPassword)); err != nil {
 		t.Fatal(err)
 	}
-	if _, _, err := member.CreatePending(membersDirectory, "pending"); err != nil {
+	if _, _, err := user.CreatePending(usersDirectory, "pending"); err != nil {
 		t.Fatal(err)
 	}
-	bob, err := member.Load(membersDirectory, "bob")
+	bob, err := user.Load(usersDirectory, "bob")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -57,20 +57,20 @@ func newMemberWebTestFixture(t *testing.T) *memberWebTestFixture {
 	storage.Write(productionPath, []byte("vault-owner-password"), []secret.Secret{secret.New("API token", "private value")})
 	storage.Write(developmentPath, []byte("development-password"), []secret.Secret{secret.New("Staging token", "another private value")})
 	storage.Write(otherPath, []byte("another-password"), []secret.Secret{secret.New("Unshared secret", "not for Bob")})
-	if err := storage.AssociateMember(productionPath, []byte("vault-owner-password"), bob.Identity); err != nil {
+	if err := storage.AssociateUser(productionPath, []byte("vault-owner-password"), bob.Identity); err != nil {
 		t.Fatal(err)
 	}
-	if err := storage.AssociateMember(developmentPath, []byte("development-password"), bob.Identity); err != nil {
+	if err := storage.AssociateUser(developmentPath, []byte("development-password"), bob.Identity); err != nil {
 		t.Fatal(err)
 	}
 	conflictingVaultPath := filepath.Join(directory, "bob-vault.json")
 	path.Store(configPath, conflictingVaultPath, "bob")
 	storage.Write(conflictingVaultPath, []byte("vault-password"), nil)
 
-	return &memberWebTestFixture{
+	return &userWebTestFixture{
 		t:               t,
-		router:          Create(configPath, membersDirectory, false),
-		memberPassword:  memberPassword,
+		router:          Create(configPath, usersDirectory, false),
+		userPassword:  userPassword,
 		bob:             bob,
 		productionPath:  productionPath,
 		developmentPath: developmentPath,
@@ -78,7 +78,7 @@ func newMemberWebTestFixture(t *testing.T) *memberWebTestFixture {
 	}
 }
 
-func (fixture *memberWebTestFixture) send(method, target, body, cookie, csrf string) *httptest.ResponseRecorder {
+func (fixture *userWebTestFixture) send(method, target, body, cookie, csrf string) *httptest.ResponseRecorder {
 	fixture.t.Helper()
 	request := httptest.NewRequest(method, target, strings.NewReader(body))
 	if body != "" {
@@ -99,7 +99,7 @@ func (fixture *memberWebTestFixture) send(method, target, body, cookie, csrf str
 	return response
 }
 
-func (fixture *memberWebTestFixture) csrf() (string, string) {
+func (fixture *userWebTestFixture) csrf() (string, string) {
 	fixture.t.Helper()
 	initial := fixture.send("GET", "/", "", "", "")
 	if initial.Code != http.StatusUnauthorized {
@@ -112,16 +112,16 @@ func (fixture *memberWebTestFixture) csrf() (string, string) {
 	return initial.Header().Get("Set-Cookie"), html.UnescapeString(csrf[1])
 }
 
-func (fixture *memberWebTestFixture) login(csrfCookie, csrfToken string) string {
+func (fixture *userWebTestFixture) login(csrfCookie, csrfToken string) string {
 	fixture.t.Helper()
-	credentials := url.Values{"username": {"bob"}, "password": {fixture.memberPassword}}.Encode()
+	credentials := url.Values{"username": {"bob"}, "password": {fixture.userPassword}}.Encode()
 	response := fixture.send("POST", "/login", credentials, csrfCookie, csrfToken)
 	if response.Code != http.StatusNoContent {
 		fixture.t.Fatalf("Login: %d, %s", response.Code, response.Body.String())
 	}
 	sessionCookie := response.Header().Get("Set-Cookie")
-	if sessionCookie == "" || strings.Contains(sessionCookie, fixture.memberPassword) {
-		fixture.t.Fatal("Missing or unsafe member session cookie")
+	if sessionCookie == "" || strings.Contains(sessionCookie, fixture.userPassword) {
+		fixture.t.Fatal("Missing or unsafe user session cookie")
 	}
 	return sessionCookie
 }

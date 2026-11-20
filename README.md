@@ -8,7 +8,7 @@ This repository is for self-hosted web solution. There exists also a [command-li
 
 ## Installation
 
-Download the latest binary from [releases](https://github.com/jarmo/secrets-web/releases). Use [secrets-cli](https://github.com/jarmo/secrets-cli) to initialize vaults and manage members, then start the web server.
+Download the latest binary from [releases](https://github.com/jarmo/secrets-web/releases). Use [secrets-cli](https://github.com/jarmo/secrets-cli) to initialize vaults and manage users, then start the web server.
 
 *Of course, you're free to compile your own version of binary to be 100% sure that it has not been tampered with, since this is an open-source project after all.*
 
@@ -20,7 +20,7 @@ Here's an output from `secrets-web --help` command.
 $ secrets-web COMMAND [OPTIONS]
 
 Usage:
-  secrets-web serve --cert=CERT_PATH --cert-priv-key=CERT_PRIVATE_KEY_PATH [--config=CONFIG_PATH] [--host=HOST] [--port=PORT] [--pid=PID_PATH] [--members-dir=MEMBERS_DIR]
+  secrets-web serve --cert=CERT_PATH --cert-priv-key=CERT_PRIVATE_KEY_PATH [--config=CONFIG_PATH] [--host=HOST] [--port=PORT] [--pid=PID_PATH] [--users-dir=USERS_DIR]
 
 Options:
   --config CONFIG_PATH                      Vault configuration file (defaults to the CLI configuration).
@@ -29,17 +29,19 @@ Options:
   --host HOST                               Host to bind to. Defaults to 0.0.0.0.
   --port PORT                               Port to listen on. Defaults to 9090.
   --pid PID_PATH                            Save PID to file.
-  --members-dir MEMBERS_DIR                 Member account directory (defaults to the CLI member directory).
+  --users-dir USERS_DIR                     User account directory (defaults to the CLI user directory).
   -h --help                                 Show this screen.
   -v --version                              Show version.
 ```
 
 ### Initializing vaults
 
-Initialize vaults with [secrets-cli](https://github.com/jarmo/secrets-cli):
+Initialize a user with [secrets-cli](https://github.com/jarmo/secrets-cli), then create vaults using that user:
 
 ```
-secrets initialize --path /path/to/production.json --alias production
+secrets user-create alice
+secrets user-activate alice
+secrets initialize --path /path/to/production.json --alias production --user alice
 ```
 
 By default, the CLI and web app use `~/.config/secrets/config.json` (or
@@ -63,34 +65,34 @@ $ secrets-web serve --cert cert.crt --cert-priv-key cert.key
 
 Now open browser at [https://localhost:9090](https://localhost:9090) to be greeted with a login form.
 
-Log in with your activated member username and password. There is no password
+Log in with your activated user username and password. There is no password
 recovery, so keep your password safe.
 
-## Member activation
+## User activation
 
-Members are created by an administrator using `secrets member-create NAME`.
-The administrator shares the one-time setup code securely. The member opens
+Users are created by an administrator using `secrets user-create NAME`.
+The administrator shares the one-time setup code securely. The user opens
 `/activate` in the web app, enters the code, and chooses their own password.
 This creates their account; vault access is granted separately by the administrator.
 
-The CLI and web app default to `~/.config/secrets/members` (or
-`$XDG_CONFIG_HOME/secrets/members` when set). Use `--config` and `--members-dir`
+The CLI and web app default to `~/.config/secrets/users` (or
+`$XDG_CONFIG_HOME/secrets/users` when set). Use `--config` and `--users-dir`
 to override the web paths if needed. The web server must be able to read the same
-vault and member files as the CLI, including when running under a different OS user.
+vault and user files as the CLI, including when running under a different OS user.
 
-### Member login
+### User login
 
-Members log in using their username and password at `/`. The vault list shows
-only vaults they can access, granted through the CLI `member-add` command.
-Members can view and manage secrets in each authorized vault. Settings allows
-members to change their password for all vaults and logs out their web sessions
+Users log in using their username and password at `/`. The vault list shows
+only vaults they can access, granted through the CLI `user-add` command.
+Users can view and manage secrets in each authorized vault. Settings allows
+users to change their password for all vaults and logs out their web sessions
 afterward. Existing vault alias and password login remains available temporarily
 for legacy compatibility.
 
 ## Using multiple vaults
 
-Initialize additional vaults using `secrets initialize`. Grant members access
-with `secrets member-add MEMBER --alias VAULT` to make vaults available after login.
+Initialize additional vaults using `secrets initialize`. Grant users access
+with `secrets user-add USER --alias VAULT` to make vaults available after login.
 
 ## But how do I sync vault between different devices?!
 
@@ -113,14 +115,13 @@ cd secrets-web
 make test
 ```
 
-2. Set up an isolated development vault and member with the CLI:
+2. Set up an isolated development vault and user with the CLI:
 
 ```
 export XDG_CONFIG_HOME="$(pwd)/tmp"
-secrets initialize --path "$(pwd)/tmp/secrets-dev.json" --alias dev
-secrets member-create dev
-secrets member-activate dev
-secrets member-add dev --alias dev
+secrets user-create dev
+secrets user-activate dev
+secrets initialize --path "$(pwd)/tmp/secrets-dev.json" --alias dev --user dev
 ```
 
 3. Install [fswatch](https://emcrisostomo.github.io/fswatch/) for watching file-system changes used for development:
@@ -143,7 +144,7 @@ $ make dev
 
 5. Open browser at [http://localhost:8080](http://localhost:8080)
 
-6. Log in as `dev` with the member password you chose.
+6. Log in as `dev` with the user password you chose.
 
 7. Change code as needed
 

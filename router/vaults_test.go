@@ -9,8 +9,8 @@ import (
 	"github.com/jarmo/secrets/storage"
 )
 
-func TestMemberVaultAccessAndEditing(t *testing.T) {
-	fixture := newMemberWebTestFixture(t)
+func TestUserVaultAccessAndEditing(t *testing.T) {
+	fixture := newUserWebTestFixture(t)
 	send := fixture.send
 	csrfCookie, csrfToken := fixture.csrf()
 	sessionCookie := fixture.login(csrfCookie, csrfToken)
@@ -39,11 +39,11 @@ func TestMemberVaultAccessAndEditing(t *testing.T) {
 		!strings.Contains(vault.Body.String(), `action="/vaults/production/secrets"`) ||
 		!strings.Contains(vault.Body.String(), "Add Secret") ||
 		strings.Contains(vault.Body.String(), `action="/secrets"`) {
-		t.Fatal("Member vault did not reuse the secret editor with vault-scoped actions")
+		t.Fatal("User vault did not reuse the secret editor with vault-scoped actions")
 	}
 	filtered := send("GET", "/vaults/production/secrets?filter=missing", "", sessionCookie, "")
 	if filtered.Code != http.StatusOK || strings.Contains(filtered.Body.String(), "API token") {
-		t.Fatalf("Member filter: %d, %s", filtered.Code, filtered.Body.String())
+		t.Fatalf("User filter: %d, %s", filtered.Code, filtered.Body.String())
 	}
 	if result := send("POST", "/vaults/production", "name=New&value=Value", sessionCookie, ""); result.Code != http.StatusPreconditionFailed {
 		t.Fatalf("Write without CSRF protection: %d", result.Code)
@@ -58,15 +58,15 @@ func TestMemberVaultAccessAndEditing(t *testing.T) {
 		t.Fatalf("Delete in unauthorized vault: %d", result.Code)
 	}
 	if result := send("POST", "/vaults/production", url.Values{"name": {"New secret"}, "value": {"New value"}}.Encode(), sessionCookie, csrfToken); result.Code != http.StatusSeeOther || result.Header().Get("Location") != "/vaults/production" {
-		t.Fatalf("Add to member vault: %d, %s", result.Code, result.Header().Get("Location"))
+		t.Fatalf("Add to user vault: %d, %s", result.Code, result.Header().Get("Location"))
 	}
-	memberKey, err := fixture.bob.Unlock([]byte(fixture.memberPassword))
+	userKey, err := fixture.bob.Unlock([]byte(fixture.userPassword))
 	if err != nil {
 		t.Fatal(err)
 	}
-	productionSecrets, err := storage.ReadForMember(productionPath, memberKey)
+	productionSecrets, err := storage.ReadForUser(productionPath, userKey)
 	if err != nil || len(productionSecrets) != 2 {
-		t.Fatalf("Member write was not persisted: %v, %v", productionSecrets, err)
+		t.Fatalf("User write was not persisted: %v, %v", productionSecrets, err)
 	}
 	newSecretID := productionSecrets[1].Id.String()
 	if result := send("PUT", "/vaults/production/"+newSecretID, url.Values{"name": {"Renamed"}, "value": {"Updated value"}}.Encode(), sessionCookie, csrfToken); result.Code != http.StatusSeeOther {
@@ -74,20 +74,20 @@ func TestMemberVaultAccessAndEditing(t *testing.T) {
 	}
 	productionSecrets, err = storage.Read(productionPath, []byte("vault-owner-password"))
 	if err != nil || len(productionSecrets) != 2 || productionSecrets[1].Name != "Renamed" || productionSecrets[1].Value != "Updated value" {
-		t.Fatalf("Owner cannot read edited member vault: %v, %v", productionSecrets, err)
+		t.Fatalf("Owner cannot read edited user vault: %v, %v", productionSecrets, err)
 	}
 	if result := send("DELETE", "/vaults/production/"+newSecretID, "", sessionCookie, csrfToken); result.Code != http.StatusSeeOther {
 		t.Fatalf("Delete shared secret: %d", result.Code)
 	}
-	productionSecrets, err = storage.ReadForMember(productionPath, memberKey)
+	productionSecrets, err = storage.ReadForUser(productionPath, userKey)
 	if err != nil || len(productionSecrets) != 1 || productionSecrets[0].Name != "API token" {
-		t.Fatalf("Member deleted the wrong secret: %v, %v", productionSecrets, err)
+		t.Fatalf("User deleted the wrong secret: %v, %v", productionSecrets, err)
 	}
 	unaffected, err := storage.Read(otherPath, []byte("another-password"))
 	if err != nil || len(unaffected) != 1 || unaffected[0].Name != "Unshared secret" {
 		t.Fatalf("Unshared vault was modified: %v, %v", unaffected, err)
 	}
-	secondVault, err := storage.ReadForMember(developmentPath, memberKey)
+	secondVault, err := storage.ReadForUser(developmentPath, userKey)
 	if err != nil || len(secondVault) != 1 || secondVault[0].Name != "Staging token" {
 		t.Fatalf("Other shared vault was modified: %v, %v", secondVault, err)
 	}

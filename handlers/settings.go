@@ -5,22 +5,22 @@ import (
 
   "github.com/gin-contrib/sessions"
   "github.com/gin-gonic/gin"
-  "github.com/jarmo/secrets/member"
+  "github.com/jarmo/secrets/user"
   "github.com/jarmo/secrets-web/middleware"
   "github.com/jarmo/secrets-web/session"
   "github.com/jarmo/secrets-web/templates"
 )
 
 func Settings(c *gin.Context) {
-  memberSession := c.MustGet("memberSession").(session.MemberSession)
+  userSession := c.MustGet("userSession").(session.UserSession)
   c.HTML(http.StatusOK, templates.Path("settings"), gin.H{
-    "username": memberSession.Username,
+    "username": userSession.Username,
     "csrfToken": middleware.CsrfToken(sessions.Default(c)),
     "sessionMaxAgeInSeconds": session.MaxAgeInSeconds,
   })
 }
 
-func ChangeMemberPassword(membersDirectory string, active *session.MemberSessions) gin.HandlerFunc {
+func ChangeUserPassword(usersDirectory string, active *session.UserSessions) gin.HandlerFunc {
   return func(c *gin.Context) {
     c.Request.Body = http.MaxBytesReader(c.Writer, c.Request.Body, 4096)
     if err := c.Request.ParseForm(); err != nil {
@@ -48,8 +48,8 @@ func ChangeMemberPassword(membersDirectory string, active *session.MemberSession
       return
     }
 
-    memberSession := c.MustGet("memberSession").(session.MemberSession)
-    if err := member.ChangePassword(membersDirectory, memberSession.Username, []byte(currentPassword), []byte(newPassword)); err != nil {
+    userSession := c.MustGet("userSession").(session.UserSession)
+    if err := user.ChangePassword(usersDirectory, userSession.Username, []byte(currentPassword), []byte(newPassword)); err != nil {
       c.String(http.StatusBadRequest, "Unable to change password. Check the current password.")
       return
     }

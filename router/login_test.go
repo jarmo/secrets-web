@@ -7,23 +7,23 @@ import (
 	"testing"
 )
 
-func TestMemberLoginAndSessions(t *testing.T) {
-	fixture := newMemberWebTestFixture(t)
+func TestUserLoginAndSessions(t *testing.T) {
+	fixture := newUserWebTestFixture(t)
 	send := fixture.send
-	memberPassword := fixture.memberPassword
+	userPassword := fixture.userPassword
 	csrfCookie, csrfToken := fixture.csrf()
-	credentials := url.Values{"username": {"bob"}, "password": {memberPassword}}.Encode()
+	credentials := url.Values{"username": {"bob"}, "password": {userPassword}}.Encode()
 	if result := send("POST", "/login", credentials, csrfCookie, ""); result.Code != http.StatusPreconditionFailed {
 		t.Fatalf("Login without CSRF token: %d", result.Code)
 	}
 	if result := send("POST", "/login", url.Values{"username": {"bob"}, "password": {"wrong"}}.Encode(), csrfCookie, csrfToken); result.Code != http.StatusUnauthorized {
 		t.Fatalf("Login with invalid password: %d", result.Code)
 	}
-	if result := send("POST", "/login", url.Values{"username": {"pending"}, "password": {memberPassword}}.Encode(), csrfCookie, csrfToken); result.Code != http.StatusUnauthorized {
-		t.Fatalf("Pending member logged in: %d", result.Code)
+	if result := send("POST", "/login", url.Values{"username": {"pending"}, "password": {userPassword}}.Encode(), csrfCookie, csrfToken); result.Code != http.StatusUnauthorized {
+		t.Fatalf("Pending user logged in: %d", result.Code)
 	}
 	if result := send("POST", "/login", url.Values{"username": {"bob"}, "password": {"vault-password"}}.Encode(), csrfCookie, csrfToken); result.Code != http.StatusUnauthorized {
-		t.Fatalf("Member login fell back to colliding vault: %d", result.Code)
+		t.Fatalf("User login fell back to colliding vault: %d", result.Code)
 	}
 	if result := send("POST", "/login", url.Values{"username": {"production"}, "password": {"vault-owner-password"}}.Encode(), csrfCookie, csrfToken); result.Code != http.StatusSeeOther {
 		t.Fatalf("Legacy vault login stopped working: %d", result.Code)
@@ -37,11 +37,11 @@ func TestMemberLoginAndSessions(t *testing.T) {
 		t.Fatalf("Login: %d, %s", login.Code, login.Body.String())
 	}
 	sessionCookie := login.Header().Get("Set-Cookie")
-	if sessionCookie == "" || strings.Contains(sessionCookie, memberPassword) {
-		t.Fatal("Missing or unsafe member session cookie")
+	if sessionCookie == "" || strings.Contains(sessionCookie, userPassword) {
+		t.Fatal("Missing or unsafe user session cookie")
 	}
-	if result := send("GET", "/member-login", "", sessionCookie, ""); result.Code != http.StatusNotFound {
-		t.Fatalf("Old member login route still exists: %d", result.Code)
+	if result := send("GET", "/user-login", "", sessionCookie, ""); result.Code != http.StatusNotFound {
+		t.Fatalf("Old user login route still exists: %d", result.Code)
 	}
 	renewal := send("GET", "/vaults", "", sessionCookie, "")
 	if renewal.Header().Get("Set-Cookie") == "" {
@@ -49,7 +49,7 @@ func TestMemberLoginAndSessions(t *testing.T) {
 	}
 	sessionCookie = renewal.Header().Get("Set-Cookie")
 	if result := send("GET", "/", "", sessionCookie, ""); result.Code != http.StatusSeeOther || result.Header().Get("Location") != "/vaults" {
-		t.Fatalf("Logged-in member was not redirected to vaults: %d", result.Code)
+		t.Fatalf("Logged-in user was not redirected to vaults: %d", result.Code)
 	}
 	secondLogin := send("POST", "/login", credentials, csrfCookie, csrfToken)
 	if secondLogin.Code != http.StatusNoContent {
@@ -71,6 +71,6 @@ func TestMemberLoginAndSessions(t *testing.T) {
 		t.Fatalf("Logout: %d", logout.Code)
 	}
 	if result := send("GET", "/vaults", "", sessionCookie, ""); result.Code != http.StatusSeeOther {
-		t.Fatalf("Member session remained valid after logout: %d", result.Code)
+		t.Fatalf("User session remained valid after logout: %d", result.Code)
 	}
 }

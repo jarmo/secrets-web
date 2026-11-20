@@ -9,31 +9,31 @@ func TestResolveStoragePaths(t *testing.T) {
   configHome := t.TempDir()
   t.Setenv("XDG_CONFIG_HOME", configHome)
 
-  configPath, membersDirectory, err := resolveStoragePaths("", "")
+  configPath, usersDirectory, err := resolveStoragePaths("", "")
   if err != nil {
     t.Fatal(err)
   }
   if expected := filepath.Join(configHome, "secrets", "config.json"); configPath != expected {
     t.Fatalf("Expected configuration path %q, got %q", expected, configPath)
   }
-  if expected := filepath.Join(configHome, "secrets", "members"); membersDirectory != expected {
-    t.Fatalf("Expected member directory %q, got %q", expected, membersDirectory)
+  if expected := filepath.Join(configHome, "secrets", "users"); usersDirectory != expected {
+    t.Fatalf("Expected user directory %q, got %q", expected, usersDirectory)
   }
 
-  configPath, membersDirectory, err = resolveStoragePaths("/custom/config.json", "")
+  configPath, usersDirectory, err = resolveStoragePaths("/custom/config.json", "")
   if err != nil {
     t.Fatal(err)
   }
-  if configPath != "/custom/config.json" || membersDirectory != filepath.Join(configHome, "secrets", "members") {
-    t.Fatalf("Unexpected paths: %q, %q", configPath, membersDirectory)
+  if configPath != "/custom/config.json" || usersDirectory != filepath.Join(configHome, "secrets", "users") {
+    t.Fatalf("Unexpected paths: %q, %q", configPath, usersDirectory)
   }
 
-  configPath, membersDirectory, err = resolveStoragePaths("", "/private/members")
+  configPath, usersDirectory, err = resolveStoragePaths("", "/private/users")
   if err != nil {
     t.Fatal(err)
   }
-  if configPath != filepath.Join(configHome, "secrets", "config.json") || membersDirectory != "/private/members" {
-    t.Fatalf("Unexpected paths: %q, %q", configPath, membersDirectory)
+  if configPath != filepath.Join(configHome, "secrets", "config.json") || usersDirectory != "/private/users" {
+    t.Fatalf("Unexpected paths: %q, %q", configPath, usersDirectory)
   }
 }
 
@@ -42,13 +42,13 @@ func TestResolveStoragePathsWithoutXDG(t *testing.T) {
   t.Setenv("XDG_CONFIG_HOME", "")
   t.Setenv("HOME", home)
 
-  configPath, membersDirectory, err := resolveStoragePaths("", "")
+  configPath, usersDirectory, err := resolveStoragePaths("", "")
   if err != nil {
     t.Fatal(err)
   }
   expectedDirectory := filepath.Join(home, ".config", "secrets")
-  if configPath != filepath.Join(expectedDirectory, "config.json") || membersDirectory != filepath.Join(expectedDirectory, "members") {
-    t.Fatalf("Unexpected paths: %q, %q", configPath, membersDirectory)
+  if configPath != filepath.Join(expectedDirectory, "config.json") || usersDirectory != filepath.Join(expectedDirectory, "users") {
+    t.Fatalf("Unexpected paths: %q, %q", configPath, usersDirectory)
   }
 }
 
@@ -57,12 +57,12 @@ func TestResolveStoragePathsWithExplicitOverrides(t *testing.T) {
   t.Setenv("HOME", "")
   t.Setenv("USERPROFILE", "")
 
-  configPath, membersDirectory, err := resolveStoragePaths("/custom/config.json", "/custom/members")
+  configPath, usersDirectory, err := resolveStoragePaths("/custom/config.json", "/custom/users")
   if err != nil {
     t.Fatal(err)
   }
-  if configPath != "/custom/config.json" || membersDirectory != "/custom/members" {
-    t.Fatalf("Unexpected paths: %q, %q", configPath, membersDirectory)
+  if configPath != "/custom/config.json" || usersDirectory != "/custom/users" {
+    t.Fatalf("Unexpected paths: %q, %q", configPath, usersDirectory)
   }
 
   if _, _, err := resolveStoragePaths("", ""); err == nil {

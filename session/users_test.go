@@ -12,12 +12,12 @@ import (
   "github.com/gin-gonic/gin"
 )
 
-func TestMemberSessionsRenewAndExpire(t *testing.T) {
+func TestUserSessionsRenewAndExpire(t *testing.T) {
   privateKey, err := ecdh.X25519().GenerateKey(rand.Reader)
   if err != nil {
     t.Fatal(err)
   }
-  store := NewMemberSessions()
+  store := NewUserSessions()
   router := gin.New()
   router.Use(CreateCookie(false))
   router.GET("/login", func(c *gin.Context) {
@@ -53,10 +53,10 @@ func TestMemberSessionsRenewAndExpire(t *testing.T) {
   oldCookie := login.Header().Get("Set-Cookie")
   var id string
   store.mutex.Lock()
-  for activeID, memberSession := range store.active {
+  for activeID, userSession := range store.active {
     id = activeID
-    memberSession.expiresAt = time.Now().Add(time.Second)
-    store.active[activeID] = memberSession
+    userSession.expiresAt = time.Now().Add(time.Second)
+    store.active[activeID] = userSession
   }
   store.mutex.Unlock()
 
@@ -84,12 +84,12 @@ func TestMemberSessionsRenewAndExpire(t *testing.T) {
   }
 }
 
-func TestMemberSessionsLogoutInvalidatesAll(t *testing.T) {
+func TestUserSessionsLogoutInvalidatesAll(t *testing.T) {
   privateKey, err := ecdh.X25519().GenerateKey(rand.Reader)
   if err != nil {
     t.Fatal(err)
   }
-  store := NewMemberSessions()
+  store := NewUserSessions()
   router := gin.New()
   router.Use(CreateCookie(false))
   router.GET("/login", func(c *gin.Context) {
@@ -110,8 +110,8 @@ func TestMemberSessionsLogoutInvalidatesAll(t *testing.T) {
   router.ServeHTTP(response, httptest.NewRequest("GET", "/login", nil))
   cookie := response.Header().Get("Set-Cookie")
   store.mutex.Lock()
-  store.active["another-session-for-bob"] = MemberSession{Username: "bob", PrivateKey: privateKey, expiresAt: time.Now().Add(time.Minute)}
-  store.active["alice-session"] = MemberSession{Username: "alice", PrivateKey: privateKey, expiresAt: time.Now().Add(time.Minute)}
+  store.active["another-session-for-bob"] = UserSession{Username: "bob", PrivateKey: privateKey, expiresAt: time.Now().Add(time.Minute)}
+  store.active["alice-session"] = UserSession{Username: "alice", PrivateKey: privateKey, expiresAt: time.Now().Add(time.Minute)}
   store.mutex.Unlock()
   logoutRequest := httptest.NewRequest("GET", "/logout", nil)
   logoutRequest.Header.Set("Cookie", cookie)

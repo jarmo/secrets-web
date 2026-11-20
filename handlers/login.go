@@ -8,14 +8,14 @@ import (
 
   "github.com/gin-contrib/sessions"
   "github.com/gin-gonic/gin"
-  "github.com/jarmo/secrets/member"
+  "github.com/jarmo/secrets/user"
   "github.com/jarmo/secrets-web/middleware"
   "github.com/jarmo/secrets-web/session"
   "github.com/jarmo/secrets-web/templates"
   "github.com/jarmo/secrets-web/redirect"
 )
 
-func Login(configurationPath, membersDirectory string, active *session.MemberSessions) gin.HandlerFunc {
+func Login(configurationPath, usersDirectory string, active *session.UserSessions) gin.HandlerFunc {
   return func(c *gin.Context) {
     credentials, err := base64.StdEncoding.DecodeString(c.GetHeader("X-Credentials"))
     parts := strings.SplitN(string(credentials), ":", 2)
@@ -24,7 +24,7 @@ func Login(configurationPath, membersDirectory string, active *session.MemberSes
       return
     }
 
-    account, err := member.Load(membersDirectory, parts[0])
+    account, err := user.Load(usersDirectory, parts[0])
     if err == nil {
       privateKey, err := account.Unlock([]byte(parts[1]))
       if err != nil {

@@ -14,7 +14,7 @@ import (
 
 func Vaults(configurationPath string) gin.HandlerFunc {
   return func(c *gin.Context) {
-    memberSession := c.MustGet("memberSession").(session.MemberSession)
+    userSession := c.MustGet("userSession").(session.UserSession)
     aliases, err := path.Aliases(configurationPath)
     if err != nil {
       c.Status(http.StatusInternalServerError)
@@ -26,12 +26,12 @@ func Vaults(configurationPath string) gin.HandlerFunc {
       if err != nil {
         continue
       }
-      if _, err := storage.ReadForMember(vaultPath, memberSession.PrivateKey); err == nil {
+      if _, err := storage.ReadForUser(vaultPath, userSession.PrivateKey); err == nil {
         accessible = append(accessible, alias)
       }
     }
     c.HTML(http.StatusOK, templates.Path("vaults"), gin.H{
-      "username": memberSession.Username,
+      "username": userSession.Username,
       "vaults": accessible,
       "csrfToken": middleware.CsrfToken(sessions.Default(c)),
       "sessionMaxAgeInSeconds": session.MaxAgeInSeconds,

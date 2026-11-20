@@ -14,7 +14,7 @@ func createUsage() string {
   return `secrets-web COMMAND [OPTIONS]
 
 Usage:
-  secrets-web serve --cert=CERT_PATH --cert-priv-key=CERT_PRIVATE_KEY_PATH [--config=CONFIG_PATH] [--host=HOST] [--port=PORT] [--pid=PID_PATH] [--members-dir=MEMBERS_DIR]
+  secrets-web serve --cert=CERT_PATH --cert-priv-key=CERT_PRIVATE_KEY_PATH [--config=CONFIG_PATH] [--host=HOST] [--port=PORT] [--pid=PID_PATH] [--users-dir=USERS_DIR]
 
 Options:
   --config CONFIG_PATH                      Vault configuration file (defaults to the CLI configuration).
@@ -23,7 +23,7 @@ Options:
   --host HOST                               Host to bind to. Defaults to 0.0.0.0.
   --port PORT                               Port to listen on. Defaults to 9090.
   --pid PID_PATH                            Save PID to file.
-  --members-dir MEMBERS_DIR                 Member account directory (defaults to the CLI member directory).
+  --users-dir USERS_DIR                     User account directory (defaults to the CLI user directory).
   -h --help                                 Show this screen.
   -v --version                              Show version.`
 }
@@ -37,8 +37,8 @@ func createCommand(arguments map[string]interface {}) command.Executable {
     host := argument(arguments, "--host")
     port := argument(arguments, "--port")
     pid := argument(arguments, "--pid")
-    membersDirectory := argument(arguments, "--members-dir")
-    return command.Serve{ConfigurationPath: configPath, CertificatePath: certificatePath, CertificatePrivKeyPath: certificatePrivKeyPath, Host: host, Port: port, Pid: pid, MembersDirectory: membersDirectory}
+    usersDirectory := argument(arguments, "--users-dir")
+    return command.Serve{ConfigurationPath: configPath, CertificatePath: certificatePath, CertificatePrivKeyPath: certificatePrivKeyPath, Host: host, Port: port, Pid: pid, UsersDirectory: usersDirectory}
   } else {
     return nil
   }

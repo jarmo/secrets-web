@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Activate member - Secrets</title>
+    <title>Activate user - Secrets</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="x-csrf-token" content="{{ .csrfToken }}">
@@ -18,7 +18,7 @@
           <p>Account activated successfully.</p>
         {{ else }}
           {{ if .error }}<p role="alert">{{ .error }}</p>{{ end }}
-          <h2>Activate member account</h2>
+          <h2>Activate user account</h2>
           <form id="activate" action="/activate" method="post">
             <input id="username" name="username" type="text" required autocomplete="username" autofocus>
             <label for="username"><span>Username</span></label>

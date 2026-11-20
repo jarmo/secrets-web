@@ -10,22 +10,22 @@ import (
   "strings"
   "testing"
 
-  "github.com/jarmo/secrets/member"
+  "github.com/jarmo/secrets/user"
 )
 
-func TestMemberActivation(t *testing.T) {
-  membersDirectory := t.TempDir()
-  if err := os.Chmod(membersDirectory, 0700); err != nil {
+func TestUserActivation(t *testing.T) {
+  usersDirectory := t.TempDir()
+  if err := os.Chmod(usersDirectory, 0700); err != nil {
     t.Fatal(err)
   }
-  code, _, err := member.CreatePending(membersDirectory, "bob")
+  code, _, err := user.CreatePending(usersDirectory, "bob")
   if err != nil {
     t.Fatal(err)
   }
-  router := Create("unused-config", membersDirectory, false)
+  router := Create("unused-config", usersDirectory, false)
   response := httptest.NewRecorder()
   router.ServeHTTP(response, httptest.NewRequest("GET", "/activate", nil))
-  if response.Code != http.StatusOK || !strings.Contains(response.Body.String(), "Activate member account") {
+  if response.Code != http.StatusOK || !strings.Contains(response.Body.String(), "Activate user account") {
     t.Fatalf("Activation page status %d: %s", response.Code, response.Body.String())
   }
   csrf := regexp.MustCompile(`name="x-csrf-token" content="([^"]+)"`).FindStringSubmatch(response.Body.String())
@@ -62,7 +62,7 @@ func TestMemberActivation(t *testing.T) {
   if result := submit("bob", code, password, "different-password", csrf[1]); result.Code != http.StatusBadRequest {
     t.Fatalf("Password mismatch: got status %d", result.Code)
   }
-  if _, err := member.Load(membersDirectory, "bob"); err == nil {
+  if _, err := user.Load(usersDirectory, "bob"); err == nil {
     t.Fatal("Account activated despite password mismatch")
   }
   if result := submit("bob", "invalid-code", password, password, csrf[1]); result.Code != http.StatusBadRequest {
@@ -75,7 +75,7 @@ func TestMemberActivation(t *testing.T) {
   if strings.Contains(result.Body.String(), password) || strings.Contains(result.Body.String(), code) {
     t.Fatal("Credentials exposed in response")
   }
-  if _, _, err := member.Authenticate(membersDirectory, "bob", []byte(password)); err != nil {
+  if _, _, err := user.Authenticate(usersDirectory, "bob", []byte(password)); err != nil {
     t.Fatalf("Account cannot authenticate: %v", err)
   }
   if result := submit("bob", code, password, password, csrf[1]); result.Code != http.StatusBadRequest {

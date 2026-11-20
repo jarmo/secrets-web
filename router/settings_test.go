@@ -8,17 +8,17 @@ import (
   "testing"
 )
 
-func TestMemberPasswordChange(t *testing.T) {
-  fixture := newMemberWebTestFixture(t)
+func TestUserPasswordChange(t *testing.T) {
+  fixture := newUserWebTestFixture(t)
   csrfCookie, csrfToken := fixture.csrf()
-  oldPassword := fixture.memberPassword
-  newPassword := "different, secure member password 456"
+  oldPassword := fixture.userPassword
+  newPassword := "different, secure user password 456"
 
   if result := fixture.send("GET", "/settings", "", csrfCookie, ""); result.Code != http.StatusSeeOther {
     t.Fatalf("Settings accessible without login: %d", result.Code)
   }
-  memberCookie := fixture.login(csrfCookie, csrfToken)
-  settings := fixture.send("GET", "/settings", "", memberCookie, "")
+  userCookie := fixture.login(csrfCookie, csrfToken)
+  settings := fixture.send("GET", "/settings", "", userCookie, "")
   if settings.Code != http.StatusOK || !strings.Contains(settings.Body.String(), "Change password") {
     t.Fatalf("Settings unavailable: %d", settings.Code)
   }
@@ -39,7 +39,7 @@ func TestMemberPasswordChange(t *testing.T) {
       "newPassword": {next},
       "confirmation": {confirmation},
     }
-    return fixture.send("POST", "/settings/password", form.Encode(), memberCookie, csrf).Code
+    return fixture.send("POST", "/settings/password", form.Encode(), userCookie, csrf).Code
   }
 
   if status := change(oldPassword, newPassword, newPassword, ""); status != http.StatusPreconditionFailed {
@@ -57,17 +57,17 @@ func TestMemberPasswordChange(t *testing.T) {
   if status := change(oldPassword, oldPassword, oldPassword, csrfToken); status != http.StatusBadRequest {
     t.Fatalf("Unchanged password accepted: %d", status)
   }
-  if result := fixture.send("GET", "/vaults", "", memberCookie, ""); result.Code != http.StatusOK {
+  if result := fixture.send("GET", "/vaults", "", userCookie, ""); result.Code != http.StatusOK {
     t.Fatalf("Failed password change invalidated session: %d", result.Code)
   }
 
   if status := change(oldPassword, newPassword, newPassword, csrfToken); status != http.StatusNoContent {
     t.Fatalf("Password change: %d", status)
   }
-  if result := fixture.send("GET", "/vaults", "", memberCookie, ""); result.Code != http.StatusSeeOther {
+  if result := fixture.send("GET", "/vaults", "", userCookie, ""); result.Code != http.StatusSeeOther {
     t.Fatalf("Session remained active after password change: %d", result.Code)
   }
-  if result := fixture.send("GET", "/settings", "", memberCookie, ""); result.Code != http.StatusSeeOther {
+  if result := fixture.send("GET", "/settings", "", userCookie, ""); result.Code != http.StatusSeeOther {
     t.Fatalf("Settings remained accessible after password change: %d", result.Code)
   }
 
@@ -104,11 +104,11 @@ func TestMemberPasswordChange(t *testing.T) {
   }
 }
 
-func TestMemberPasswordChangeRequiresMemberSession(t *testing.T) {
-  fixture := newMemberWebTestFixture(t)
+func TestUserPasswordChangeRequiresUserSession(t *testing.T) {
+  fixture := newUserWebTestFixture(t)
   csrfCookie, csrfToken := fixture.csrf()
   form := url.Values{
-    "currentPassword": {fixture.memberPassword},
+    "currentPassword": {fixture.userPassword},
     "newPassword": {"some other long password 123"},
     "confirmation": {"some other long password 123"},
   }

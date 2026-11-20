@@ -7,7 +7,7 @@ import (
   "github.com/jarmo/secrets-web/session"
 )
 
-func Logout(active *session.MemberSessions) gin.HandlerFunc {
+func Logout(active *session.UserSessions) gin.HandlerFunc {
   return func(c *gin.Context) {
     if err := active.Logout(c); err != nil {
       c.Status(http.StatusInternalServerError)

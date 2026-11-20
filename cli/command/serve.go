@@ -9,6 +9,7 @@ import (
   "strconv"
 
   "github.com/jarmo/secrets-web/router"
+  "github.com/jarmo/secrets/user"
 )
 
 type Serve struct {
@@ -18,7 +19,7 @@ type Serve struct {
   Host string
   Port string
   Pid string
-  MembersDirectory string
+  UsersDirectory string
 }
 
 func (command Serve) Execute() {
@@ -29,11 +30,11 @@ func (command Serve) Execute() {
 
 func serveUntilExit(command Serve) error {
   isProdMode := isProdMode()
-  configurationPath, membersDirectory, err := resolveStoragePaths(command.ConfigurationPath, command.MembersDirectory)
+  configurationPath, usersDirectory, err := resolveStoragePaths(command.ConfigurationPath, command.UsersDirectory)
   if err != nil {
     return err
   }
-  router := router.Create(configurationPath, membersDirectory, isProdMode)
+  router := router.Create(configurationPath, usersDirectory, isProdMode)
   port := argumentOrDefault(command.Port, "9090")
 
   if command.Pid != "" {
@@ -49,9 +50,9 @@ func serveUntilExit(command Serve) error {
 
 }
 
-func resolveStoragePaths(configurationPath, membersDirectory string) (string, string, error) {
-  if configurationPath != "" && membersDirectory != "" {
-    return configurationPath, membersDirectory, nil
+func resolveStoragePaths(configurationPath, usersDirectory string) (string, string, error) {
+  if configurationPath != "" && usersDirectory != "" {
+    return configurationPath, usersDirectory, nil
   }
 
   configHome := os.Getenv("XDG_CONFIG_HOME")
@@ -70,10 +71,10 @@ func resolveStoragePaths(configurationPath, membersDirectory string) (string, st
   if configurationPath == "" {
     configurationPath = filepath.Join(secretsDirectory, "config.json")
   }
-  if membersDirectory == "" {
-    membersDirectory = filepath.Join(secretsDirectory, "members")
+  if usersDirectory == "" {
+    usersDirectory = user.DefaultDirectory(secretsDirectory)
   }
-  return configurationPath, membersDirectory, nil
+  return configurationPath, usersDirectory, nil
 }
 
 func writePidToFile(path string) {

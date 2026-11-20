@@ -18,7 +18,7 @@ import (
 )
 
 const csrfToken = "csrf-token"
-const user = "user"
+const testVaultAlias = "user"
 const password = "password"
 
 func Test_Router(t *testing.T) {
@@ -28,7 +28,7 @@ func Test_Router(t *testing.T) {
   vaultPath := tempFilePath(t, "test-secrets-vault")
   defer os.Remove(vaultPath)
 
-  path.Store(configPath, vaultPath, user)
+  path.Store(configPath, vaultPath, testVaultAlias)
 
   initialSecrets := make([]secret.Secret, 0)
   storage.Write(vaultPath, []byte(password), initialSecrets)
@@ -61,7 +61,7 @@ func Test_Router(t *testing.T) {
 
   t.Run("GET / => Authenticated", func(t *testing.T) {
     req, _ := http.NewRequest("GET", "/", nil)
-    authenticate(req, user, password)
+    authenticate(req, testVaultAlias, password)
     res := httptest.NewRecorder()
     router.ServeHTTP(res, req)
 
@@ -82,7 +82,7 @@ func Test_Router(t *testing.T) {
 
   t.Run("GET / => Authenticated with invalid password", func(t *testing.T) {
     req, _ := http.NewRequest("GET", "/", nil)
-    authenticate(req, user, "invalid-password")
+    authenticate(req, testVaultAlias, "invalid-password")
     res := httptest.NewRecorder()
     router.ServeHTTP(res, req)
 
@@ -125,7 +125,7 @@ func Test_Router(t *testing.T) {
 
   t.Run("POST /secrets => No CSRF header", func(t *testing.T) {
     req, _ := http.NewRequest("POST", "/secrets", nil)
-    authenticate(req, user, password)
+    authenticate(req, testVaultAlias, password)
     res := httptest.NewRecorder()
     router.ServeHTTP(res, req)
 
@@ -136,7 +136,7 @@ func Test_Router(t *testing.T) {
 
   t.Run("POST /secrets => Invalid CSRF header", func(t *testing.T) {
     req, _ := http.NewRequest("POST", "/secrets", nil)
-    authenticate(req, user, password)
+    authenticate(req, testVaultAlias, password)
     req.Header.Set("Cookie", session)
     req.Header.Set("X-Csrf-Token", "invalid-token")
     res := httptest.NewRecorder()
@@ -258,7 +258,7 @@ func Test_Router(t *testing.T) {
 
 func request(router *gin.Engine, method, path, body, session string) *httptest.ResponseRecorder {
   req, _ := http.NewRequest(method, path, strings.NewReader(body))
-  authenticate(req, user, password)
+  authenticate(req, testVaultAlias, password)
   req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
   req.Header.Set("Cookie", session)
   req.Header.Set("X-Csrf-Token", csrfToken)
