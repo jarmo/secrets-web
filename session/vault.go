@@ -1,7 +1,9 @@
 package session
 
 import (
+  "crypto/ecdh"
   "encoding/base64"
+  "net/url"
   "errors"
   "strings"
 
@@ -16,6 +18,29 @@ type Vault struct {
   Path string
   Password []byte
   Secrets []secret.Secret
+  MemberKey *ecdh.PrivateKey
+}
+
+func (vault Vault) URL() string {
+  if vault.MemberKey != nil {
+    return "/vaults/" + url.PathEscape(vault.Alias)
+  }
+  return "/secrets"
+}
+
+func (vault Vault) RedirectURL() string {
+  if vault.MemberKey != nil {
+    return vault.URL()
+  }
+  return "/"
+}
+
+func (vault Vault) Save(secrets []secret.Secret) error {
+  if vault.MemberKey != nil {
+    return storage.WriteForMember(vault.Path, vault.MemberKey, secrets)
+  }
+  storage.Write(vault.Path, vault.Password, secrets)
+  return nil
 }
 
 func CreateVault(configurationPath string, c *gin.Context) (Vault, error) {

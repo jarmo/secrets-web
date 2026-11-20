@@ -13,6 +13,7 @@ func CreateCookie(prodModeEnabled bool) gin.HandlerFunc {
     Path: "/",
     HttpOnly: true,
     Secure: prodModeEnabled,
+    MaxAge: MaxAgeInSeconds,
   })
 
   return sessions.Sessions("secrets", sessionStore)

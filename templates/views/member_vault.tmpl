@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{ .alias }} - Secrets</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="x-csrf-token" content="{{ .csrfToken }}">
+    <link rel="stylesheet" href="/public/assets/css/bootstrap-reboot.min.css">
+    <link rel="stylesheet" href="/public/assets/css/app.css">
+    <script src="/public/assets/js/member_session.js" defer></script>
+  </head>
+  <body>
+    <main>
+      <div class="container">
+        <h1>{{ .alias }}</h1>
+        <p><a href="/vaults">All vaults</a></p>
+        {{ range .secrets }}<div class="secret"><h2>{{ .Name }}</h2><pre>{{ .Value }}</pre></div>{{ else }}<p>This vault is empty.</p>{{ end }}
+        <form id="member-logout" action="/member-logout" method="post"><input type="submit" value="Logout"></form>
+      </div>
+    </main>
+  </body>
+</html>

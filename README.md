@@ -39,7 +39,7 @@ Options:
 
 ### Initializing Vault
 
-Vault needs to be initialized for each user. Initializing vault just stores location and alias to your vault into a configuration file. Alias will be used for logging in from the login form.
+Initializing a vault stores its file path and alias in the configuration file. Repeat this for each vault.
 
 When using [command-line client](https://github.com/jarmo/secrets-cli) then it is possible to reuse the same configuration file.
 
@@ -66,15 +66,8 @@ $ secrets-web serve --config ~/vault-conf.json --cert cert.crt --cert-priv-key c
 
 Now open browser at [https://localhost:9090](https://localhost:9090) to be greeted with a login form.
 
-Log-in with previously created **alias** as user and enter some **strong passphrase**! It is
-recommended to write that password somewhere for the first login and then
-copy-paste it so that there would be no typos.
-
-Add some secret via **Add** button to actually create your vault!
-
-**PS!** Remember that passphrase since there is no "forgot my password"
-functionality (and if there would be then it would defeat the purpose) and it
-is impossible to retrieve any of your secrets in case you should forget it.
+Log in with your activated member username and password. There is no password
+recovery, so keep your password safe.
 
 ## Member activation
 
@@ -86,6 +79,13 @@ This creates their account; vault access is granted separately by the administra
 The web app and CLI must use the same member directory. Pass `--members-dir`
 to both commands when using different defaults (for the web app, the default
 is `members/` next to the vault configuration file).
+
+### Member login
+
+Members log in using their username and password at `/`. The vault list shows
+only vaults they can access, granted through the CLI `member-add` command.
+Members can view and manage secrets in each authorized vault. Existing vault alias
+and password login remains available temporarily for legacy compatibility.
 
 ## Using multiple vaults
 

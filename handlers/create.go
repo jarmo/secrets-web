@@ -1,9 +1,9 @@
 package handlers
 
 import (
+  "net/http"
   "github.com/gin-gonic/gin"
   "github.com/jarmo/secrets/vault"
-  "github.com/jarmo/secrets/storage"
   "github.com/jarmo/secrets-web/session"
   "github.com/jarmo/secrets-web/redirect"
 )
@@ -14,6 +14,9 @@ func Create(c *gin.Context) {
   sessionVault := c.MustGet("session").(session.Vault)
 
   _, newSecrets := vault.Add(sessionVault.Secrets, name, value)
-  storage.Write(sessionVault.Path, sessionVault.Password, newSecrets)
-  redirect.WithMessage(c, "/", "Added successfully")
+  if err := sessionVault.Save(newSecrets); err != nil {
+    c.Status(http.StatusInternalServerError)
+    return
+  }
+  redirect.WithMessage(c, sessionVault.RedirectURL(), "Added successfully")
 }

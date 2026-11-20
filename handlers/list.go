@@ -16,5 +16,6 @@ func List(c *gin.Context) {
 
   c.HTML(http.StatusOK, templates.Path("_secrets"), gin.H{
     "secrets": result,
+    "vaultPath": vaultSession.URL(),
   })
 }

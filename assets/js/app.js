@@ -9,8 +9,8 @@ function App(csrfToken, sessionMaxAgeInSeconds) {
 
       if (form.id === "login") {
         login(form)
-      } else if (form.id == "logout") {
-        window.location.reload()
+      } else if (form.id === "logout") {
+        request(form.action, "POST")
       } else if (formMethod === "GET") {
         get(form.action, new FormData(form), form.dataset.container)
       } else {
@@ -21,7 +21,16 @@ function App(csrfToken, sessionMaxAgeInSeconds) {
 
   function login(form) {
     session = new Session(document.getElementById("user").value, document.getElementById("password").value)
-    return request(form.action, "POST").then(logoutAfterSessionExpiration)
+    return request(form.action, "POST").then(function() {
+      if (session) logoutAfterSessionExpiration()
+    })
+  }
+
+  function encodeCredentials(user, password) {
+    var bytes = new TextEncoder().encode(user + ":" + password)
+    var binary = ""
+    for (var i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i])
+    return btoa(binary)
   }
 
   function get(path, data, container) {
@@ -29,18 +38,24 @@ function App(csrfToken, sessionMaxAgeInSeconds) {
   }
 
   function request(path, method, body, container) {
-    return fetch(path, {
-      method: method,
-      body: body,
-      headers: {
-        "X-Credentials": btoa(session.user + ":" + session.password),
-        "X-Csrf-Token": csrfToken
-      }
-    }).then(function(response) {
-      if (!response.ok && response.status !== 401) throw "Request failed! Please try again."
+    var headers = {"X-Csrf-Token": csrfToken}
+    if (session) headers["X-Credentials"] = encodeCredentials(session.user, session.password)
 
+    return fetch(path, {method: method, body: body, headers: headers}).then(function(response) {
+      if (response.status === 204) {
+        session = null
+        window.location.assign(path.endsWith("/logout") ? "/" : "/vaults")
+        return null
+      }
+      if (response.redirected && !session) {
+        window.location.assign(response.url)
+        return null
+      }
+      if (response.status === 401) session = null
+      if (!response.ok && response.status !== 401) throw "Request failed! Please try again."
       return response.text()
     }).then(function(body) {
+      if (body === null) return
       var resultContainer = container ? document.querySelector(container) : document.body
       resultContainer.innerHTML = body
       var firstVisibleAutofocusableField = Array

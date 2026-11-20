@@ -21,7 +21,7 @@
 						<div>Add Secret</div>
 					</div>
 					<div class="modal-content">
-						<form action="/secrets" method="POST">
+						<form action="{{ .vaultPath }}" method="POST">
 							<input id="secret-add-name" type="text" name="name" required autocomplete="off" autofocus>
 							<label for="secret-add-name"><span>Name</span></label>
 							<textarea id="secret-add-value" name="value" required autocomplete="off" rows="5"></textarea>
@@ -31,9 +31,14 @@
 					</div>
 				</div>
 			</div>
-			<a href="/" class="logout btn">× Logout</a>
+			{{ if .member }}
+				<a href="/vaults" class="btn">All vaults</a>
+				<form id="logout" action="/logout" method="POST"><button class="logout btn" type="submit">× Logout</button></form>
+			{{ else }}
+				<a href="/" class="logout btn">× Logout</a>
+			{{ end }}
 		</aside>
-		<form class="filter" action="/secrets" method="GET" data-container="#secrets">
+		<form class="filter" action="{{ .vaultPath }}{{ if .member }}/secrets{{ end }}" method="GET" data-container="#secrets">
 			<input id="filter" name="filter" type="text" autocomplete="off" autofocus>
 			<label for="filter"><span>Filter</span></label>
 			<input type="submit" value="Search" hidden>
