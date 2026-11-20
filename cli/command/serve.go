@@ -17,6 +17,7 @@ type Serve struct {
   Host string
   Port string
   Pid string
+  MembersDirectory string
 }
 
 func (command Serve) Execute() {
@@ -27,7 +28,11 @@ func (command Serve) Execute() {
 
 func serveUntilExit(command Serve) error {
   isProdMode := isProdMode()
-  router := router.Create(command.ConfigurationPath, isProdMode)
+  membersDirectory := command.MembersDirectory
+  if membersDirectory == "" {
+    membersDirectory = filepath.Join(filepath.Dir(command.ConfigurationPath), "members")
+  }
+  router := router.Create(command.ConfigurationPath, membersDirectory, isProdMode)
   port := argumentOrDefault(command.Port, "9090")
 
   if command.Pid != "" {

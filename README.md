@@ -21,7 +21,7 @@ $ secrets-web COMMAND [OPTIONS]
 
 Usage:
   secrets-web initialize --config=CONFIG_PATH --path=VAULT_PATH --alias=VAULT_ALIAS
-  secrets-web serve --config=CONFIG_PATH --cert=CERT_PATH --cert-priv-key=CERT_PRIVATE_KEY_PATH [--host=HOST] [--port=PORT] [--pid=PID_PATH]
+  secrets-web serve --config=CONFIG_PATH --cert=CERT_PATH --cert-priv-key=CERT_PRIVATE_KEY_PATH [--host=HOST] [--port=PORT] [--pid=PID_PATH] [--members-dir=MEMBERS_DIR]
 
 Options:
   --config CONFIG_PATH                      Configuration path for vaults.
@@ -32,6 +32,7 @@ Options:
   --host HOST                               Host to bind to. Defaults to 0.0.0.0.
   --port PORT                               Port to listen on. Defaults to 9090.
   --pid PID_PATH                            Save PID to file.
+  --members-dir MEMBERS_DIR                 Member account directory.
   -h --help                                 Show this screen.
   -v --version                              Show version.
 ```
@@ -75,6 +76,17 @@ Add some secret via **Add** button to actually create your vault!
 functionality (and if there would be then it would defeat the purpose) and it
 is impossible to retrieve any of your secrets in case you should forget it.
 
+## Member activation
+
+Members are created by an administrator using `secrets member-create NAME`.
+The administrator shares the one-time setup code securely. The member opens
+`/activate` in the web app, enters the code, and chooses their own password.
+This creates their account; vault access is granted separately by the administrator.
+
+The web app and CLI must use the same member directory. Pass `--members-dir`
+to both commands when using different defaults (for the web app, the default
+is `members/` next to the vault configuration file).
+
 ## Using multiple vaults
 
 To add support for other user/vault, then just execute `initialize` command
@@ -93,12 +105,11 @@ location!
 
 ## Development
 
-1. Clone repository, retrieve dependencies and run tests:
+1. Clone repository and run tests (assets are generated automatically):
 
 ```
 git clone https://github.com/jarmo/secrets-web.git
 cd secrets-web
-go get github.com/jessevdk/go-assets-builder@v0.0.0-20130903091706-b8483521738f
 make test
 ```
 

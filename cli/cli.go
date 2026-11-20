@@ -15,7 +15,7 @@ func createUsage() string {
 
 Usage:
   secrets-web initialize --config=CONFIG_PATH --path=VAULT_PATH --alias=VAULT_ALIAS
-  secrets-web serve --config=CONFIG_PATH --cert=CERT_PATH --cert-priv-key=CERT_PRIVATE_KEY_PATH [--host=HOST] [--port=PORT] [--pid=PID_PATH]
+  secrets-web serve --config=CONFIG_PATH --cert=CERT_PATH --cert-priv-key=CERT_PRIVATE_KEY_PATH [--host=HOST] [--port=PORT] [--pid=PID_PATH] [--members-dir=MEMBERS_DIR]
 
 Options:
   --config CONFIG_PATH                      Configuration path for vaults.
@@ -26,6 +26,7 @@ Options:
   --host HOST                               Host to bind to. Defaults to 0.0.0.0.
   --port PORT                               Port to listen on. Defaults to 9090.
   --pid PID_PATH                            Save PID to file.
+  --members-dir MEMBERS_DIR                 Member account directory. Defaults to members/ beside the configuration file.
   -h --help                                 Show this screen.
   -v --version                              Show version.`
 }
@@ -43,7 +44,8 @@ func createCommand(arguments map[string]interface {}) command.Executable {
     host := argument(arguments, "--host")
     port := argument(arguments, "--port")
     pid := argument(arguments, "--pid")
-    return command.Serve{ConfigurationPath: configPath, CertificatePath: certificatePath, CertificatePrivKeyPath: certificatePrivKeyPath, Host: host, Port: port, Pid: pid}
+    membersDirectory := argument(arguments, "--members-dir")
+    return command.Serve{ConfigurationPath: configPath, CertificatePath: certificatePath, CertificatePrivKeyPath: certificatePrivKeyPath, Host: host, Port: port, Pid: pid, MembersDirectory: membersDirectory}
   } else {
     return nil
   }

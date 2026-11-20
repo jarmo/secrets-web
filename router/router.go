@@ -12,7 +12,7 @@ import (
   "github.com/jarmo/secrets-web/templates"
 )
 
-func Create(configurationPath string, prodModeEnabled bool) *gin.Engine {
+func Create(configurationPath, membersDirectory string, prodModeEnabled bool) *gin.Engine {
   if prodModeEnabled {
     gin.SetMode(gin.ReleaseMode)
   }
@@ -28,13 +28,15 @@ func Create(configurationPath string, prodModeEnabled bool) *gin.Engine {
   router.Use(middleware.CacheControl())
   router.Use(middleware.CsrfProtection())
   router.StaticFS("/public", generated.Assets)
-  initRoutes(router, configurationPath)
+  initRoutes(router, configurationPath, membersDirectory)
 
   return router
 }
 
-func initRoutes(router *gin.Engine, configurationPath string) {
+func initRoutes(router *gin.Engine, configurationPath, membersDirectory string) {
   router.POST("/login", handlers.Login(configurationPath))
+  router.GET("/activate", handlers.ActivationForm)
+  router.POST("/activate", handlers.Activate(membersDirectory))
 
   authenticated := router.Group("", middleware.Authenticated(configurationPath))
   authenticated.GET("/", handlers.Index)

@@ -144,3 +144,12 @@ func TestCommand_ServeWithPid(t *testing.T) {
       t.Fatalf("Got unexpected command: %T", parsedCommand)
   }
 }
+
+func TestCommand_ServeWithMembersDirectory(t *testing.T) {
+  parsedCommand := Command(version, []string{
+    "serve", "--config", "config-path", "--cert", "cert", "--cert-priv-key", "key", "--members-dir", "/private/members",
+  }).(command.Serve)
+  if parsedCommand.MembersDirectory != "/private/members" {
+    t.Fatalf("Expected member directory, got %q", parsedCommand.MembersDirectory)
+  }
+}

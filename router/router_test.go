@@ -34,7 +34,7 @@ func Test_Router(t *testing.T) {
   storage.Write(vaultPath, []byte(password), initialSecrets)
 
   gin.SetMode(gin.ReleaseMode)
-  router := Create(configPath, false)
+  router := Create(configPath, "", false)
   router.GET("/init-csrf-token", func(c *gin.Context) {
     session := sessions.Default(c)
     session.Set("csrfToken", csrfToken)

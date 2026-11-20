@@ -10,11 +10,11 @@ clean:
 	rm -rf generated/assets.go
 
 vendor: assets
-	go mod vendor
 	go mod tidy
+	go mod vendor
 
 assets:
-	go-assets-builder -p generated -o generated/assets.go assets templates/views
+	go run -mod=mod script/generate_assets.go assets templates/views
 
 linux: vendor
 	GOOS=linux ${GO_BUILD} -o bin/linux_${GOARCH}/${BINARY}

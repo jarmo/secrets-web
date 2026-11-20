@@ -14,7 +14,12 @@ func Create() (*template.Template, error) {
     if file.IsDir() || !strings.HasSuffix(name, ".tmpl") {
       continue
     }
-    content, err := ioutil.ReadAll(file)
+    resource, err := generated.Assets.Open(name)
+    if err != nil {
+      return nil, err
+    }
+    content, err := ioutil.ReadAll(resource)
+    resource.Close()
     if err != nil {
       return nil, err
     }
