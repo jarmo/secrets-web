@@ -63,13 +63,13 @@ document.addEventListener("submit", function(event) {
   if (!input || input.value !== input.dataset.deleteName) event.preventDefault()
 }, true)
 
-document.addEventListener("keydown", function(event) {
-  if (event.key !== "Escape") return
+window.addEventListener("keydown", function(event) {
+  if (event.key !== "Escape" || event.target.matches(".filter-input")) return
   var panel = event.target.closest("#add-secret[open], #secrets details.secret[open]") ||
     document.querySelector("#add-secret[open], #secrets details.secret[open]")
   if (!panel) return
   event.preventDefault()
-  event.stopPropagation()
+  event.stopImmediatePropagation()
   panel.open = false
   if (panel.matches("#secrets details.secret")) resetDeleteConfirmation(panel)
   panel.querySelector("summary").focus({preventScroll: true})

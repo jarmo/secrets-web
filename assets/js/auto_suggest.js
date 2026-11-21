@@ -35,6 +35,16 @@ function AutoSuggest() {
     }
   })
 
+  window.addEventListener('keydown', function(event) {
+    if (event.key !== "Escape" || !event.target.matches || !event.target.matches(".filter-input")) return
+    event.preventDefault()
+    event.stopImmediatePropagation()
+    if (event.target.value) {
+      event.target.value = ""
+      event.target.dispatchEvent(new Event("input", {bubbles: true}))
+    }
+  }, true)
+
   document.addEventListener('keydown', function(event) {
     if (event.key !== "Enter") return
 
