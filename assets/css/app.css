@@ -90,6 +90,7 @@ h2 { font-size: 1.15rem; font-weight: 650; letter-spacing: -.015em; }
 }
 .brand { display: inline-flex; gap: .12rem; align-items: center; color: var(--text); text-decoration: none; font-size: 1.55rem; font-weight: 760; letter-spacing: -.06em; white-space: nowrap; }
 .brand img { width: 44px; height: 39px; object-fit: contain; }
+.brand > span, .auth-brand > span { margin-left: -5px; }
 .brand:hover { color: var(--text); }
 .site-nav { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: .25rem; }
 .site-nav form { display: inline; margin: 0; }
