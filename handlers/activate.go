@@ -50,5 +50,6 @@ func showActivation(c *gin.Context, status int, message string, activated bool) 
     "csrfToken": middleware.CsrfToken(sessions.Default(c)),
     "error": message,
     "activated": activated,
+    "authPage": true,
   })
 }

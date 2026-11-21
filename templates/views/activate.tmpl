@@ -1,38 +1,50 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title>Activate user - Secrets</title>
+    <title>Activate account — Secrets</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="x-csrf-token" content="{{ .csrfToken }}">
+    <script src="/public/assets/js/theme.js"></script>
     <link rel="stylesheet" href="/public/assets/css/bootstrap-reboot.min.css">
     <link rel="stylesheet" href="/public/assets/css/app.css">
     <link rel="icon" type="image/png" href="/public/assets/favicon.png">
     <script src="/public/assets/js/activate.js" defer></script>
   </head>
   <body>
-    <main>
-      <div class="container">
-        <h1 id="title"><img src="/public/assets/favicon.png">ecrets</h1>
+    {{ template "/templates/views/_nav.tmpl" . }}
+    <main class="auth-layout">
+      <section class="panel auth-card" aria-labelledby="activation-heading">
+        <div class="auth-brand"><img src="/public/assets/favicon.png" alt="" width="76" height="69"><span>ecrets</span></div>
+        <h1 id="activation-heading">Activate your account</h1>
         {{ if .activated }}
-          <p>Account activated successfully.</p>
+          <p class="page-description">Your account is ready.</p>
+          <p class="auth-footer"><a href="/">Continue to login</a></p>
         {{ else }}
-          {{ if .error }}<p role="alert">{{ .error }}</p>{{ end }}
-          <h2>Activate user account</h2>
+          <p class="page-description">Use the setup code provided by your administrator.</p>
+          {{ if .error }}<div class="toast toast-error" role="alert"><p>{{ .error }}</p></div>{{ end }}
           <form id="activate" action="/activate" method="post">
-            <input id="username" name="username" type="text" required autocomplete="username" autofocus>
-            <label for="username"><span>Username</span></label>
-            <input id="setup-code" name="setupCode" type="text" required autocomplete="off">
-            <label for="setup-code"><span>Setup code</span></label>
-            <input id="password" name="password" type="password" required minlength="12" autocomplete="new-password">
-            <label for="password"><span>Password</span></label>
-            <input id="confirmation" name="confirmation" type="password" required minlength="12" autocomplete="new-password">
-            <label for="confirmation"><span>Confirm password</span></label>
-            <input type="submit" value="Activate">
+            <div class="field">
+              <label for="username">Username</label>
+              <input id="username" name="username" type="text" required autocomplete="username" autofocus>
+            </div>
+            <div class="field">
+              <label for="setup-code">Setup code</label>
+              <input id="setup-code" name="setupCode" type="text" required autocomplete="off" spellcheck="false">
+            </div>
+            <div class="field">
+              <label for="password">Password</label>
+              <input id="password" name="password" type="password" required minlength="12" autocomplete="new-password">
+            </div>
+            <div class="field">
+              <label for="confirmation">Confirm password</label>
+              <input id="confirmation" name="confirmation" type="password" required minlength="12" autocomplete="new-password">
+            </div>
+            <div class="form-actions"><button type="submit" class="btn btn-primary">Activate account</button></div>
           </form>
+          <p class="auth-footer"><a href="/">Back to login</a></p>
         {{ end }}
-        <p><a href="/">Back to login</a></p>
-      </div>
+      </section>
     </main>
   </body>
 </html>

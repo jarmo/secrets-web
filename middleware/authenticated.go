@@ -17,6 +17,7 @@ func Authenticated(configurationPath string) gin.HandlerFunc {
       c.HTML(http.StatusUnauthorized, templates.Path("login"), gin.H{
         "sessionMaxAgeInSeconds": session.MaxAgeInSeconds,
         "csrfToken": CsrfToken(serverSession),
+        "authPage": true,
       })
       c.AbortWithStatus(http.StatusUnauthorized)
     } else {

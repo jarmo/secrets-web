@@ -54,6 +54,7 @@ func Login(configurationPath, usersDirectory string, active *session.UserSession
 func showLoginError(c *gin.Context) {
   c.HTML(http.StatusUnauthorized, templates.Path("login"), gin.H{
     "error": "Invalid username or password",
+    "authPage": true,
     "csrfToken": middleware.CsrfToken(sessions.Default(c)),
     "sessionMaxAgeInSeconds": session.MaxAgeInSeconds,
   })

@@ -39,7 +39,7 @@ func TestUserVaultAccessAndEditing(t *testing.T) {
 	}
 	if !strings.Contains(vault.Body.String(), `action="/vaults/production"`) ||
 		!strings.Contains(vault.Body.String(), `action="/vaults/production/secrets"`) ||
-		!strings.Contains(vault.Body.String(), "Add Secret") ||
+		!strings.Contains(vault.Body.String(), `id="add-secret"`) ||
 		strings.Contains(vault.Body.String(), `action="/secrets"`) {
 		t.Fatal("User vault did not reuse the secret editor with vault-scoped actions")
 	}

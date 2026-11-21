@@ -1,51 +1,43 @@
-<main>
-	<div class="container">
-		{{ if .error }}
-			<div class="toast toast-error">
-				<p>{{ .error }}</p>
-				<div class="toast-progress"></div>
-			</div>
-		{{ end }}
-		{{ if .message }}
-			<div class="toast toast-success">
-				<p>{{ .message }}</p>
-				<div class="toast-progress"></div>
-			</div>
-		{{ end }}
-		<aside>
-			<a href="#" class="add btn btn-modal" data-target="#add-modal">+ Add</a>
-			<div id="add-modal" class="modal">
-				<div class="modal-container">
-					<div class="modal-header">
-						<a href="#" class="close btn">×</a>
-						<div>Add Secret</div>
-					</div>
-					<div class="modal-content">
-						<form action="{{ .vaultPath }}" method="POST">
-							<input id="secret-add-name" type="text" name="name" required autocomplete="off" autofocus>
-							<label for="secret-add-name"><span>Name</span></label>
-							<textarea id="secret-add-value" name="value" required autocomplete="off" rows="5"></textarea>
-							<label for="secret-add-value"><span>Value</span></label>
-							<input type="submit" value="Add">
-						</form>
-					</div>
-				</div>
-			</div>
-			{{ if .user }}
-				<a href="/vaults" class="btn">All vaults</a>
-				<a href="/settings" class="btn">Settings</a>
-				<form id="logout" action="/logout" method="POST"><button class="logout btn" type="submit">× Logout</button></form>
-			{{ else }}
-				<a href="/" class="logout btn">× Logout</a>
-			{{ end }}
-		</aside>
-		<form class="filter" action="{{ .vaultPath }}{{ if .user }}/secrets{{ end }}" method="GET" data-container="#secrets">
-			<input id="filter" name="filter" type="text" autocomplete="off" autofocus>
-			<label for="filter"><span>Filter</span></label>
-			<input type="submit" value="Search" hidden>
-		</form>
-		<div id="secrets">
-		  {{ template "/templates/views/_secrets.tmpl" . }}
-		</div>
-	</div>
+{{ template "/templates/views/_nav.tmpl" . }}
+<main class="app-shell">
+  {{ if .error }}<div class="toast toast-error" role="alert"><p>{{ .error }}</p></div>{{ end }}
+  {{ if .message }}<div class="toast toast-success" role="status"><p>{{ .message }}</p></div>{{ end }}
+  <div class="vault-heading">
+    <div class="page-heading vault-title">
+      <p class="eyebrow">Encrypted vault</p>
+      <h1 title="{{ .alias }}">{{ if .alias }}{{ .alias }}{{ else }}Your secrets{{ end }}</h1>
+    </div>
+    <details id="add-secret" class="new-secret">
+    <summary>Add secret</summary>
+    <div class="new-secret-body">
+      <form action="{{ .vaultPath }}" method="POST">
+        <div class="field">
+          <label for="secret-add-name">Name</label>
+          <input id="secret-add-name" type="text" name="name" required autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="secret-add-value">Value</label>
+          <textarea id="secret-add-value" name="value" required autocomplete="off" rows="5"></textarea>
+        </div>
+        <div class="form-actions"><button type="submit" class="btn btn-primary">Add secret</button></div>
+      </form>
+    </div>
+    </details>
+  </div>
+  {{ if .secrets }}
+  <div class="section-toolbar">
+    <form class="filter" action="{{ .vaultPath }}{{ if .user }}/secrets{{ end }}" method="GET" data-container="#secrets" role="search">
+      <label for="filter" class="sr-only">Filter secrets</label>
+      <input class="filter-input" id="filter" name="filter" type="search" autocomplete="off" placeholder="Filter secrets…" autofocus>
+      <button type="button" class="filter-clear" data-clear-filter aria-label="Clear secrets filter" hidden>×</button>
+      <input type="submit" value="Search" hidden>
+    </form>
+  </div>
+  {{ else }}
+    <div class="panel empty-state"><h2>No secrets yet</h2><p>Add your first secret to get started.</p></div>
+  {{ end }}
+  <div id="secrets" aria-label="Secrets">
+    {{ template "/templates/views/_secrets.tmpl" . }}
+  </div>
+  {{ if not .user }}<p class="help-text" style="margin-top: 2rem;"><a href="/">Return to login</a></p>{{ end }}
 </main>

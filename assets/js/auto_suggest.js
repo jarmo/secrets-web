@@ -7,7 +7,24 @@ function AutoSuggest() {
     }
   })
 
+  function syncClearButton(input) {
+    var clear = input.closest(".filter").querySelector("[data-clear-filter]")
+    if (clear) clear.hidden = !input.value
+  }
+
+  document.addEventListener('click', function(event) {
+    var clear = event.target.closest("[data-clear-filter]")
+    if (!clear) return
+    var input = clear.closest(".filter").querySelector(".filter-input")
+    input.value = ""
+    input.dispatchEvent(new Event("input", {bubbles: true}))
+    input.focus()
+  })
+
+  document.querySelectorAll(".filter-input").forEach(syncClearButton)
+
   document.addEventListener('input', function(event) {
+    if (event.target.classList && event.target.classList.contains("filter-input")) syncClearButton(event.target)
     if (event.target.id === "vault-filter") {
       var filter = event.target.value.toLowerCase()
       document.querySelectorAll("#vaults .vault").forEach(function(vault) {

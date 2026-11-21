@@ -1,36 +1,38 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title>Your vaults - Secrets</title>
+    <title>Your vaults — Secrets</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="x-csrf-token" content="{{ .csrfToken }}">
+    <meta name="x-session-max-age-in-seconds" content="{{ .sessionMaxAgeInSeconds }}">
+    <script src="/public/assets/js/theme.js"></script>
     <link rel="stylesheet" href="/public/assets/css/bootstrap-reboot.min.css">
     <link rel="stylesheet" href="/public/assets/css/app.css">
-    <meta name="x-session-max-age-in-seconds" content="{{ .sessionMaxAgeInSeconds }}">
-    <script src="/public/assets/js/app.js"></script>
-    <script src="/public/assets/js/modal.js"></script>
-    <script src="/public/assets/js/auto_suggest.js"></script>
-    <script src="/public/assets/js/initialize_app.js"></script>
-    <script src="/public/assets/js/session_expiration.js"></script>
+    <link rel="icon" type="image/png" href="/public/assets/favicon.png">
+    <script src="/public/assets/js/app.js" defer></script>
+    <script src="/public/assets/js/auto_suggest.js" defer></script>
+    <script src="/public/assets/js/initialize_app.js" defer></script>
+    <script src="/public/assets/js/session_expiration.js" defer></script>
   </head>
   <body>
-    <main>
-      <div class="container">
-        <aside>
-          <a href="/settings" class="btn">Settings</a>
-          <form id="logout" action="/logout" method="post"><button class="logout btn" type="submit">× Logout</button></form>
-        </aside>
+    {{ template "/templates/views/_nav.tmpl" . }}
+    <main class="app-shell">
+      <div class="page-heading">
+        <p class="eyebrow">Your workspace</p>
         <h1>Your vaults</h1>
-        {{ if .vaults }}
-          <div class="filter">
-            <input id="vault-filter" type="text" autocomplete="off" autofocus>
-            <label for="vault-filter"><span>Filter</span></label>
+      </div>
+      {{ if .vaults }}
+        <div class="section-toolbar">
+          <div class="filter" role="search">
+            <label for="vault-filter" class="sr-only">Filter vaults</label>
+            <input class="filter-input" id="vault-filter" type="search" autocomplete="off" placeholder="Filter vaults…" autofocus>
+            <button type="button" class="filter-clear" data-clear-filter aria-label="Clear vault filter" hidden>×</button>
           </div>
-        {{ end }}
-        <div id="vaults">
-          {{ range .vaults }}<p class="vault"><a href="/vaults/{{ . | urlquery }}">{{ . }}</a></p>{{ else }}<p>No vaults available.</p>{{ end }}
         </div>
+      {{ end }}
+      <div id="vaults" class="vault-list">
+        {{ range .vaults }}<p class="vault"><a href="/vaults/{{ . | urlquery }}">{{ . }}</a></p>{{ else }}<div class="panel empty-state"><h2>No vaults available yet</h2><p>Ask your administrator to grant you access using <code>secrets user-add</code>. See the <a href="https://github.com/jarmo/secrets-cli#readme">CLI documentation</a>.</p></div>{{ end }}
       </div>
     </main>
   </body>

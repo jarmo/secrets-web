@@ -17,7 +17,10 @@ function App(csrfToken, sessionMaxAgeInSeconds) {
         get(form.action, new FormData(form), form.dataset.container).then(function() {
           if (openSingle) {
             var matches = document.querySelectorAll("#secrets .secret")
-            if (matches.length === 1) matches[0].querySelector(".btn-modal").click()
+            if (matches.length === 1) {
+              matches[0].open = true
+              matches[0].querySelector("summary").focus()
+            }
           }
         })
       } else {

@@ -25,7 +25,7 @@ func TestUserActivation(t *testing.T) {
   router := Create("unused-config", usersDirectory, false)
   response := httptest.NewRecorder()
   router.ServeHTTP(response, httptest.NewRequest("GET", "/activate", nil))
-  if response.Code != http.StatusOK || !strings.Contains(response.Body.String(), "Activate user account") {
+  if response.Code != http.StatusOK || !strings.Contains(response.Body.String(), "Activate your account") {
     t.Fatalf("Activation page status %d: %s", response.Code, response.Body.String())
   }
   csrf := regexp.MustCompile(`name="x-csrf-token" content="([^"]+)"`).FindStringSubmatch(response.Body.String())
@@ -77,7 +77,7 @@ func TestUserActivation(t *testing.T) {
     t.Fatalf("Wrong code: got status %d", result.Code)
   }
   result := submit("bob", code, password, password, csrf[1])
-  if result.Code != http.StatusOK || !strings.Contains(result.Body.String(), "Account activated successfully") {
+  if result.Code != http.StatusOK || !strings.Contains(result.Body.String(), "Your account is ready.") {
     t.Fatalf("Activation: got status %d and body %s", result.Code, result.Body.String())
   }
   if strings.Contains(result.Body.String(), password) || strings.Contains(result.Body.String(), code) {

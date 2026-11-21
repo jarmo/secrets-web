@@ -1,39 +1,42 @@
 <!DOCTYPE html>
-<html>
-	<head>
-		<title>Secrets</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<meta name="x-csrf-token" content="{{ .csrfToken }}">
-		<meta name="x-session-max-age-in-seconds" content="{{ .sessionMaxAgeInSeconds }}">
-		<link rel="stylesheet" href="/public/assets/css/bootstrap-reboot.min.css">
-		<link rel="stylesheet" href="/public/assets/css/app.css">
-		<link rel="icon" type="image/png" href="/public/assets/favicon.png">
-		<script src="/public/assets/js/session.js"></script>
-		<script src="/public/assets/js/app.js"></script>
-		<script src="/public/assets/js/modal.js"></script>
-		<script src="/public/assets/js/auto_suggest.js"></script>
-		<script src="/public/assets/js/initialize_app.js"></script>
-	</head>
-	<body>
-	  <main>
-			<div class="container">
-				{{ if .error }}
-					<div class="toast toast-error">
-					  <p>{{ .error }}</p>
-					  <div class="toast-progress"></div>
-					</div>
-				{{ end }}
-				<h1 id="title"><img src="/public/assets/favicon.png">ecrets</h1>
-				<form id="login" action="/login" method="post">
-					<input id="user" name="user" type="text" required autocomplete="username" autofocus value="{{ .user }}">
-					<label for="user"><span>Username</span></label>
-					<input id="password" name="password" type="password" required autocomplete="current-password" {{ if .user }}autofocus{{ end }}>
-					<label for="password"><span>Password</span></label>
-					<input type="submit" value="Login">
-				</form>
-				<p><a href="/activate">Activate user account</a></p>
-			</div>
-	  </main>
-	</body>
+<html lang="en">
+  <head>
+    <title>Log in — Secrets</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="x-csrf-token" content="{{ .csrfToken }}">
+    <meta name="x-session-max-age-in-seconds" content="{{ .sessionMaxAgeInSeconds }}">
+    <script src="/public/assets/js/theme.js"></script>
+    <link rel="stylesheet" href="/public/assets/css/bootstrap-reboot.min.css">
+    <link rel="stylesheet" href="/public/assets/css/app.css">
+    <link rel="icon" type="image/png" href="/public/assets/favicon.png">
+    <script src="/public/assets/js/session.js" defer></script>
+    <script src="/public/assets/js/app.js" defer></script>
+    <script src="/public/assets/js/details.js" defer></script>
+    <script src="/public/assets/js/auto_suggest.js" defer></script>
+    <script src="/public/assets/js/initialize_app.js" defer></script>
+  </head>
+  <body>
+    {{ template "/templates/views/_nav.tmpl" . }}
+    <main class="auth-layout">
+      <section class="panel auth-card" aria-labelledby="login-heading">
+        <div class="auth-brand"><img src="/public/assets/favicon.png" alt="" width="76" height="69"><span>ecrets</span></div>
+        <h1 id="login-heading">Welcome back</h1>
+        <p class="page-description">Sign in to unlock your secrets.</p>
+        {{ if .error }}<div class="toast toast-error" role="alert"><p>{{ .error }}</p></div>{{ end }}
+        <form id="login" action="/login" method="post">
+          <div class="field">
+            <label for="user">Username</label>
+            <input id="user" name="user" type="text" required autocomplete="username" {{ if not .user }}autofocus{{ end }} value="{{ .user }}">
+          </div>
+          <div class="field">
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password" required autocomplete="current-password" {{ if .user }}autofocus{{ end }}>
+          </div>
+          <div class="form-actions"><button type="submit" class="btn btn-primary">Log in</button></div>
+        </form>
+        <p class="auth-footer">Have a setup code? <a href="/activate">Activate your account</a></p>
+      </section>
+    </main>
+  </body>
 </html>

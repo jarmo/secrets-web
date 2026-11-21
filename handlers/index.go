@@ -24,6 +24,11 @@ func renderVault(c *gin.Context, displayError error) {
     view = "vault"
   }
 
+  username := ""
+  if current, ok := c.Get("userSession"); ok {
+    username = current.(session.UserSession).Username
+  }
+
   c.HTML(http.StatusOK, templates.Path(view), gin.H{
     "message": redirect.Message(c),
     "error": displayError,
@@ -31,6 +36,7 @@ func renderVault(c *gin.Context, displayError error) {
     "vaultPath": vaultSession.URL(),
     "user": vaultSession.UserKey != nil,
     "alias": vaultSession.Alias,
+    "username": username,
     "csrfToken": middleware.CsrfToken(sessions.Default(c)),
     "sessionMaxAgeInSeconds": session.MaxAgeInSeconds,
   })

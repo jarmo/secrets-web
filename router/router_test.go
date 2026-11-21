@@ -66,7 +66,7 @@ func Test_Router(t *testing.T) {
     router.ServeHTTP(res, req)
 
     assertCode(t, 200, res.Code)
-    assertBody(t, res.Body.String(), "Filter")
+    assertBody(t, res.Body.String(), "No secrets yet")
   })
 
   t.Run("GET / => Authenticated with invalid user", func(t *testing.T) {
@@ -120,7 +120,7 @@ func Test_Router(t *testing.T) {
     assertNotInBody(t, res.Body.String(), "secret-1-value")
     assertBody(t, res.Body.String(), "secret-2-name")
     assertBody(t, res.Body.String(), "secret-2-value")
-    assertBody(t, res.Body.String(), "Edit Secret")
+    assertBody(t, res.Body.String(), `<details class="secret panel">`)
   })
 
   t.Run("POST /secrets => No CSRF header", func(t *testing.T) {

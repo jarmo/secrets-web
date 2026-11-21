@@ -1,36 +1,45 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title>Settings - Secrets</title>
+    <title>Settings — Secrets</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="x-csrf-token" content="{{ .csrfToken }}">
     <meta name="x-session-max-age-in-seconds" content="{{ .sessionMaxAgeInSeconds }}">
+    <script src="/public/assets/js/theme.js"></script>
     <link rel="stylesheet" href="/public/assets/css/bootstrap-reboot.min.css">
     <link rel="stylesheet" href="/public/assets/css/app.css">
     <link rel="icon" type="image/png" href="/public/assets/favicon.png">
-    <script src="/public/assets/js/app.js"></script>
-    <script src="/public/assets/js/modal.js"></script>
-    <script src="/public/assets/js/auto_suggest.js"></script>
-    <script src="/public/assets/js/initialize_app.js"></script>
-    <script src="/public/assets/js/session_expiration.js"></script>
+    <script src="/public/assets/js/app.js" defer></script>
+    <script src="/public/assets/js/initialize_app.js" defer></script>
+    <script src="/public/assets/js/session_expiration.js" defer></script>
   </head>
   <body>
-    <main>
-      <div class="container">
+    {{ template "/templates/views/_nav.tmpl" . }}
+    <main class="app-shell">
+      <div class="page-heading">
+        <p class="eyebrow">Account</p>
         <h1>Settings</h1>
-        <p>Change password for {{ .username }}</p>
-        <form action="/settings/password" method="post">
-          <input id="current-password" name="currentPassword" type="password" required autocomplete="current-password" autofocus>
-          <label for="current-password"><span>Current password</span></label>
-          <input id="new-password" name="newPassword" type="password" required minlength="12" autocomplete="new-password">
-          <label for="new-password"><span>New password</span></label>
-          <input id="confirm-password" name="confirmation" type="password" required minlength="12" autocomplete="new-password">
-          <label for="confirm-password"><span>Confirm new password</span></label>
-          <input type="submit" value="Change password">
-        </form>
-        <p><a href="/vaults">Back to vaults</a></p>
       </div>
+      <section class="panel settings-card" aria-labelledby="password-heading">
+        <div class="settings-card-header"><h2 id="password-heading">Change password</h2></div>
+        <form class="settings-card-body" action="/settings/password" method="post">
+          <div class="field">
+            <label for="current-password">Current password</label>
+            <input id="current-password" name="currentPassword" type="password" required autocomplete="current-password" autofocus>
+          </div>
+          <div class="field">
+            <label for="new-password">New password</label>
+            <input id="new-password" name="newPassword" type="password" required minlength="12" autocomplete="new-password">
+            <p class="help-text">At least 12 characters.</p>
+          </div>
+          <div class="field">
+            <label for="confirm-password">Confirm new password</label>
+            <input id="confirm-password" name="confirmation" type="password" required minlength="12" autocomplete="new-password">
+          </div>
+          <div class="form-actions"><button type="submit" class="btn btn-primary">Change password</button></div>
+        </form>
+      </section>
     </main>
   </body>
 </html>
