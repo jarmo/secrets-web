@@ -3,33 +3,42 @@ package session
 import (
   "crypto/ecdh"
   "crypto/rand"
+  "crypto/sha256"
   "encoding/base64"
+  "encoding/json"
   "errors"
   "sync"
   "time"
 
   "github.com/gin-contrib/sessions"
   "github.com/gin-gonic/gin"
+  "github.com/jarmo/secrets/user"
 )
 
 type UserSession struct {
   Username string
   PrivateKey *ecdh.PrivateKey
+  identityFingerprint [sha256.Size]byte
   expiresAt time.Time
 }
 
 type UserSessions struct {
   mutex sync.Mutex
   active map[string]UserSession
+  usersDirectory string
 }
 
-func NewUserSessions() *UserSessions {
-  return &UserSessions{active: make(map[string]UserSession)}
+func NewUserSessions(usersDirectory string) *UserSessions {
+  return &UserSessions{active: make(map[string]UserSession), usersDirectory: usersDirectory}
 }
 
-func (store *UserSessions) Login(c *gin.Context, username string, privateKey *ecdh.PrivateKey) error {
+func (store *UserSessions) Login(c *gin.Context, account user.User, privateKey *ecdh.PrivateKey) error {
   if privateKey == nil {
     return errors.New("Missing user key")
+  }
+  fingerprint, err := userFingerprint(account)
+  if err != nil {
+    return err
   }
   idBytes := make([]byte, 32)
   if _, err := rand.Read(idBytes); err != nil {
@@ -46,11 +55,11 @@ func (store *UserSessions) Login(c *gin.Context, username string, privateKey *ec
   defer store.mutex.Unlock()
   now := time.Now()
   for existingID, existing := range store.active {
-    if !now.Before(existing.expiresAt) || existing.Username == username {
+    if !now.Before(existing.expiresAt) || existing.Username == account.Username {
       delete(store.active, existingID)
     }
   }
-  store.active[id] = UserSession{Username: username, PrivateKey: privateKey, expiresAt: now.Add(MaxAgeInSeconds * time.Second)}
+  store.active[id] = UserSession{Username: account.Username, PrivateKey: privateKey, identityFingerprint: fingerprint, expiresAt: now.Add(MaxAgeInSeconds * time.Second)}
   return nil
 }
 
@@ -69,6 +78,20 @@ func (store *UserSessions) Current(c *gin.Context) (UserSession, bool) {
   now := time.Now()
   if !now.Before(userSession.expiresAt) {
     delete(store.active, id)
+    return UserSession{}, false
+  }
+  account, err := user.Load(store.usersDirectory, userSession.Username)
+  if err != nil {
+    delete(store.active, id)
+    cookie.Delete("userSession")
+    cookie.Save()
+    return UserSession{}, false
+  }
+  fingerprint, err := userFingerprint(account)
+  if err != nil || fingerprint != userSession.identityFingerprint {
+    delete(store.active, id)
+    cookie.Delete("userSession")
+    cookie.Save()
     return UserSession{}, false
   }
   cookie.Set("userSession", id)
@@ -95,4 +118,12 @@ func (store *UserSessions) Logout(c *gin.Context) error {
   }
   cookie.Delete("userSession")
   return cookie.Save()
+}
+
+func userFingerprint(account user.User) ([sha256.Size]byte, error) {
+  data, err := json.Marshal(account)
+  if err != nil {
+    return [sha256.Size]byte{}, err
+  }
+  return sha256.Sum256(data), nil
 }

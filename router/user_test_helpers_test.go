@@ -23,6 +23,7 @@ type userWebTestFixture struct {
 	router          http.Handler
 	userPassword  string
 	bob             user.User
+	usersDirectory  string
 	productionPath  string
 	developmentPath string
 	otherPath       string
@@ -72,6 +73,7 @@ func newUserWebTestFixture(t *testing.T) *userWebTestFixture {
 		router:          Create(configPath, usersDirectory, false),
 		userPassword:  userPassword,
 		bob:             bob,
+		usersDirectory:  usersDirectory,
 		productionPath:  productionPath,
 		developmentPath: developmentPath,
 		otherPath:       otherPath,

@@ -28,7 +28,7 @@ func Create(configurationPath, usersDirectory string, prodModeEnabled bool) *gin
   router.Use(middleware.CacheControl())
   router.Use(middleware.CsrfProtection())
   router.StaticFS("/public", generated.Assets)
-  initRoutes(router, configurationPath, usersDirectory, session.NewUserSessions())
+  initRoutes(router, configurationPath, usersDirectory, session.NewUserSessions(usersDirectory))
 
   return router
 }
