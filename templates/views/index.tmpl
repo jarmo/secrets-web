@@ -29,7 +29,7 @@
     <form class="filter" action="{{ .vaultPath }}{{ if .user }}/secrets{{ end }}" method="GET" data-container="#secrets" role="search">
       <label for="filter" class="sr-only">Filter secrets</label>
       <input class="filter-input" id="filter" name="filter" type="search" autocomplete="off" placeholder="Filter secrets…" autofocus>
-      <button type="button" class="filter-clear" data-clear-filter aria-label="Clear secrets filter" hidden>×</button>
+      <button type="button" class="filter-clear" tabindex="-1" data-clear-filter aria-label="Clear secrets filter" hidden>×</button>
       <input type="submit" value="Search" hidden>
     </form>
   </div>
