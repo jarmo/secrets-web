@@ -35,8 +35,8 @@ func ChangeUserPassword(usersDirectory string, active *session.UserSessions) gin
       c.String(http.StatusBadRequest, "Current password is required")
       return
     }
-    if len(newPassword) < 12 || len(newPassword) > 1024 {
-      c.String(http.StatusBadRequest, "Password must be between 12 and 1024 bytes")
+    if err := user.ValidatePassword([]byte(newPassword)); err != nil {
+      c.String(http.StatusBadRequest, err.Error())
       return
     }
     if newPassword != confirmation {

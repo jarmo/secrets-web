@@ -33,8 +33,8 @@ func Activate(usersDirectory string) gin.HandlerFunc {
       showActivation(c, http.StatusBadRequest, "Passwords do not match", false)
       return
     }
-    if len(password) < 12 || len(password) > 1024 {
-      showActivation(c, http.StatusBadRequest, "Password must be between 12 and 1024 bytes", false)
+    if err := user.ValidatePassword([]byte(password)); err != nil {
+      showActivation(c, http.StatusBadRequest, err.Error(), false)
       return
     }
     if err := user.Activate(usersDirectory, username, setupCode, []byte(password)); err != nil {

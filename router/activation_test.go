@@ -65,6 +65,14 @@ func TestUserActivation(t *testing.T) {
   if _, err := user.Load(usersDirectory, "bob"); err == nil {
     t.Fatal("Account activated despite password mismatch")
   }
+  for _, invalidPassword := range []string{"short", strings.Repeat("x", 1025)} {
+    if result := submit("bob", code, invalidPassword, invalidPassword, csrf[1]); result.Code != http.StatusBadRequest {
+      t.Fatalf("Invalid password length: got status %d", result.Code)
+    }
+    if _, err := user.Load(usersDirectory, "bob"); err == nil {
+      t.Fatal("Invalid password activated account")
+    }
+  }
   if result := submit("bob", "invalid-code", password, password, csrf[1]); result.Code != http.StatusBadRequest {
     t.Fatalf("Wrong code: got status %d", result.Code)
   }
