@@ -30,7 +30,7 @@ func accessibleVaults(configurationPath string, privateKey *ecdh.PrivateKey) ([]
     if err != nil {
       continue
     }
-    if _, err := storage.ReadForUser(vaultPath, privateKey); err == nil {
+    if err := storage.CanAccessForUser(vaultPath, privateKey); err == nil {
       accessible = append(accessible, alias)
     }
   }

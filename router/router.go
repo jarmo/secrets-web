@@ -49,7 +49,7 @@ func initRoutes(router *gin.Engine, configurationPath, usersDirectory string, us
         c.Status(403)
         return
       }
-      if _, err := storage.ReadForUser(vaultPath, userSession.PrivateKey); err != nil {
+      if err := storage.CanAccessForUser(vaultPath, userSession.PrivateKey); err != nil {
         c.Status(403)
         return
       }
