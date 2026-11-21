@@ -50,6 +50,7 @@ dev_run: vendor
 	XDG_CONFIG_HOME=$(CURDIR)/tmp go run -ldflags="-X main.version=$(BUILD_VERSION)" secrets-web.go serve --cert none --cert-priv-key none --port 8080 --pid tmp/dev.pid
 
 release:
+	script/release.sh --check
 	$(MAKE) all BUILD_VERSION=$(RELEASE_VERSION)
 	script/release.sh
 
