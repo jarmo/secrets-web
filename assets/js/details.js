@@ -65,19 +65,12 @@ document.addEventListener("submit", function(event) {
 
 document.addEventListener("keydown", function(event) {
   if (event.key !== "Escape") return
-  var confirmation = event.target.closest(".delete-confirm-body:not([hidden])")
-  if (confirmation) {
-    event.preventDefault()
-    event.stopPropagation()
-    var secret = confirmation.closest("details.secret")
-    resetDeleteConfirmation(secret)
-    secret.querySelector("[data-delete-toggle]").focus({preventScroll: true})
-    return
-  }
-  var panel = event.target.closest("details[open]")
-  if (!panel || !panel.matches("#add-secret, #secrets details.secret")) return
+  var panel = event.target.closest("#add-secret[open], #secrets details.secret[open]") ||
+    document.querySelector("#add-secret[open], #secrets details.secret[open]")
+  if (!panel) return
   event.preventDefault()
   event.stopPropagation()
   panel.open = false
+  if (panel.matches("#secrets details.secret")) resetDeleteConfirmation(panel)
   panel.querySelector("summary").focus({preventScroll: true})
 }, true)
