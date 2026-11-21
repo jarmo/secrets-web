@@ -6,7 +6,7 @@ Self-hosted web interface for [secrets](https://github.com/jarmo/secrets). [secr
 
 ## Installation
 
-Download a binary from [releases](https://github.com/jarmo/secrets-web/releases) and put `secrets-web` in your `PATH`. Install [secrets-cli](https://github.com/jarmo/secrets-cli#readme) on the server as well.
+Download a binary from [releases](https://github.com/jarmo/secrets-web/releases) and put `secrets-web` in your `PATH`. Install [secrets-cli](https://github.com/jarmo/secrets-cli#readme) **version 7.x or newer** on the server; **do not use older CLI versions**. If you have legacy vaults, follow the [CLI migration guide](https://github.com/jarmo/secrets-cli#migrating-legacy-vaults) using CLI 7.x before upgrading to the next major version.
 
 ## Getting started
 
@@ -63,7 +63,7 @@ Use `secrets-web --help` for other options, including host, port and PID file. C
 
 ## Legacy vaults
 
-During the transition, legacy vault alias/password login remains available for vaults that still have password-based access. Use the CLI to add a user to each legacy vault; this converts the vault and retires its old password. New vaults use user-based access only.
+During the transition, legacy vault alias/password login remains available for vaults that still have password-based access. **Migrate every legacy vault before the next major version**, which will remove that support. The [CLI migration guide](https://github.com/jarmo/secrets-cli#migrating-legacy-vaults) includes commands for converting and verifying multiple vaults, plus backups before and after migration. New vaults use user-based access only.
 
 ## Backups
 
