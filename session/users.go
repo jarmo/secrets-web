@@ -64,6 +64,15 @@ func (store *UserSessions) Login(c *gin.Context, account user.User, privateKey *
 }
 
 func (store *UserSessions) Current(c *gin.Context) (UserSession, bool) {
+  return store.current(c, true)
+}
+
+func (store *UserSessions) Valid(c *gin.Context) bool {
+  _, ok := store.current(c, false)
+  return ok
+}
+
+func (store *UserSessions) current(c *gin.Context, renew bool) (UserSession, bool) {
   cookie := sessions.Default(c)
   id, ok := cookie.Get("userSession").(string)
   if !ok || id == "" {
@@ -94,12 +103,14 @@ func (store *UserSessions) Current(c *gin.Context) (UserSession, bool) {
     cookie.Save()
     return UserSession{}, false
   }
-  cookie.Set("userSession", id)
-  if err := cookie.Save(); err != nil {
-    return UserSession{}, false
+  if renew {
+    cookie.Set("userSession", id)
+    if err := cookie.Save(); err != nil {
+      return UserSession{}, false
+    }
+    userSession.expiresAt = now.Add(MaxAgeInSeconds * time.Second)
+    store.active[id] = userSession
   }
-  userSession.expiresAt = now.Add(MaxAgeInSeconds * time.Second)
-  store.active[id] = userSession
   return userSession, true
 }
 

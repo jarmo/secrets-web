@@ -35,6 +35,13 @@ func Create(configurationPath, usersDirectory string, prodModeEnabled bool) *gin
 
 func initRoutes(router *gin.Engine, configurationPath, usersDirectory string, users *session.UserSessions) {
   router.POST("/logout", handlers.Logout(users))
+  router.GET("/session/status", func(c *gin.Context) {
+    if !users.Valid(c) {
+      c.Status(401)
+      return
+    }
+    c.Status(204)
+  })
   userRoutes := router.Group("", func(c *gin.Context) {
     userSession, ok := users.Current(c)
     if !ok {

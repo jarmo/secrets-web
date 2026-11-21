@@ -214,3 +214,69 @@ func TestUserSessionInvalidatedAfterAccountDeletion(t *testing.T) {
     t.Fatalf("Deleted account left session active: %d", response.Code)
   }
 }
+
+func TestSessionStatusDoesNotRenewExpiration(t *testing.T) {
+  directory, account, privateKey := newSessionTestAccount(t)
+  store := NewUserSessions(directory)
+  router := gin.New()
+  router.Use(CreateCookie(false))
+  router.GET("/login", func(c *gin.Context) {
+    if err := store.Login(c, account, privateKey); err != nil {
+      c.Status(http.StatusInternalServerError)
+      return
+    }
+    c.Status(http.StatusNoContent)
+  })
+  router.GET("/status", func(c *gin.Context) {
+    if !store.Valid(c) {
+      c.Status(http.StatusUnauthorized)
+      return
+    }
+    c.Status(http.StatusNoContent)
+  })
+
+  login := httptest.NewRecorder()
+  router.ServeHTTP(login, httptest.NewRequest("GET", "/login", nil))
+  if login.Code != http.StatusNoContent {
+    t.Fatalf("Login status: %d", login.Code)
+  }
+  cookie := login.Header().Get("Set-Cookie")
+
+  store.mutex.Lock()
+  var sessionID string
+  for id, userSession := range store.active {
+    sessionID = id
+    userSession.expiresAt = time.Now().Add(time.Minute)
+    store.active[id] = userSession
+  }
+  originalExpiration := store.active[sessionID].expiresAt
+  store.mutex.Unlock()
+
+  statusRequest := httptest.NewRequest("GET", "/status", nil)
+  statusRequest.Header.Set("Cookie", cookie)
+  status := httptest.NewRecorder()
+  router.ServeHTTP(status, statusRequest)
+  if status.Code != http.StatusNoContent {
+    t.Fatalf("Active session status: %d", status.Code)
+  }
+  if status.Header().Get("Set-Cookie") != "" {
+    t.Fatal("Status check refreshed the session cookie")
+  }
+  store.mutex.Lock()
+  renewedExpiration := store.active[sessionID].expiresAt
+  store.mutex.Unlock()
+  if !renewedExpiration.Equal(originalExpiration) {
+    t.Fatal("Status check extended the session lifetime")
+  }
+
+  store.mutex.Lock()
+  expired := store.active[sessionID]
+  expired.expiresAt = time.Now().Add(-time.Second)
+  store.active[sessionID] = expired
+  store.mutex.Unlock()
+  status = httptest.NewRecorder()
+  router.ServeHTTP(status, statusRequest)
+  if status.Code != http.StatusUnauthorized {
+    t.Fatalf("Expired session status: %d", status.Code)
+  }
+}
