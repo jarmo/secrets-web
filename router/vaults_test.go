@@ -3,6 +3,7 @@ package router
 import (
 	"net/http"
 	"net/url"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -137,5 +138,58 @@ func TestSingleAccessibleVaultRedirectsToEditor(t *testing.T) {
 	listing := fixture.send("GET", "/vaults", "", login.Header().Get("Set-Cookie"), "")
 	if listing.Code != http.StatusSeeOther || listing.Header().Get("Location") != "/vaults/production" {
 		t.Fatalf("Single vault was not opened automatically: %d, %s", listing.Code, listing.Header().Get("Location"))
+	}
+	for _, address := range []string{"/vaults/production", "/settings"} {
+		page := fixture.send("GET", address, "", login.Header().Get("Set-Cookie"), "")
+		if page.Code != http.StatusOK || strings.Contains(page.Body.String(), `href="/vaults" class="nav-link"`) {
+			t.Fatalf("Vaults navigation should be hidden for a single vault on %s: %d", address, page.Code)
+		}
+	}
+	if err := storage.AssociateUser(fixture.developmentPath, []byte("development-password"), account.Identity); err != nil {
+		t.Fatal(err)
+	}
+	page := fixture.send("GET", "/vaults/production", "", login.Header().Get("Set-Cookie"), "")
+	if page.Code != http.StatusOK || !strings.Contains(page.Body.String(), `href="/vaults" class="nav-link"`) {
+		t.Fatal("Vaults navigation was not shown after refreshing with two accessible vaults")
+	}
+}
+
+func TestVaultsNavigationForNoAccessibleVaults(t *testing.T) {
+	fixture := newUserWebTestFixture(t)
+	password := "empty user password 123"
+	if err := user.Register(fixture.usersDirectory, "empty", []byte(password)); err != nil {
+		t.Fatal(err)
+	}
+	csrfCookie, csrfToken := fixture.csrf()
+	credentials := url.Values{"username": {"empty"}, "password": {password}}.Encode()
+	login := fixture.send("POST", "/login", credentials, csrfCookie, csrfToken)
+	if login.Code != http.StatusNoContent {
+		t.Fatalf("Login without vaults returned %d", login.Code)
+	}
+	for _, address := range []string{"/vaults", "/settings"} {
+		page := fixture.send("GET", address, "", login.Header().Get("Set-Cookie"), "")
+		if page.Code != http.StatusOK || strings.Contains(page.Body.String(), `href="/vaults" class="nav-link"`) {
+			t.Fatalf("Vaults navigation should be hidden without access on %s: %d", address, page.Code)
+		}
+	}
+
+	if err := os.Remove(filepath.Join(filepath.Dir(fixture.productionPath), "config.json")); err != nil {
+		t.Fatal(err)
+	}
+	page := fixture.send("GET", "/vaults", "", login.Header().Get("Set-Cookie"), "")
+	if page.Code != http.StatusOK || !strings.Contains(page.Body.String(), "No vaults available yet") {
+		t.Fatalf("Missing vault configuration should display an empty list: %d", page.Code)
+	}
+}
+
+func TestVaultsNavigationForMultipleAccessibleVaults(t *testing.T) {
+	fixture := newUserWebTestFixture(t)
+	csrfCookie, csrfToken := fixture.csrf()
+	userCookie := fixture.login(csrfCookie, csrfToken)
+	for _, address := range []string{"/vaults", "/vaults/production", "/settings"} {
+		page := fixture.send("GET", address, "", userCookie, "")
+		if page.Code != http.StatusOK || !strings.Contains(page.Body.String(), `href="/vaults" class="nav-link"`) {
+			t.Fatalf("Vaults navigation should appear for multiple vaults on %s: %d", address, page.Code)
+		}
 	}
 }

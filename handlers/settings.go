@@ -15,6 +15,7 @@ func Settings(c *gin.Context) {
   userSession := c.MustGet("userSession").(session.UserSession)
   c.HTML(http.StatusOK, templates.Path("settings"), gin.H{
     "username": userSession.Username,
+    "showVaultsLink": len(c.GetStringSlice("accessibleVaults")) > 1,
     "csrfToken": middleware.CsrfToken(sessions.Default(c)),
     "sessionMaxAgeInSeconds": session.MaxAgeInSeconds,
   })

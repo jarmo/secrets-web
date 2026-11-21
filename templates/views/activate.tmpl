@@ -23,10 +23,10 @@
         {{ else }}
           <p class="page-description">Use the setup code provided by your administrator.</p>
           {{ if .error }}<div class="toast toast-error" role="alert"><p>{{ .error }}</p></div>{{ end }}
-          <form id="activate" action="/activate" method="post">
+          <form id="activate" action="/activate" method="post" autocomplete="off">
             <div class="field">
               <label for="username">Username</label>
-              <input id="username" name="username" type="text" required autocomplete="username" autofocus>
+              <input id="username" name="username" type="text" required autocomplete="off" autofocus>
             </div>
             <div class="field">
               <label for="setup-code">Setup code</label>

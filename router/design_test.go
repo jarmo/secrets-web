@@ -46,3 +46,16 @@ func TestAccessibleSecretEditorAndThemeControls(t *testing.T) {
     t.Fatalf("Settings page is missing appearance controls: %d", settings.Code)
   }
 }
+
+func TestUsernameAutocompleteIsDisabled(t *testing.T) {
+  fixture := newUserWebTestFixture(t)
+  for _, address := range []string{"/", "/activate"} {
+    page := fixture.send("GET", address, "", "", "")
+    if !strings.Contains(page.Body.String(), `autocomplete="off"`) {
+      t.Fatalf("Username autocomplete not disabled on %s", address)
+    }
+    if strings.Contains(page.Body.String(), `autocomplete="username"`) {
+      t.Fatalf("Username autocomplete remains enabled on %s", address)
+    }
+  }
+}

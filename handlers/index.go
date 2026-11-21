@@ -37,6 +37,7 @@ func renderVault(c *gin.Context, displayError error) {
     "user": vaultSession.UserKey != nil,
     "alias": vaultSession.Alias,
     "username": username,
+    "showVaultsLink": len(c.GetStringSlice("accessibleVaults")) > 1,
     "csrfToken": middleware.CsrfToken(sessions.Default(c)),
     "sessionMaxAgeInSeconds": session.MaxAgeInSeconds,
   })

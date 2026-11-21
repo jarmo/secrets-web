@@ -24,10 +24,10 @@
         <h1 id="login-heading">Welcome back</h1>
         <p class="page-description">Sign in to unlock your secrets.</p>
         {{ if .error }}<div class="toast toast-error" role="alert"><p>{{ .error }}</p></div>{{ end }}
-        <form id="login" action="/login" method="post">
+        <form id="login" action="/login" method="post" autocomplete="off">
           <div class="field">
             <label for="user">Username</label>
-            <input id="user" name="user" type="text" required autocomplete="username" {{ if not .user }}autofocus{{ end }} value="{{ .user }}">
+            <input id="user" name="user" type="text" required autocomplete="off" {{ if not .user }}autofocus{{ end }} value="{{ .user }}">
           </div>
           <div class="field">
             <label for="password">Password</label>
