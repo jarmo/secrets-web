@@ -14,6 +14,8 @@ func createUsage() string {
   return `secrets-web COMMAND [OPTIONS]
 
 Usage:
+  secrets-web (-h | --help)
+  secrets-web (-v | --version)
   secrets-web serve --cert=CERT_PATH --cert-priv-key=CERT_PRIVATE_KEY_PATH [--config=CONFIG_PATH] [--host=HOST] [--port=PORT] [--pid=PID_PATH] [--users-dir=USERS_DIR]
 
 Options:

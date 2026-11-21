@@ -59,7 +59,7 @@ By default, CLI and web use the same locations:
 
 Both respect `XDG_CONFIG_HOME`. Use `--config` or `--users-dir` with `secrets-web serve` to override these paths. If the server runs as a different OS user from the CLI, make sure both processes can access the intended configuration, user data and vault files, without making sensitive files publicly readable.
 
-Use `secrets-web --help` for other options, including host, port and PID file.
+Use `secrets-web --help` for other options, including host, port and PID file. Check the installed version with `secrets-web --version`. Release builds use the Git tag; development builds show a commit identifier (and `-dirty` for uncommitted changes).
 
 ## Legacy vaults
 
@@ -103,3 +103,6 @@ Build and install:
 make
 make install
 ```
+
+Bump `VERSION` in `secrets-web.go`, commit the change, then run `make release`. The release script creates the GitHub tag automatically and fails if the tag already exists. Set `GITHUB_RELEASE_TOKEN` to a token with repository Contents write permission.
+
