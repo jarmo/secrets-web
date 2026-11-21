@@ -68,8 +68,12 @@ func (store *UserSessions) Current(c *gin.Context) (UserSession, bool) {
 }
 
 func (store *UserSessions) Valid(c *gin.Context) bool {
-  _, ok := store.current(c, false)
+  _, ok := store.Inspect(c)
   return ok
+}
+
+func (store *UserSessions) Inspect(c *gin.Context) (UserSession, bool) {
+  return store.current(c, false)
 }
 
 func (store *UserSessions) current(c *gin.Context, renew bool) (UserSession, bool) {

@@ -6,6 +6,7 @@ import (
   "testing"
 
   "github.com/jarmo/secrets/user"
+  "github.com/jarmo/secrets/storage"
 )
 
 func TestSessionStatusAndAutomaticRefreshScript(t *testing.T) {
@@ -42,5 +43,43 @@ func TestSessionStatusAndAutomaticRefreshScript(t *testing.T) {
   }
   if result := fixture.send("GET", "/session/status", "", cookie, ""); result.Code != http.StatusUnauthorized {
     t.Fatalf("Password change did not invalidate session status: %d", result.Code)
+  }
+}
+
+func TestSessionStatusDetectsRevokedVaultAccess(t *testing.T) {
+  fixture := newUserWebTestFixture(t)
+  csrfCookie, csrfToken := fixture.csrf()
+  cookie := fixture.login(csrfCookie, csrfToken)
+
+  vault := fixture.send("GET", "/vaults/production", "", cookie, "")
+  if vault.Code != http.StatusOK || !strings.Contains(vault.Body.String(), `name="x-vault-alias" content="production"`) {
+    t.Fatal("Vault page does not provide its alias for access checks")
+  }
+
+  for _, target := range []string{"/session/status?vault=production", "/session/status?vault=development"} {
+    result := fixture.send("GET", target, "", cookie, "")
+    if result.Code != http.StatusNoContent || result.Header().Get("Set-Cookie") != "" {
+      t.Fatalf("Accessible vault status %s: %d, cookie %q", target, result.Code, result.Header().Get("Set-Cookie"))
+    }
+  }
+  if result := fixture.send("GET", "/session/status?vault=private", "", cookie, ""); result.Code != http.StatusForbidden {
+    t.Fatalf("Unshared vault status: %d", result.Code)
+  }
+
+  if err := storage.RemoveUser(fixture.productionPath, fixture.usersDirectory, "bob", []byte("vault-owner-password")); err != nil {
+    t.Fatal(err)
+  }
+  revoked := fixture.send("GET", "/session/status?vault=production", "", cookie, "")
+  if revoked.Code != http.StatusForbidden || revoked.Header().Get("Set-Cookie") != "" {
+    t.Fatalf("Revoked vault status: %d, cookie %q", revoked.Code, revoked.Header().Get("Set-Cookie"))
+  }
+  if result := fixture.send("GET", "/vaults/production", "", cookie, ""); result.Code != http.StatusNotFound {
+    t.Fatalf("Revoked user can still open the vault: %d", result.Code)
+  }
+  if result := fixture.send("GET", "/session/status?vault=development", "", cookie, ""); result.Code != http.StatusNoContent {
+    t.Fatalf("Other vault access lost: %d", result.Code)
+  }
+  if result := fixture.send("GET", "/settings", "", cookie, ""); result.Code != http.StatusOK {
+    t.Fatalf("Revoking vault access invalidated the user session: %d", result.Code)
   }
 }

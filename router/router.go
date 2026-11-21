@@ -10,6 +10,8 @@ import (
   "github.com/jarmo/secrets-web/session"
   "github.com/jarmo/secrets-web/generated"
   "github.com/jarmo/secrets-web/templates"
+  "github.com/jarmo/secrets/storage"
+  "github.com/jarmo/secrets/storage/path"
 )
 
 func Create(configurationPath, usersDirectory string, prodModeEnabled bool) *gin.Engine {
@@ -36,9 +38,21 @@ func Create(configurationPath, usersDirectory string, prodModeEnabled bool) *gin
 func initRoutes(router *gin.Engine, configurationPath, usersDirectory string, users *session.UserSessions) {
   router.POST("/logout", handlers.Logout(users))
   router.GET("/session/status", func(c *gin.Context) {
-    if !users.Valid(c) {
+    userSession, ok := users.Inspect(c)
+    if !ok {
       c.Status(401)
       return
+    }
+    if alias := c.Query("vault"); alias != "" {
+      vaultPath, err := path.Get(configurationPath, alias)
+      if err != nil {
+        c.Status(403)
+        return
+      }
+      if _, err := storage.ReadForUser(vaultPath, userSession.PrivateKey); err != nil {
+        c.Status(403)
+        return
+      }
     }
     c.Status(204)
   })
