@@ -1,10 +1,8 @@
 package handlers
 
 import (
-  "encoding/base64"
   "net/http"
   "os"
-  "strings"
 
   "github.com/gin-contrib/sessions"
   "github.com/gin-gonic/gin"
@@ -17,16 +15,15 @@ import (
 
 func Login(configurationPath, usersDirectory string, active *session.UserSessions) gin.HandlerFunc {
   return func(c *gin.Context) {
-    credentials, err := base64.StdEncoding.DecodeString(c.GetHeader("X-Credentials"))
-    parts := strings.SplitN(string(credentials), ":", 2)
-    if err != nil || len(parts) != 2 || parts[0] == "" || parts[1] == "" {
+    username, password, err := session.Credentials(c.GetHeader("X-Credentials"))
+    if err != nil {
       showLoginError(c)
       return
     }
 
-    account, err := user.Load(usersDirectory, parts[0])
+    account, err := user.Load(usersDirectory, username)
     if err == nil {
-      privateKey, err := account.Unlock([]byte(parts[1]))
+      privateKey, err := account.Unlock(password)
       if err != nil {
         showLoginError(c)
         return

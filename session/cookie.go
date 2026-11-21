@@ -5,6 +5,7 @@ import (
   "github.com/gin-contrib/sessions"
   "github.com/gin-contrib/sessions/cookie"
   "github.com/jarmo/secrets/crypto"
+  "net/http"
 )
 
 func CreateCookie(prodModeEnabled bool) gin.HandlerFunc {
@@ -12,6 +13,7 @@ func CreateCookie(prodModeEnabled bool) gin.HandlerFunc {
   sessionStore.Options(sessions.Options{
     Path: "/",
     HttpOnly: true,
+    SameSite: http.SameSiteLaxMode,
     Secure: prodModeEnabled,
     MaxAge: MaxAgeInSeconds,
   })

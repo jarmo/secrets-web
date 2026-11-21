@@ -2,10 +2,7 @@ package session
 
 import (
   "crypto/ecdh"
-  "encoding/base64"
   "net/url"
-  "errors"
-  "strings"
 
   "github.com/gin-gonic/gin"
   "github.com/jarmo/secrets/secret"
@@ -44,28 +41,18 @@ func (vault Vault) Save(secrets []secret.Secret) error {
 }
 
 func CreateVault(configurationPath string, c *gin.Context) (Vault, error) {
-  if decodedCredentialsHeader, err := base64.StdEncoding.DecodeString(c.GetHeader("X-Credentials")); err != nil {
-    return Vault{}, errors.New("Invalid X-Credentials header")
-  } else if len(decodedCredentialsHeader) == 0 {
-    return Vault{}, errors.New("No X-Credentials header value")
-  } else {
-    credentials := strings.SplitN(string(decodedCredentialsHeader), ":", 2)
-    vaultAlias := credentials[0]
-
-    if len(credentials) != 2 {
-      return Vault{Alias: vaultAlias}, errors.New("Invalid X-Credentials header value")
-    } else {
-      password := credentials[1]
-      if path, aliasErr := path.Get(configurationPath, vaultAlias); aliasErr != nil {
-        return Vault{Alias: vaultAlias}, aliasErr
-      } else {
-        if secrets, vaultErr := storage.Read(path, []byte(password)); vaultErr != nil {
-          return Vault{Alias: vaultAlias}, vaultErr
-        } else {
-          return Vault{Alias: vaultAlias, Path: path, Password: []byte(password), Secrets: secrets}, nil
-        }
-      }
-    }
+  alias, password, err := Credentials(c.GetHeader("X-Credentials"))
+  if err != nil {
+    return Vault{}, err
   }
+  vaultPath, err := path.Get(configurationPath, alias)
+  if err != nil {
+    return Vault{Alias: alias}, err
+  }
+  secrets, err := storage.Read(vaultPath, password)
+  if err != nil {
+    return Vault{Alias: alias}, err
+  }
+  return Vault{Alias: alias, Path: vaultPath, Password: password, Secrets: secrets}, nil
 }
 

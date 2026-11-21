@@ -69,3 +69,28 @@ func TestResolveStoragePathsWithExplicitOverrides(t *testing.T) {
     t.Fatal("Expected an error without an XDG or home directory")
   }
 }
+
+func TestTLSModeDoesNotDependOnExecutableLocation(t *testing.T) {
+  for _, tc := range []struct {
+    certificate, key string
+    tls, valid       bool
+  }{
+    {"cert.pem", "key.pem", true, true},
+    {"none", "none", false, true},
+    {"none", "key.pem", false, false},
+    {"cert.pem", "none", false, false},
+    {"", "", false, false},
+  } {
+    enabled, err := useTLS(tc.certificate, tc.key)
+    if (err == nil) != tc.valid || enabled != tc.tls {
+      t.Fatalf("TLS selection for %q/%q: %v %v", tc.certificate, tc.key, enabled, err)
+    }
+  }
+}
+
+func TestDevelopmentHTTPCannotListenPublicly(t *testing.T) {
+  err := serveUntilExit(Serve{CertificatePath: "none", CertificatePrivKeyPath: "none", Host: "0.0.0.0"})
+  if err == nil {
+    t.Fatal("Development HTTP accepted public binding")
+  }
+}

@@ -2,7 +2,6 @@ package command
 
 import (
   "errors"
-  "strings"
   "os"
   "io/ioutil"
   "path/filepath"
@@ -29,7 +28,13 @@ func (command Serve) Execute() {
 }
 
 func serveUntilExit(command Serve) error {
-  isProdMode := isProdMode()
+  isProdMode, err := useTLS(command.CertificatePath, command.CertificatePrivKeyPath)
+  if err != nil {
+    return err
+  }
+  if !isProdMode && command.Host != "" && command.Host != "localhost" && command.Host != "127.0.0.1" && command.Host != "::1" {
+    return errors.New("HTTP development mode is restricted to localhost")
+  }
   configurationPath, usersDirectory, err := resolveStoragePaths(command.ConfigurationPath, command.UsersDirectory)
   if err != nil {
     return err
@@ -91,13 +96,16 @@ func argumentOrDefault(argument, defaultArgument string) string {
   }
 }
 
-func isProdMode() bool {
-  binary, err := os.Executable()
-  if err != nil {
-    panic(err)
+// Only the explicit development sentinel disables TLS. The binary's path
+// (including a temporary build/run directory) must never determine whether
+// passwords are sent over HTTP or whether session cookies are Secure.
+func useTLS(certPath, keyPath string) (bool, error) {
+  if certPath == "none" && keyPath == "none" {
+    return false, nil
   }
-  binaryDir := filepath.Dir(binary)
-
-  return !strings.HasPrefix(binaryDir, os.TempDir())
+  if certPath == "" || keyPath == "" || certPath == "none" || keyPath == "none" {
+    return false, errors.New("An HTTPS certificate and private key are required (use none/none only for local development)")
+  }
+  return true, nil
 }
 

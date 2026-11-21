@@ -22,12 +22,16 @@ func Create(configurationPath, usersDirectory string, prodModeEnabled bool) *gin
   router := gin.Default()
 
   if prodModeEnabled {
-    router.Use(secure.New(secure.DefaultConfig()))
+    policy := secure.DefaultConfig()
+    policy.ReferrerPolicy = "no-referrer"
+    policy.FeaturePolicy = "camera 'none'; microphone 'none'; geolocation 'none'"
+    router.Use(secure.New(policy))
   }
 
   router.SetHTMLTemplate(initTemplates())
   router.Use(session.CreateCookie(prodModeEnabled))
   router.Use(middleware.CacheControl())
+  router.Use(middleware.RequestSize())
   router.Use(middleware.CsrfProtection())
   router.StaticFS("/public", generated.Assets)
   initRoutes(router, configurationPath, usersDirectory, session.NewUserSessions(usersDirectory))
@@ -36,6 +40,8 @@ func Create(configurationPath, usersDirectory string, prodModeEnabled bool) *gin
 }
 
 func initRoutes(router *gin.Engine, configurationPath, usersDirectory string, users *session.UserSessions) {
+  authLimit := middleware.NewAuthLimiter()
+  legacyLimit := middleware.NewLegacyAuthLimiter()
   router.POST("/logout", handlers.Logout(users))
   router.GET("/session/status", func(c *gin.Context) {
     userSession, ok := users.Inspect(c)
@@ -71,15 +77,15 @@ func initRoutes(router *gin.Engine, configurationPath, usersDirectory string, us
   userVault := userRoutes.Group("/vaults/:alias", middleware.VaultAccess(configurationPath))
   userVault.GET("", handlers.VaultNavigation(configurationPath), handlers.Index)
   userVault.GET("/secrets", handlers.List)
-  userVault.POST("", handlers.Create)
-  userVault.PUT("/:id", handlers.Edit)
+  userVault.POST("", middleware.ParseSecretForm(), handlers.Create)
+  userVault.PUT("/:id", middleware.ParseSecretForm(), handlers.Edit)
   userVault.DELETE("/:id", handlers.Delete)
 
-  router.POST("/login", handlers.Login(configurationPath, usersDirectory, users))
+  router.POST("/login", authLimit.Limit(), handlers.Login(configurationPath, usersDirectory, users))
   router.GET("/activate", handlers.ActivationForm)
-  router.POST("/activate", handlers.Activate(usersDirectory))
+  router.POST("/activate", authLimit.Limit(), handlers.Activate(usersDirectory))
 
-  router.GET("/", func(c *gin.Context) {
+  router.GET("/", legacyLimit.LimitCredentials(), func(c *gin.Context) {
     if _, ok := users.Current(c); ok {
       c.Redirect(303, "/vaults")
       return
@@ -91,10 +97,10 @@ func initRoutes(router *gin.Engine, configurationPath, usersDirectory string, us
     handlers.Index(c)
   })
 
-  authenticated := router.Group("", middleware.Authenticated(configurationPath))
+  authenticated := router.Group("", legacyLimit.LimitCredentials(), middleware.Authenticated(configurationPath))
   authenticated.GET("/secrets", handlers.List)
-  authenticated.POST("/secrets", handlers.Create)
-  authenticated.PUT("/secrets/:id", handlers.Edit)
+  authenticated.POST("/secrets", middleware.ParseSecretForm(), handlers.Create)
+  authenticated.PUT("/secrets/:id", middleware.ParseSecretForm(), handlers.Edit)
   authenticated.DELETE("/secrets/:id", handlers.Delete)
 }
 
