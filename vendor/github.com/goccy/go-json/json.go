@@ -5,7 +5,9 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/goccy/go-json/internal/decoder"
 	"github.com/goccy/go-json/internal/encoder"
+	"github.com/goccy/go-json/internal/jsonstring"
 )
 
 // Marshaler is the interface implemented by types that
@@ -89,31 +91,31 @@ type UnmarshalerContext interface {
 //
 // Examples of struct field tags and their meanings:
 //
-//   // Field appears in JSON as key "myName".
-//   Field int `json:"myName"`
+//	// Field appears in JSON as key "myName".
+//	Field int `json:"myName"`
 //
-//   // Field appears in JSON as key "myName" and
-//   // the field is omitted from the object if its value is empty,
-//   // as defined above.
-//   Field int `json:"myName,omitempty"`
+//	// Field appears in JSON as key "myName" and
+//	// the field is omitted from the object if its value is empty,
+//	// as defined above.
+//	Field int `json:"myName,omitempty"`
 //
-//   // Field appears in JSON as key "Field" (the default), but
-//   // the field is skipped if empty.
-//   // Note the leading comma.
-//   Field int `json:",omitempty"`
+//	// Field appears in JSON as key "Field" (the default), but
+//	// the field is skipped if empty.
+//	// Note the leading comma.
+//	Field int `json:",omitempty"`
 //
-//   // Field is ignored by this package.
-//   Field int `json:"-"`
+//	// Field is ignored by this package.
+//	Field int `json:"-"`
 //
-//   // Field appears in JSON as key "-".
-//   Field int `json:"-,"`
+//	// Field appears in JSON as key "-".
+//	Field int `json:"-,"`
 //
 // The "string" option signals that a field is stored as JSON inside a
 // JSON-encoded string. It applies only to fields of string, floating point,
 // integer, or boolean types. This extra level of encoding is sometimes used
 // when communicating with JavaScript programs:
 //
-//    Int64String int64 `json:",string"`
+//	Int64String int64 `json:",string"`
 //
 // The key name will be used if it's a non-empty string consisting of
 // only Unicode letters, digits, and ASCII punctuation except quotation
@@ -166,35 +168,38 @@ type UnmarshalerContext interface {
 // JSON cannot represent cyclic data structures and Marshal does not
 // handle them. Passing cyclic structures to Marshal will result in
 // an infinite recursion.
-//
-func Marshal(v interface{}) ([]byte, error) {
+func Marshal(v any) ([]byte, error) {
 	return MarshalWithOption(v)
 }
 
-// MarshalNoEscape returns the JSON encoding of v and doesn't escape v.
-func MarshalNoEscape(v interface{}) ([]byte, error) {
-	return marshalNoEscape(v)
+// MarshalNoEscape returns the JSON encoding of v.
+//
+// Deprecated: Use Marshal. MarshalNoEscape used to keep v from escaping to the heap, but the encoder refers to v
+// by its address, which is not updated when the stack of the goroutine is copied while v is being encoded.
+// A value left on the stack was then read from the freed stack, so MarshalNoEscape is now the same as Marshal.
+func MarshalNoEscape(v any) ([]byte, error) {
+	return marshal(v)
 }
 
 // MarshalContext returns the JSON encoding of v with context.Context and EncodeOption.
-func MarshalContext(ctx context.Context, v interface{}, optFuncs ...EncodeOptionFunc) ([]byte, error) {
+func MarshalContext(ctx context.Context, v any, optFuncs ...EncodeOptionFunc) ([]byte, error) {
 	return marshalContext(ctx, v, optFuncs...)
 }
 
 // MarshalWithOption returns the JSON encoding of v with EncodeOption.
-func MarshalWithOption(v interface{}, optFuncs ...EncodeOptionFunc) ([]byte, error) {
+func MarshalWithOption(v any, optFuncs ...EncodeOptionFunc) ([]byte, error) {
 	return marshal(v, optFuncs...)
 }
 
 // MarshalIndent is like Marshal but applies Indent to format the output.
 // Each JSON element in the output will begin on a new line beginning with prefix
 // followed by one or more copies of indent according to the indentation nesting.
-func MarshalIndent(v interface{}, prefix, indent string) ([]byte, error) {
+func MarshalIndent(v any, prefix, indent string) ([]byte, error) {
 	return MarshalIndentWithOption(v, prefix, indent)
 }
 
 // MarshalIndentWithOption is like Marshal but applies Indent to format the output with EncodeOption.
-func MarshalIndentWithOption(v interface{}, prefix, indent string, optFuncs ...EncodeOptionFunc) ([]byte, error) {
+func MarshalIndentWithOption(v any, prefix, indent string, optFuncs ...EncodeOptionFunc) ([]byte, error) {
 	return marshalIndent(v, prefix, indent, optFuncs...)
 }
 
@@ -264,31 +269,36 @@ func MarshalIndentWithOption(v interface{}, prefix, indent string, optFuncs ...E
 //
 // The JSON null value unmarshals into an interface, map, pointer, or slice
 // by setting that Go value to nil. Because null is often used in JSON to mean
-// ``not present,'' unmarshaling a JSON null into any other Go type has no effect
+// “not present,” unmarshaling a JSON null into any other Go type has no effect
 // on the value and produces no error.
 //
 // When unmarshaling quoted strings, invalid UTF-8 or
 // invalid UTF-16 surrogate pairs are not treated as an error.
 // Instead, they are replaced by the Unicode replacement
 // character U+FFFD.
-//
-func Unmarshal(data []byte, v interface{}) error {
+func Unmarshal(data []byte, v any) error {
 	return unmarshal(data, v)
 }
 
 // UnmarshalContext parses the JSON-encoded data and stores the result
 // in the value pointed to by v. If you implement the UnmarshalerContext interface,
 // call it with ctx as an argument.
-func UnmarshalContext(ctx context.Context, data []byte, v interface{}, optFuncs ...DecodeOptionFunc) error {
-	return unmarshalContext(ctx, data, v)
+func UnmarshalContext(ctx context.Context, data []byte, v any, optFuncs ...DecodeOptionFunc) error {
+	return unmarshalContext(ctx, data, v, optFuncs...)
 }
 
-func UnmarshalWithOption(data []byte, v interface{}, optFuncs ...DecodeOptionFunc) error {
+func UnmarshalWithOption(data []byte, v any, optFuncs ...DecodeOptionFunc) error {
 	return unmarshal(data, v, optFuncs...)
 }
 
-func UnmarshalNoEscape(data []byte, v interface{}, optFuncs ...DecodeOptionFunc) error {
-	return unmarshalNoEscape(data, v, optFuncs...)
+// UnmarshalNoEscape parses the JSON-encoded data and stores the result in the value pointed to by v.
+//
+// Deprecated: Use UnmarshalOf, which lets the value stay on the stack of the caller. UnmarshalNoEscape used to
+// keep v from escaping to the heap, but the decoder refers to v by its address, which is not updated when the
+// stack of the goroutine is copied while v is being decoded, so UnmarshalNoEscape is now the same as
+// UnmarshalWithOption.
+func UnmarshalNoEscape(data []byte, v any, optFuncs ...DecodeOptionFunc) error {
+	return unmarshal(data, v, optFuncs...)
 }
 
 // A Token holds a value of one of these types:
@@ -299,7 +309,6 @@ func UnmarshalNoEscape(data []byte, v interface{}, optFuncs ...DecodeOptionFunc)
 //	Number, for JSON numbers
 //	string, for JSON string literals
 //	nil, for JSON null
-//
 type Token = json.Token
 
 // A Number represents a JSON number literal.
@@ -341,28 +350,18 @@ func Indent(dst *bytes.Buffer, src []byte, prefix, indent string) error {
 // escaping within <script> tags, so an alternative JSON encoding must
 // be used.
 func HTMLEscape(dst *bytes.Buffer, src []byte) {
-	var v interface{}
-	dec := NewDecoder(bytes.NewBuffer(src))
-	dec.UseNumber()
-	if err := dec.Decode(&v); err != nil {
-		return
-	}
-	buf, _ := marshal(v)
-	dst.Write(buf)
+	// the bytes are escaped wherever they are, and the rest is kept as it is, as encoding/json does
+	dst.Grow(len(src))
+	dst.Write(jsonstring.AppendHTMLEscaped(dst.AvailableBuffer(), src))
 }
 
 // Valid reports whether data is a valid JSON encoding.
 func Valid(data []byte) bool {
-	var v interface{}
-	decoder := NewDecoder(bytes.NewReader(data))
-	err := decoder.Decode(&v)
-	if err != nil {
-		return false
-	}
-	if !decoder.More() {
-		return true
-	}
-	return decoder.InputOffset() >= int64(len(data))
+	// the input is checked by the grammar in the buffer of a context, which is followed by the nul byte
+	ctx := decoder.TakeRuntimeContext()
+	valid := decoder.Valid(ctx.SetInput(data))
+	decoder.ReleaseRuntimeContext(ctx)
+	return valid
 }
 
 func init() {

@@ -2,9 +2,7 @@ package vault
 
 import (
   "errors"
-  "bytes"
   "github.com/jarmo/secrets/secret"
-  "github.com/jarmo/secrets/storage"
   "github.com/jarmo/secrets/vault/add"
   "github.com/jarmo/secrets/vault/list"
   "github.com/jarmo/secrets/vault/delete"
@@ -39,20 +37,6 @@ func Edit(secrets []secret.Secret, id uuid.UUID, newName, newValue string) (*sec
 
   editedSecret, newSecrets := edit.Execute(secrets, existingSecretIndex, newName, newValue)
   return &editedSecret, newSecrets, nil
-}
-
-func ChangePassword(storagePath string, currentPassword, newPassword, newPasswordConfirmation []byte) error {
-  secrets, err := storage.Read(storagePath, currentPassword)
-  if err != nil {
-    return err
-  }
-
-  if !bytes.Equal(newPassword, newPasswordConfirmation) {
-    return errors.New("Passwords do not match!")
-  }
-  storage.Write(storagePath, newPassword, secrets)
-
-  return nil
 }
 
 func findIndexById(secrets []secret.Secret, id uuid.UUID) int {

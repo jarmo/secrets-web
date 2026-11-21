@@ -1,7 +1,14 @@
-# sessions
+# Gorilla Sessions
 
-[![GoDoc](https://godoc.org/github.com/gorilla/sessions?status.svg)](https://godoc.org/github.com/gorilla/sessions) [![Build Status](https://travis-ci.org/gorilla/sessions.svg?branch=master)](https://travis-ci.org/gorilla/sessions)
-[![Sourcegraph](https://sourcegraph.com/github.com/gorilla/sessions/-/badge.svg)](https://sourcegraph.com/github.com/gorilla/sessions?badge)
+> [!IMPORTANT]
+> The latest version of this repository requires go 1.23 because of the new partitioned attribute. The last version that is compatible with older versions of go is v1.3.0.
+
+![testing](https://github.com/gorilla/sessions/actions/workflows/test.yml/badge.svg)
+[![codecov](https://codecov.io/github/gorilla/sessions/branch/main/graph/badge.svg)](https://codecov.io/github/gorilla/sessions)
+[![godoc](https://godoc.org/github.com/gorilla/sessions?status.svg)](https://godoc.org/github.com/gorilla/sessions)
+[![sourcegraph](https://sourcegraph.com/github.com/gorilla/sessions/-/badge.svg)](https://sourcegraph.com/github.com/gorilla/sessions?badge)
+
+![Gorilla Logo](https://github.com/gorilla/.github/assets/53367916/d92caabf-98e0-473e-bfbf-ab554ba435e5)
 
 gorilla/sessions provides cookie and filesystem sessions and infrastructure for
 custom session backends.
@@ -55,8 +62,7 @@ secret key used to authenticate the session. Inside the handler, we call
 some session values in session.Values, which is a `map[interface{}]interface{}`.
 And finally we call `session.Save()` to save the session in the response.
 
-More examples are available [on the Gorilla
-website](https://www.gorillatoolkit.org/pkg/sessions).
+More examples are available at [package documentation](https://pkg.go.dev/github.com/gorilla/sessions).
 
 ## Store Implementations
 
@@ -71,6 +77,7 @@ Other implementations of the `sessions.Store` interface:
 - [github.com/dsoprea/go-appengine-sessioncascade](https://github.com/dsoprea/go-appengine-sessioncascade) - Memcache/Datastore/Context in AppEngine
 - [github.com/kidstuff/mongostore](https://github.com/kidstuff/mongostore) - MongoDB
 - [github.com/srinathgs/mysqlstore](https://github.com/srinathgs/mysqlstore) - MySQL
+- [github.com/danielepintore/gorilla-sessions-mysql](https://github.com/danielepintore/gorilla-sessions-mysql) - MySQL
 - [github.com/EnumApps/clustersqlstore](https://github.com/EnumApps/clustersqlstore) - MySQL Cluster
 - [github.com/antonlindstrom/pgstore](https://github.com/antonlindstrom/pgstore) - PostgreSQL
 - [github.com/boj/redistore](https://github.com/boj/redistore) - Redis
@@ -84,6 +91,7 @@ Other implementations of the `sessions.Store` interface:
 - [github.com/lafriks/xormstore](https://github.com/lafriks/xormstore) - XORM (MySQL, PostgreSQL, SQLite, Microsoft SQL Server, TiDB)
 - [github.com/GoogleCloudPlatform/firestore-gorilla-sessions](https://github.com/GoogleCloudPlatform/firestore-gorilla-sessions) - Cloud Firestore
 - [github.com/stephenafamo/crdbstore](https://github.com/stephenafamo/crdbstore) - CockroachDB
+- [github.com/ryicoh/tikvstore](github.com/ryicoh/tikvstore) - TiKV
 
 ## License
 
