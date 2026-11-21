@@ -21,7 +21,15 @@
           <form id="logout" action="/logout" method="post"><button class="logout btn" type="submit">× Logout</button></form>
         </aside>
         <h1>Your vaults</h1>
-        {{ range .vaults }}<p><a href="/vaults/{{ . | urlquery }}">{{ . }}</a></p>{{ else }}<p>No vaults available.</p>{{ end }}
+        {{ if .vaults }}
+          <div class="filter">
+            <input id="vault-filter" type="text" autocomplete="off" autofocus>
+            <label for="vault-filter"><span>Filter</span></label>
+          </div>
+        {{ end }}
+        <div id="vaults">
+          {{ range .vaults }}<p class="vault"><a href="/vaults/{{ . | urlquery }}">{{ . }}</a></p>{{ else }}<p>No vaults available.</p>{{ end }}
+        </div>
       </div>
     </main>
   </body>

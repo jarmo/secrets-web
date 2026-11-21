@@ -2,6 +2,8 @@ package handlers
 
 import (
   "net/http"
+  "net/url"
+  "sort"
 
   "github.com/gin-contrib/sessions"
   "github.com/gin-gonic/gin"
@@ -29,6 +31,11 @@ func Vaults(configurationPath string) gin.HandlerFunc {
       if _, err := storage.ReadForUser(vaultPath, userSession.PrivateKey); err == nil {
         accessible = append(accessible, alias)
       }
+    }
+    sort.Strings(accessible)
+    if len(accessible) == 1 {
+      c.Redirect(http.StatusSeeOther, "/vaults/"+url.PathEscape(accessible[0]))
+      return
     }
     c.HTML(http.StatusOK, templates.Path("vaults"), gin.H{
       "username": userSession.Username,

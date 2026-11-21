@@ -12,7 +12,14 @@ function App(csrfToken, sessionMaxAgeInSeconds) {
       } else if (form.id === "logout") {
         request(form.action, "POST")
       } else if (formMethod === "GET") {
-        get(form.action, new FormData(form), form.dataset.container)
+        var openSingle = form.dataset.openSingle === "true"
+        delete form.dataset.openSingle
+        get(form.action, new FormData(form), form.dataset.container).then(function() {
+          if (openSingle) {
+            var matches = document.querySelectorAll("#secrets .secret")
+            if (matches.length === 1) matches[0].querySelector(".btn-modal").click()
+          }
+        })
       } else {
         request(form.action, formMethod, new FormData(form), form.dataset.container)
       }

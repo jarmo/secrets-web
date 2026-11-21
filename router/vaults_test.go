@@ -3,10 +3,12 @@ package router
 import (
 	"net/http"
 	"net/url"
+	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/jarmo/secrets/storage"
+	"github.com/jarmo/secrets/user"
 )
 
 func TestUserVaultAccessAndEditing(t *testing.T) {
@@ -90,5 +92,50 @@ func TestUserVaultAccessAndEditing(t *testing.T) {
 	secondVault, err := storage.ReadForUser(developmentPath, userKey)
 	if err != nil || len(secondVault) != 1 || secondVault[0].Name != "Staging token" {
 		t.Fatalf("Other shared vault was modified: %v, %v", secondVault, err)
+	}
+}
+
+func TestUserVaultsSortedByName(t *testing.T) {
+	fixture := newUserWebTestFixture(t)
+	csrfCookie, csrfToken := fixture.csrf()
+	sessionCookie := fixture.login(csrfCookie, csrfToken)
+	response := fixture.send("GET", "/vaults", "", sessionCookie, "")
+	if response.Code != http.StatusOK {
+		t.Fatalf("Vault listing returned %d", response.Code)
+	}
+	developmentIndex := strings.Index(response.Body.String(), `href="/vaults/development"`)
+	productionIndex := strings.Index(response.Body.String(), `href="/vaults/production"`)
+	if developmentIndex == -1 || productionIndex == -1 || developmentIndex >= productionIndex {
+		t.Fatalf("Vaults are not sorted alphabetically: %s", response.Body.String())
+	}
+	if !strings.Contains(response.Body.String(), `id="vault-filter"`) || !strings.Contains(response.Body.String(), `class="vault"`) {
+		t.Fatal("Vault list is missing filter controls")
+	}
+}
+
+func TestSingleAccessibleVaultRedirectsToEditor(t *testing.T) {
+	fixture := newUserWebTestFixture(t)
+	usersDirectory := filepath.Join(filepath.Dir(fixture.productionPath), "users")
+	password := "solo private password 123"
+	if err := user.Register(usersDirectory, "solo", []byte(password)); err != nil {
+		t.Fatal(err)
+	}
+	account, err := user.Load(usersDirectory, "solo")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := storage.AssociateUser(fixture.productionPath, []byte("vault-owner-password"), account.Identity); err != nil {
+		t.Fatal(err)
+	}
+
+	csrfCookie, csrfToken := fixture.csrf()
+	credentials := url.Values{"username": {"solo"}, "password": {password}}.Encode()
+	login := fixture.send("POST", "/login", credentials, csrfCookie, csrfToken)
+	if login.Code != http.StatusNoContent {
+		t.Fatalf("Solo login returned %d", login.Code)
+	}
+	listing := fixture.send("GET", "/vaults", "", login.Header().Get("Set-Cookie"), "")
+	if listing.Code != http.StatusSeeOther || listing.Header().Get("Location") != "/vaults/production" {
+		t.Fatalf("Single vault was not opened automatically: %d, %s", listing.Code, listing.Header().Get("Location"))
 	}
 }
