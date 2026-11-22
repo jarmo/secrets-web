@@ -49,8 +49,17 @@ for platform in linux freebsd openbsd darwin windows; do
   fi
 done
 
-read -rp "Enter changelog to release version $VERSION: " CHANGELOG
-if [[ -z "$CHANGELOG" ]]; then
+if [[ -n "${RELEASE_NOTES_FILE:-}" ]]; then
+  if [[ ! -f "$RELEASE_NOTES_FILE" ]]; then
+    echo "Cannot release - release notes file not found: $RELEASE_NOTES_FILE" >&2
+    exit 1
+  fi
+  CHANGELOG=$(cat "$RELEASE_NOTES_FILE")
+else
+  echo "Enter changelog for $VERSION (finish with Ctrl+D on a new line):"
+  CHANGELOG=$(cat)
+fi
+if [[ -z "${CHANGELOG//[[:space:]]/}" ]]; then
   echo "Cannot release - changelog cannot be empty!" >&2
   exit 1
 fi
@@ -68,7 +77,9 @@ done
 git push
 SHA=$(git rev-parse HEAD)
 if ! http --check-status -b POST "https://api.github.com/repos/jarmo/secrets-web/git/refs" Authorization:"Bearer $GITHUB_RELEASE_TOKEN" ref="refs/tags/$VERSION" sha="$SHA"; then
-  echo "Cannot release $VERSION: GitHub rejected the tag. If it already exists, bump VERSION first." >&2
+  echo "Cannot release $VERSION: GitHub rejected tag creation (see API error above)." >&2
+  echo "For HTTP 403, check GITHUB_RELEASE_TOKEN permissions (Contents: write) and repository access." >&2
+  echo "For HTTP 422, check existing tags or GitHub validation rules." >&2
   exit 1
 fi
 
