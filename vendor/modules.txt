@@ -133,7 +133,7 @@ github.com/gorilla/securecookie
 # github.com/gorilla/sessions v1.4.0
 ## explicit; go 1.23
 github.com/gorilla/sessions
-# github.com/jarmo/secrets v0.0.0-20230408145532-dd802b1db650 => ../secrets
+# github.com/jarmo/secrets v0.0.0-20261122134747-80078d479eb5
 ## explicit; go 1.27
 github.com/jarmo/secrets/crypto
 github.com/jarmo/secrets/secret
@@ -292,4 +292,3 @@ google.golang.org/protobuf/proto
 google.golang.org/protobuf/reflect/protoreflect
 google.golang.org/protobuf/reflect/protoregistry
 google.golang.org/protobuf/runtime/protoiface
-# github.com/jarmo/secrets => ../secrets

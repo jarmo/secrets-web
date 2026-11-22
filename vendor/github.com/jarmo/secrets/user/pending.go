@@ -105,7 +105,8 @@ func loadPending(directory, username string) (pendingUser, error) {
 	if !validUsername.MatchString(username) {
 		return pendingUser{}, errors.New("Invalid user username")
 	}
-	if err := checkPrivateDirectory(directory); err != nil {
+	allowedMode, err := accountFileMode(directory)
+	if err != nil {
 		return pendingUser{}, err
 	}
 	path := pendingUserPath(directory, username)
@@ -113,7 +114,7 @@ func loadPending(directory, username string) (pendingUser, error) {
 	if err != nil {
 		return pendingUser{}, err
 	}
-	if !info.Mode().IsRegular() || info.Mode().Perm()&0077 != 0 || info.Size() > maxPendingFileSize {
+	if !info.Mode().IsRegular() || info.Mode().Perm() &^ allowedMode != 0 || info.Size() > maxPendingFileSize {
 		return pendingUser{}, errors.New("Invalid user setup file")
 	}
 	file, err := os.Open(path)

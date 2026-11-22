@@ -2,6 +2,7 @@ package path
 
 import (
 	"encoding/json"
+	"bytes"
 	"errors"
 	"os"
 	"path/filepath"
@@ -16,6 +17,25 @@ const maxConfigurationSize int64 = 1 << 20
 type config struct {
 	Path  string
 	Alias string
+}
+
+type configuration struct {
+	UsersDir string `json:",omitempty"`
+	Vaults []config
+}
+
+// UsersDirectory returns the configured account directory, or an empty string
+// when the setting (or configuration file) is absent. Callers supply the
+// existing per-application default in that case.
+func UsersDirectory(configurationPath string) (string, error) {
+	conf, err := loadConfiguration(configurationPath)
+	if os.IsNotExist(err) {
+		return "", nil
+	}
+	if err != nil {
+		return "", err
+	}
+	return conf.UsersDir, nil
 }
 
 func Get(configurationPath, alias string) (string, error) {
@@ -65,7 +85,7 @@ func Store(configurationPath, vaultPath, vaultAlias string) string {
 	}
 	defer locker.Unlock()
 
-	configs, err := configurations(configurationPath)
+	conf, err := loadConfiguration(configurationPath)
 	if err != nil {
 		if !os.IsNotExist(err) {
 			// Historically an empty, pre-created configuration file was
@@ -76,10 +96,10 @@ func Store(configurationPath, vaultPath, vaultAlias string) string {
 				panic(err)
 			}
 		}
-		configs = nil
+		conf = configuration{}
 	}
-	configs = append(configs, config{Path: absoluteVaultPath, Alias: vaultAlias})
-	data, err := json.MarshalIndent(configs, "", " ")
+	conf.Vaults = append(conf.Vaults, config{Path: absoluteVaultPath, Alias: vaultAlias})
+	data, err := json.MarshalIndent(conf, "", " ")
 	if err != nil {
 		panic(err)
 	}
@@ -93,37 +113,58 @@ func Store(configurationPath, vaultPath, vaultAlias string) string {
 }
 
 func configurations(path string) ([]config, error) {
+	conf, err := loadConfiguration(path)
+	return conf.Vaults, err
+}
+
+func loadConfiguration(path string) (configuration, error) {
 	before, err := os.Lstat(path)
 	if err != nil {
-		return nil, err
+		return configuration{}, err
 	}
 	if !before.Mode().IsRegular() || before.Size() > maxConfigurationSize {
-		return nil, errors.New("Invalid vault configuration file")
+		return configuration{}, errors.New("Invalid vault configuration file")
 	}
 	file, err := os.Open(path)
 	if err != nil {
-		return nil, err
+		return configuration{}, err
 	}
 	defer file.Close()
 	opened, err := file.Stat()
 	if err != nil {
-		return nil, err
+		return configuration{}, err
 	}
 	if !opened.Mode().IsRegular() || !os.SameFile(before, opened) || opened.Size() > maxConfigurationSize {
-		return nil, errors.New("Vault configuration file changed or is too large")
+		return configuration{}, errors.New("Vault configuration file changed or is too large")
 	}
 	data, err := io.ReadAll(io.LimitReader(file, maxConfigurationSize+1))
 	if err != nil {
-		return nil, err
+		return configuration{}, err
 	}
 	if int64(len(data)) > maxConfigurationSize {
-		return nil, fmt.Errorf("Vault configuration exceeds %d bytes", maxConfigurationSize)
+		return configuration{}, fmt.Errorf("Vault configuration exceeds %d bytes", maxConfigurationSize)
 	}
-	var configs []config
-	if err := json.Unmarshal(data, &configs); err != nil {
-		return nil, err
+	data = bytes.TrimSpace(data)
+	var conf configuration
+	if len(data) == 0 {
+		return configuration{}, errors.New("Empty vault configuration")
 	}
-	return configs, nil
+	switch data[0] {
+	case '[':
+		if err := json.Unmarshal(data, &conf.Vaults); err != nil {
+			return configuration{}, err
+		}
+	case '{':
+		if err := json.Unmarshal(data, &conf); err != nil {
+			return configuration{}, err
+		}
+	default:
+		return configuration{}, errors.New("Invalid vault configuration format")
+	}
+	if conf.UsersDir != "" && !filepath.IsAbs(conf.UsersDir) {
+		return configuration{}, errors.New("UsersDir must be an absolute path")
+	}
+	return conf, nil
 }
 
 func writeConfiguration(path string, data []byte) error {

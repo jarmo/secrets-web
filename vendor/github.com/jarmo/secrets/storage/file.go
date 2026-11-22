@@ -55,9 +55,15 @@ func writeVaultFile(path string, data []byte) error {
 	if int64(len(data)) > maxVaultFileSize {
 		return fmt.Errorf("Vault exceeds maximum size of %d bytes", maxVaultFileSize)
 	}
+	mode := os.FileMode(0600)
 	if info, err := os.Lstat(path); err == nil {
 		if !info.Mode().IsRegular() {
 			return errors.New("Vault must be a regular file (not a symlink)")
+		}
+		// Preserve group access for encrypted vaults that already have it,
+		// but never preserve permissions granted to other users.
+		if info.Mode().Perm()&0007 == 0 {
+			mode |= info.Mode().Perm() & 0060
 		}
 	} else if !os.IsNotExist(err) {
 		return err
@@ -68,7 +74,7 @@ func writeVaultFile(path string, data []byte) error {
 		return err
 	}
 	defer os.Remove(file.Name())
-	if err := file.Chmod(0600); err != nil {
+	if err := file.Chmod(mode); err != nil {
 		file.Close()
 		return err
 	}

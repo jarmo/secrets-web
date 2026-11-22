@@ -31,7 +31,8 @@ func Load(directory, username string) (User, error) {
 	if !validUsername.MatchString(username) {
 		return User{}, errors.New("Invalid user username")
 	}
-	if err := checkPrivateDirectory(directory); err != nil {
+	allowedMode, err := accountFileMode(directory)
+	if err != nil {
 		return User{}, err
 	}
 	path := userPath(directory, username)
@@ -39,7 +40,7 @@ func Load(directory, username string) (User, error) {
 	if err != nil {
 		return User{}, err
 	}
-	if !info.Mode().IsRegular() || info.Mode().Perm()&0077 != 0 || info.Size() > maxUserFileSize {
+	if !info.Mode().IsRegular() || info.Mode().Perm() &^ allowedMode != 0 || info.Size() > maxUserFileSize {
 		return User{}, errors.New("Invalid user file")
 	}
 	file, err := os.Open(path)
@@ -96,12 +97,16 @@ func ChangePassword(directory, username string, currentPassword, newPassword []b
 	if err != nil {
 		return err
 	}
+	mode, err := accountFileMode(directory)
+	if err != nil {
+		return err
+	}
 	file, err := os.CreateTemp(directory, ".user-*")
 	if err != nil {
 		return err
 	}
 	defer os.Remove(file.Name())
-	if err := file.Chmod(0600); err != nil {
+	if err := file.Chmod(mode); err != nil {
 		file.Close()
 		return err
 	}
@@ -131,19 +136,42 @@ func ensurePrivateDirectory(directory string) error {
 }
 
 func checkPrivateDirectory(directory string) error {
+	_, err := accountFileMode(directory)
+	return err
+}
+
+// Group access is allowed only when an administrator explicitly opts in by
+// configuring a setgid, group-writable users directory (typically 2770).
+func accountFileMode(directory string) (os.FileMode, error) {
 	info, err := os.Lstat(directory)
 	if err != nil {
-		return err
+		return 0, err
 	}
-	if !info.IsDir() || info.Mode().Perm()&0077 != 0 {
-		return fmt.Errorf("User directory must be private: %s", directory)
+	if !info.IsDir() || info.Mode().Perm()&0007 != 0 {
+		return 0, fmt.Errorf("User directory must be private or shared with a trusted group: %s", directory)
 	}
-	return nil
+	group := info.Mode().Perm() & 0070
+	if group == 0 {
+		return 0600, nil
+	}
+	if group != 0070 || info.Mode()&os.ModeSetgid == 0 {
+		return 0, fmt.Errorf("Shared user directory must be setgid and group-writable: %s", directory)
+	}
+	return 0660, nil
 }
 
 func writeExclusiveFile(path string, data []byte) error {
-	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0600)
+	mode, err := accountFileMode(filepath.Dir(path))
 	if err != nil {
+		return err
+	}
+	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_EXCL, mode)
+	if err != nil {
+		return err
+	}
+	if err := file.Chmod(mode); err != nil {
+		file.Close()
+		os.Remove(file.Name())
 		return err
 	}
 	if _, err := file.Write(data); err != nil {
