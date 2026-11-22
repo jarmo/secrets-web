@@ -57,7 +57,7 @@ By default, CLI and web use the same locations:
 | Vault aliases | `~/.config/secrets/config.json` |
 | User accounts | `~/.config/secrets/users` |
 
-Both respect `XDG_CONFIG_HOME`. Use `--config` or `--users-dir` with `secrets-web serve` to override these paths. If the server runs as a different OS user from the CLI, make sure both processes can access the intended configuration, user data and vault files, without making sensitive files publicly readable.
+Both respect `XDG_CONFIG_HOME`. The configuration file may specify one global `UsersDir` (an absolute path) alongside its `Vaults` array; see the [CLI configuration example](https://github.com/jarmo/secrets-cli#vaults-and-configuration). An existing array-only configuration remains supported and falls back to the default user directory. Use `--config` to select a different configuration file, or `--users-dir` to override its `UsersDir` setting. If the server runs as a different OS user from the CLI, make sure both processes can access the intended configuration, user data and vault files, without making sensitive files publicly readable.
 
 Use `secrets-web --help` for other options, including host, port and PID file. Check the installed version with `secrets-web --version`. Release builds use the Git tag; development builds show a commit identifier (and `-dirty` for uncommitted changes).
 

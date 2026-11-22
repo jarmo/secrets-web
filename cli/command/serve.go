@@ -9,6 +9,7 @@ import (
 
   "github.com/jarmo/secrets-web/router"
   "github.com/jarmo/secrets/user"
+  "github.com/jarmo/secrets/storage/path"
 )
 
 type Serve struct {
@@ -77,7 +78,15 @@ func resolveStoragePaths(configurationPath, usersDirectory string) (string, stri
     configurationPath = filepath.Join(secretsDirectory, "config.json")
   }
   if usersDirectory == "" {
-    usersDirectory = user.DefaultDirectory(secretsDirectory)
+    configured, err := path.UsersDirectory(configurationPath)
+    if err != nil {
+      return "", "", err
+    }
+    if configured != "" {
+      usersDirectory = configured
+    } else {
+      usersDirectory = user.DefaultDirectory(secretsDirectory)
+    }
   }
   return configurationPath, usersDirectory, nil
 }

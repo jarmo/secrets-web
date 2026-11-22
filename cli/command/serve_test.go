@@ -1,6 +1,7 @@
 package command
 
 import (
+  "os"
   "path/filepath"
   "testing"
 )
@@ -92,5 +93,31 @@ func TestDevelopmentHTTPCannotListenPublicly(t *testing.T) {
   err := serveUntilExit(Serve{CertificatePath: "none", CertificatePrivKeyPath: "none", Host: "0.0.0.0"})
   if err == nil {
     t.Fatal("Development HTTP accepted public binding")
+  }
+}
+
+func TestResolveStoragePathsUsesConfiguredUsersDirectory(t *testing.T) {
+  configHome := t.TempDir()
+  t.Setenv("XDG_CONFIG_HOME", configHome)
+  configurationPath := filepath.Join(configHome, "config.json")
+  configured := filepath.Join(configHome, "Dropbox", "users")
+  if err := os.WriteFile(configurationPath, []byte(`{"UsersDir":"`+filepath.ToSlash(configured)+`","Vaults":[]}`), 0600); err != nil {
+    t.Fatal(err)
+  }
+
+  _, actual, err := resolveStoragePaths(configurationPath, "")
+  if err != nil || actual != configured {
+    t.Fatalf("Configured users directory: %q, %v", actual, err)
+  }
+  _, actual, err = resolveStoragePaths(configurationPath, "/explicit/users")
+  if err != nil || actual != "/explicit/users" {
+    t.Fatalf("Explicit override: %q, %v", actual, err)
+  }
+
+  if err := os.WriteFile(configurationPath, []byte(`{"UsersDir":"relative/users","Vaults":[]}`), 0600); err != nil {
+    t.Fatal(err)
+  }
+  if _, _, err := resolveStoragePaths(configurationPath, ""); err == nil {
+    t.Fatal("Invalid configured UsersDir was accepted")
   }
 }
