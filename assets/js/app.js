@@ -32,7 +32,10 @@ function App(csrfToken, sessionMaxAgeInSeconds) {
   function login(form) {
     session = new Session(document.getElementById("user").value, document.getElementById("password").value)
     return request(form.action, "POST").then(function() {
-      if (session) logoutAfterSessionExpiration()
+      if (session) {
+        document.title = session.user + " — Secrets"
+        logoutAfterSessionExpiration()
+      }
     })
   }
 
