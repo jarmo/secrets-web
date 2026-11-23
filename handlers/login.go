@@ -29,7 +29,7 @@ func Login(configurationPath, usersDirectory string, active *session.UserSession
         return
       }
       if err := active.Login(c, account, privateKey); err != nil {
-        c.Status(http.StatusInternalServerError)
+        showLoginError(c)
         return
       }
       c.Status(http.StatusNoContent)

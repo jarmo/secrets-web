@@ -10,7 +10,7 @@ import (
 func Logout(active *session.UserSessions) gin.HandlerFunc {
   return func(c *gin.Context) {
     if err := active.Logout(c); err != nil {
-      c.Status(http.StatusInternalServerError)
+      c.Status(http.StatusUnauthorized)
       return
     }
     c.Status(http.StatusNoContent)

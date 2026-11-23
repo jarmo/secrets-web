@@ -51,7 +51,7 @@ function AutoSuggest() {
     if (event.target.id === "vault-filter") {
       event.preventDefault()
       var matches = document.querySelectorAll("#vaults .vault:not([hidden]) a")
-      if (matches.length === 1) window.location.assign(matches[0].href)
+      if (matches.length === 1) matches[0].click()
     } else if (event.target.id === "filter") {
       event.preventDefault()
       clearTimeout(deferTimeoutId)

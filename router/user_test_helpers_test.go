@@ -1,6 +1,7 @@
 package router
 
 import (
+	"bytes"
 	"encoding/base64"
 	"html"
 	"net/http"
@@ -22,6 +23,7 @@ type userWebTestFixture struct {
 	t               *testing.T
 	router          http.Handler
 	userPassword  string
+	tabToken        string
 	bob             user.User
 	usersDirectory  string
 	productionPath  string
@@ -72,6 +74,7 @@ func newUserWebTestFixture(t *testing.T) *userWebTestFixture {
 		t:               t,
 		router:          Create(configPath, usersDirectory, false),
 		userPassword:  userPassword,
+		tabToken:      base64.RawURLEncoding.EncodeToString(bytes.Repeat([]byte{0x7a}, 32)),
 		bob:             bob,
 		usersDirectory:  usersDirectory,
 		productionPath:  productionPath,
@@ -91,6 +94,9 @@ func (fixture *userWebTestFixture) send(method, target, body, cookie, csrf strin
 	}
 	if csrf != "" {
 		request.Header.Set("X-Csrf-Token", csrf)
+	}
+	if cookie != "" || target == "/login" {
+		request.Header.Set("X-Tab-Token", fixture.tabToken)
 	}
 	if method == "POST" && target == "/login" {
 		form, _ := url.ParseQuery(body)

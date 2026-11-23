@@ -4,6 +4,7 @@ import (
   "crypto/ecdh"
   "crypto/rand"
   "crypto/sha256"
+  "crypto/subtle"
   "encoding/base64"
   "encoding/json"
   "errors"
@@ -19,6 +20,7 @@ type UserSession struct {
   Username string
   PrivateKey *ecdh.PrivateKey
   identityFingerprint [sha256.Size]byte
+  tabTokenHash [sha256.Size]byte
   expiresAt time.Time
 }
 
@@ -36,6 +38,10 @@ func (store *UserSessions) Login(c *gin.Context, account user.User, privateKey *
   if privateKey == nil {
     return errors.New("Missing user key")
   }
+  tokenHash, ok := tabTokenHash(c.GetHeader("X-Tab-Token"))
+  if !ok {
+    return errors.New("Missing or invalid tab authorization")
+  }
   fingerprint, err := userFingerprint(account)
   if err != nil {
     return err
@@ -52,15 +58,36 @@ func (store *UserSessions) Login(c *gin.Context, account user.User, privateKey *
   }
 
   store.mutex.Lock()
-  defer store.mutex.Unlock()
   now := time.Now()
   for existingID, existing := range store.active {
     if !now.Before(existing.expiresAt) || existing.Username == account.Username {
       delete(store.active, existingID)
     }
   }
-  store.active[id] = UserSession{Username: account.Username, PrivateKey: privateKey, identityFingerprint: fingerprint, expiresAt: now.Add(MaxAgeInSeconds * time.Second)}
+  store.active[id] = UserSession{Username: account.Username, PrivateKey: privateKey, identityFingerprint: fingerprint, tabTokenHash: tokenHash, expiresAt: now.Add(MaxAgeInSeconds * time.Second)}
+  store.mutex.Unlock()
+  // Erase expired private keys even if the browser never contacts us again.
+  store.scheduleCleanup(id, now.Add(MaxAgeInSeconds * time.Second))
   return nil
+}
+
+func (store *UserSessions) scheduleCleanup(id string, deadline time.Time) {
+  time.AfterFunc(time.Until(deadline), func() {
+    store.mutex.Lock()
+    active, found := store.active[id]
+    if !found {
+      store.mutex.Unlock()
+      return
+    }
+    if !time.Now().Before(active.expiresAt) {
+      delete(store.active, id)
+      store.mutex.Unlock()
+      return
+    }
+    nextExpiry := active.expiresAt
+    store.mutex.Unlock()
+    store.scheduleCleanup(id, nextExpiry)
+  })
 }
 
 func (store *UserSessions) Current(c *gin.Context) (UserSession, bool) {
@@ -86,6 +113,10 @@ func (store *UserSessions) current(c *gin.Context, renew bool) (UserSession, boo
   defer store.mutex.Unlock()
   userSession, found := store.active[id]
   if !found {
+    return UserSession{}, false
+  }
+  tokenHash, valid := tabTokenHash(c.GetHeader("X-Tab-Token"))
+  if !valid || subtle.ConstantTimeCompare(tokenHash[:], userSession.tabTokenHash[:]) != 1 {
     return UserSession{}, false
   }
   now := time.Now()
@@ -123,6 +154,11 @@ func (store *UserSessions) Logout(c *gin.Context) error {
   if id, ok := cookie.Get("userSession").(string); ok {
     store.mutex.Lock()
     if userSession, found := store.active[id]; found {
+      tokenHash, valid := tabTokenHash(c.GetHeader("X-Tab-Token"))
+      if !valid || subtle.ConstantTimeCompare(tokenHash[:], userSession.tabTokenHash[:]) != 1 {
+        store.mutex.Unlock()
+        return errors.New("Invalid tab authorization")
+      }
       for existingID, existing := range store.active {
         if existing.Username == userSession.Username {
           delete(store.active, existingID)
@@ -133,6 +169,17 @@ func (store *UserSessions) Logout(c *gin.Context) error {
   }
   cookie.Delete("userSession")
   return cookie.Save()
+}
+
+func tabTokenHash(value string) ([sha256.Size]byte, bool) {
+  if len(value) != 43 {
+    return [sha256.Size]byte{}, false
+  }
+  decoded, err := base64.RawURLEncoding.Strict().DecodeString(value)
+  if err != nil || len(decoded) != 32 {
+    return [sha256.Size]byte{}, false
+  }
+  return sha256.Sum256(decoded), true
 }
 
 func userFingerprint(account user.User) ([sha256.Size]byte, error) {

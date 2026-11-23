@@ -2,6 +2,9 @@ package router
 
 import (
   "html/template"
+  "net/http"
+
+  "github.com/gin-contrib/sessions"
 
   "github.com/gin-contrib/secure"
   "github.com/gin-gonic/gin"
@@ -88,6 +91,16 @@ func initRoutes(router *gin.Engine, configurationPath, usersDirectory string, us
   router.GET("/", legacyLimit.LimitCredentials(), func(c *gin.Context) {
     if _, ok := users.Current(c); ok {
       c.Redirect(303, "/vaults")
+      return
+    }
+    // A new tab or refreshed document has no in-memory tab token. Show the
+    // login form without clearing the cookie used by a different open tab.
+    if c.GetHeader("X-Credentials") == "" {
+      c.HTML(http.StatusUnauthorized, templates.Path("login"), gin.H{
+        "sessionMaxAgeInSeconds": session.MaxAgeInSeconds,
+        "csrfToken": middleware.CsrfToken(sessions.Default(c)),
+        "authPage": true,
+      })
       return
     }
     middleware.Authenticated(configurationPath)(c)

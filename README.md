@@ -48,6 +48,8 @@ Bob can then log in with his own username and password. To create more vaults, u
 
 After login, the app shows each user's accessible vaults; if there is only one, it opens directly. The **Settings** page lets users change their password for every vault they can access. No password recovery is provided.
 
+Account login is tied to a random per-tab authorization token held only in JavaScript memory. Refreshing the page, closing the tab, or opening a vault URL in a new tab requires logging in again. Navigation between vaults and Settings works without a reload. The session cookie alone cannot unlock vaults; server-side sessions still expire after 15 minutes of inactivity. The server may retain an unusable session until that expiry.
+
 ## Configuration
 
 By default, CLI and web use the same locations:
