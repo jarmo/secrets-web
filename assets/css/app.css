@@ -94,6 +94,8 @@ h2 { font-size: 1.15rem; font-weight: 650; letter-spacing: -.015em; }
 .brand:hover { color: var(--text); }
 .site-nav { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: .25rem; }
 .site-nav form { display: inline; margin: 0; }
+.site-nav-auth { flex-wrap: nowrap; }
+.nav-account { display: flex; align-items: center; gap: .45rem; min-width: 0; }
 .nav-actions { display: flex; align-items: center; gap: .25rem; }
 .nav-link, .nav-button, .theme-toggle, .theme-reset {
   display: inline-flex;
@@ -363,12 +365,14 @@ h2 { font-size: 1.15rem; font-weight: 650; letter-spacing: -.015em; }
 
 @media (max-width: 640px) {
   .site-header { position: relative; flex-wrap: wrap; gap: .45rem; }
-  .brand { padding-right: 46px; }
-  .brand span { display: none; }
+  .brand { padding-right: 50px; font-size: 1.4rem; }
+  .brand span { display: inline; }
   .brand img { width: 42px; height: 38px; }
-  .site-nav { width: 100%; justify-content: space-between; flex-wrap: nowrap; min-width: 0; padding-top: .25rem; padding-right: 0; }
-  .nav-username { max-width: none; min-width: 0; flex: 1 1 auto; padding: .25rem .35rem; font-size: .82rem; }
-  .nav-actions { flex: 0 0 auto; gap: 0; }
+  .site-nav { width: 100%; justify-content: flex-end; min-width: 0; padding-top: .25rem; padding-right: 0; }
+  .site-nav-auth { justify-content: flex-end; }
+  .nav-account { flex: 1 1 auto; flex-wrap: wrap; justify-content: flex-end; gap: .35rem .45rem; padding-right: .35rem; }
+  .nav-username { max-width: min(42vw, 12rem); min-width: 0; flex: 0 1 auto; padding: .25rem .55rem; font-size: .82rem; }
+  .nav-actions { flex: 0 1 auto; flex-wrap: wrap; justify-content: flex-end; gap: .1rem; }
   .nav-link, .nav-button { white-space: nowrap; padding: .4rem .35rem; font-size: .82rem; }
   .nav-divider { display: none; }
   .theme-toggle { position: absolute; top: .7rem; right: 0; width: 40px; height: 40px; }

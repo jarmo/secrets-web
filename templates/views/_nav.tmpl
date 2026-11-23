@@ -6,13 +6,15 @@
       <img src="/public/assets/favicon.png" alt="" width="44" height="39"><span>ecrets</span>
     </a>
   {{ end }}
-  <nav class="site-nav" aria-label="Main navigation">
+  <nav class="site-nav{{ if or .user .username }} site-nav-auth{{ end }}" aria-label="Main navigation">
     {{ if or .user .username }}
-      {{ if .username }}<span class="nav-username" title="Logged in as {{ .username }}">{{ .username }}</span>{{ end }}
-      <div class="nav-actions">
-        {{ if .showVaultsLink }}<a href="/vaults" class="nav-link">Vaults</a>{{ end }}
-        <a href="/settings" class="nav-link">Settings</a>
-        <form id="logout" action="/logout" method="POST"><button class="nav-button" type="submit">Log out</button></form>
+      <div class="nav-account">
+        {{ if .username }}<span class="nav-username" title="Logged in as {{ .username }}">{{ .username }}</span>{{ end }}
+        <div class="nav-actions">
+          {{ if .showVaultsLink }}<a href="/vaults" class="nav-link">Vaults</a>{{ end }}
+          <a href="/settings" class="nav-link">Settings</a>
+          <form id="logout" action="/logout" method="POST"><button class="nav-button" type="submit">Log out</button></form>
+        </div>
       </div>
       <span class="nav-divider" aria-hidden="true"></span>
     {{ end }}
