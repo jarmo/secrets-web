@@ -147,6 +147,7 @@ h2 { font-size: 1.15rem; font-weight: 650; letter-spacing: -.015em; }
   box-shadow: none;
 }
 .field textarea { min-height: 140px; resize: vertical; white-space: pre-wrap; }
+.secret-content textarea { white-space: pre; overflow-x: auto; }
 .field input::placeholder, .field textarea::placeholder, .filter-input::placeholder { color: var(--muted); opacity: .85; }
 .field input:focus, .field textarea:focus, .filter-input:focus { outline: 2px solid var(--focus); outline-offset: 0; border-color: transparent; }
 .help-text { color: var(--muted); font-size: .86rem; }
