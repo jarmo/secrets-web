@@ -86,14 +86,10 @@ fi
 RESPONSE=$(http --check-status -b POST "https://api.github.com/repos/jarmo/secrets-web/releases" Authorization:"Bearer $GITHUB_RELEASE_TOKEN" tag_name="$VERSION" draft:=true name="secrets-web $VERSION" body="$CHANGELOG")
 RELEASE_ID=$(echo "$RESPONSE" | jq -er .id)
 
-ASSET_DETAILS=()
 for file in dist/*; do
   ASSET_NAME=$(basename "$file")
   UPLOAD_RESPONSE=$(http --check-status -b POST "https://uploads.github.com/repos/jarmo/secrets-web/releases/$RELEASE_ID/assets?name=$ASSET_NAME" Authorization:"Bearer $GITHUB_RELEASE_TOKEN" Content-Type:application/octet-stream "@$file")
-  ASSET_URL=$(echo "$UPLOAD_RESPONSE" | jq -er --arg name "$ASSET_NAME" 'select(.name == $name) | .browser_download_url | select(type == "string" and length > 0)')
-  ASSET_HASH=$(shasum -a 512 "$file")
-  ASSET_HASH=${ASSET_HASH%% *}
-  ASSET_DETAILS+=("$ASSET_NAME"$'\n'"  URL: $ASSET_URL"$'\n'"  SHA-512: $ASSET_HASH")
+  echo "$UPLOAD_RESPONSE" | jq -er --arg name "$ASSET_NAME" 'select(.name == $name) | .browser_download_url | select(type == "string" and length > 0)' > /dev/null
 done
 
 RESPONSE=$(http --check-status -b PATCH "https://api.github.com/repos/jarmo/secrets-web/releases/$RELEASE_ID" Authorization:"Bearer $GITHUB_RELEASE_TOKEN" draft:=false)
@@ -101,4 +97,9 @@ RESPONSE=$(http --check-status -b PATCH "https://api.github.com/repos/jarmo/secr
 echo "Release done:"
 echo "$RESPONSE" | jq -r .html_url
 echo "Assets:"
-printf '%s\n' "${ASSET_DETAILS[@]}"
+for file in dist/*.zip; do
+  ASSET_NAME=$(basename "$file")
+  read -r ASSET_HASH _ < "$file.sha512"
+  ASSET_URL="https://github.com/jarmo/secrets-web/releases/download/$VERSION/$ASSET_NAME"
+  printf '%s\n' "$ASSET_NAME" "  URL: $ASSET_URL" "  SHA-512: $ASSET_HASH"
+done
