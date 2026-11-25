@@ -84,6 +84,7 @@ func initRoutes(router *gin.Engine, configurationPath, usersDirectory string, us
   userVault.PUT("/:id", middleware.ParseSecretForm(), handlers.Edit)
   userVault.DELETE("/:id", handlers.Delete)
 
+  router.GET("/login", func(c *gin.Context) { c.Redirect(http.StatusSeeOther, "/") })
   router.POST("/login", authLimit.Limit(), handlers.Login(configurationPath, usersDirectory, users))
   router.GET("/activate", handlers.ActivationForm)
   router.POST("/activate", authLimit.Limit(), handlers.Activate(usersDirectory))

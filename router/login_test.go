@@ -2,6 +2,7 @@ package router
 
 import (
 	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"strings"
 	"testing"
@@ -72,5 +73,25 @@ func TestUserLoginAndSessions(t *testing.T) {
 	}
 	if result := send("GET", "/vaults", "", sessionCookie, ""); result.Code != http.StatusSeeOther {
 		t.Fatalf("User session remained valid after logout: %d", result.Code)
+	}
+}
+
+func TestLoginPageRedirect(t *testing.T) {
+	fixture := newUserWebTestFixture(t)
+	csrfCookie, csrfToken := fixture.csrf()
+	cookie := fixture.login(csrfCookie, csrfToken)
+	for _, sessionCookie := range []string{"", cookie} {
+		req := httptest.NewRequest("GET", "/login", nil)
+		if sessionCookie != "" {
+			req.Header.Set("Cookie", sessionCookie)
+		}
+		result := httptest.NewRecorder()
+		fixture.router.ServeHTTP(result, req)
+		if result.Code != http.StatusSeeOther || result.Header().Get("Location") != "/" {
+			t.Fatalf("GET /login returned %d, Location %q", result.Code, result.Header().Get("Location"))
+		}
+	}
+	if result := fixture.send("GET", "/session/status", "", cookie, ""); result.Code != http.StatusNoContent {
+		t.Fatalf("GET /login invalidated the existing session: %d", result.Code)
 	}
 }

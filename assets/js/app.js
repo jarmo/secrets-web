@@ -38,6 +38,7 @@ function App(csrfToken, sessionMaxAgeInSeconds) {
     })
 
     window.addEventListener("popstate", function() {
+      if (session) return location.replace("/")
       if (!tabToken) return
       if (!accountPage(location.pathname)) return location.replace("/")
       showPage(location.href)
@@ -143,7 +144,7 @@ function App(csrfToken, sessionMaxAgeInSeconds) {
         if (action === "/login" && pendingToken) {
           tabToken = pendingToken
           session = null
-          history.replaceState(null, "", "/vaults")
+          history.pushState(null, "", "/vaults")
           return showPage("/vaults")
         }
         location.replace(action === "/logout" || action === "/settings/password" ? "/" : "/vaults")
@@ -165,6 +166,7 @@ function App(csrfToken, sessionMaxAgeInSeconds) {
           var target = container ? document.querySelector(container) : document.body
           if (target) target.innerHTML = html
           if (action === "/login" && session) {
+            history.pushState(null, "", "/")
             document.title = session.user + " — Secrets"
             lastActivityAt = Date.now()
             logoutAfterSessionExpiration()
