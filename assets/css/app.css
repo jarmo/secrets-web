@@ -88,9 +88,10 @@ h2 { font-size: 1.15rem; font-weight: 650; letter-spacing: -.015em; }
   justify-content: space-between;
   gap: 1rem;
 }
-.brand { display: inline-flex; gap: .12rem; align-items: center; color: var(--text); text-decoration: none; font-size: 1.55rem; font-weight: 760; letter-spacing: -.06em; white-space: nowrap; }
-.brand img { width: 44px; height: 39px; object-fit: contain; }
-.brand > span, .auth-brand > span { margin-left: -5px; }
+.brand, .auth-brand { display: inline-flex; gap: .043em; align-items: center; color: var(--text); font-weight: 760; letter-spacing: -.065em; line-height: 1.3; white-space: nowrap; }
+.brand { text-decoration: none; font-size: 1.55rem; }
+.brand img, .auth-brand img { width: 1.7em; height: 1.54em; object-fit: contain; flex-shrink: 0; }
+.brand > span, .auth-brand > span { margin-left: -.335em; }
 .brand:hover { color: var(--text); }
 .site-nav { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: .25rem; }
 .site-nav form { display: inline; margin: 0; }
@@ -183,8 +184,7 @@ h2 { font-size: 1.15rem; font-weight: 650; letter-spacing: -.015em; }
 
 .auth-layout { min-height: calc(100vh - 115px); display: flex; align-items: center; justify-content: center; padding: 1rem 1.5rem 5rem; }
 .auth-card { width: min(100%, 440px); padding: clamp(1.5rem, 5vw, 2.6rem); }
-.auth-brand { display: flex; justify-content: center; align-items: center; gap: .12rem; margin: 0 auto 1.8rem; font-size: 2.8rem; font-weight: 760; letter-spacing: -.065em; line-height: 1.3; }
-.auth-brand img { width: 76px; height: 69px; object-fit: contain; }
+.auth-brand { display: flex; justify-content: center; margin: 0 auto 1.8rem; font-size: 2.8rem; }
 .auth-card h1:not(.auth-brand) { text-align: center; font-size: 1.42rem; letter-spacing: -.025em; margin-bottom: .4rem; }
 .auth-card .page-description { text-align: center; margin-bottom: 1.7rem; }
 .auth-card .form-actions .btn { flex: 1; }
@@ -368,7 +368,6 @@ h2 { font-size: 1.15rem; font-weight: 650; letter-spacing: -.015em; }
   .site-header { position: relative; flex-wrap: wrap; gap: .45rem; }
   .brand { padding-right: 50px; font-size: 1.4rem; }
   .brand span { display: inline; }
-  .brand img { width: 42px; height: 38px; }
   .site-nav { width: 100%; justify-content: flex-end; min-width: 0; padding-top: .25rem; padding-right: 0; }
   .site-nav-auth { justify-content: flex-end; }
   .nav-account { flex: 1 1 auto; flex-wrap: wrap; justify-content: flex-end; gap: .35rem .45rem; padding-right: .35rem; }
