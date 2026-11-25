@@ -103,3 +103,9 @@ for file in dist/*.zip; do
   ASSET_URL="https://github.com/jarmo/secrets-web/releases/download/$VERSION/$ASSET_NAME"
   printf '%s\n' "$ASSET_NAME" "  URL: $ASSET_URL" "  SHA-512: $ASSET_HASH"
 done
+
+if ! git fetch --no-tags origin "refs/tags/$VERSION:refs/tags/$VERSION"; then
+  echo "Release $VERSION was published, but local tag synchronization failed." >&2
+  echo "Resolve the Git error and run: git fetch --no-tags origin refs/tags/$VERSION:refs/tags/$VERSION" >&2
+  exit 1
+fi
