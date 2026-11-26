@@ -88,7 +88,7 @@ h2 { font-size: 1.15rem; font-weight: 650; letter-spacing: -.015em; }
   justify-content: space-between;
   gap: 1rem;
 }
-.brand, .auth-brand { display: inline-flex; gap: .043em; align-items: center; color: var(--text); font-weight: 760; letter-spacing: -.065em; line-height: 1.3; white-space: nowrap; }
+.brand, .auth-brand { display: inline-flex; gap: .043em; align-items: center; color: var(--text); font-weight: 400; letter-spacing: -.065em; line-height: 1.3; white-space: nowrap; }
 .brand { text-decoration: none; font-size: 1.55rem; }
 .brand img, .auth-brand img { width: 1.7em; height: 1.54em; object-fit: contain; flex-shrink: 0; }
 .brand > span, .auth-brand > span { margin-left: -.335em; }
