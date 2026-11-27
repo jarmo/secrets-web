@@ -86,7 +86,17 @@ function App(csrfToken, sessionMaxAgeInSeconds) {
     var headers = {"X-Csrf-Token": csrfToken}
     if (session) headers["X-Credentials"] = encodeCredentials(session.user, session.password)
     if (pendingToken || tabToken) headers["X-Tab-Token"] = pendingToken || tabToken
-    return fetch(path, {method: method, body: body, headers: headers, credentials: "same-origin", cache: "no-store"})
+    var options = {method: method, body: body, headers: headers, credentials: "same-origin", cache: "no-store"}
+    return fetch(path, options).then(function(response) {
+      if (!pendingToken || response.status !== 412) return response
+      return response.clone().text().then(function(html) {
+        var token = new DOMParser().parseFromString(html, "text/html").querySelector('meta[name="x-csrf-token"]')
+        if (!token || !token.content) return response
+        csrfToken = token.content
+        headers["X-Csrf-Token"] = csrfToken
+        return fetch(path, options)
+      })
+    })
   }
 
   function showPage(path) {
