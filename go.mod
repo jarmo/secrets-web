@@ -7,7 +7,7 @@ require (
 	github.com/gin-contrib/secure v1.1.7
 	github.com/gin-contrib/sessions v1.1.4
 	github.com/gin-gonic/gin v1.12.0
-	github.com/jarmo/secrets v0.0.0-20261122134747-80078d479eb5
+	github.com/jarmo/secrets v0.0.0-20261128112833-1b02f8fc4fdc
 	github.com/jessevdk/go-assets v0.0.0-20160921144138-4f4301a06e15
 	github.com/satori/go.uuid v1.2.0
 )

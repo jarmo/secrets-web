@@ -60,11 +60,7 @@ func lock(path string) (*fslock.Lock, error) {
 	// Lock a stable sidecar inode: vault files are replaced atomically by rename.
 	// Locking the vault inode itself would no longer serialize later writers.
 	lockPath := path + ".lock"
-	if info, err := os.Lstat(lockPath); err == nil {
-		if !info.Mode().IsRegular() {
-			return nil, errors.New("Vault lock must be a regular file")
-		}
-	} else if !os.IsNotExist(err) {
+	if err := prepareVaultLock(lockPath); err != nil {
 		return nil, err
 	}
 	lock := fslock.New(lockPath)
@@ -77,4 +73,28 @@ func lock(path string) (*fslock.Lock, error) {
 	}
 
 	return nil, errors.New("Failed to lock " + path)
+}
+
+func prepareVaultLock(lockPath string) error {
+	for {
+		info, err := os.Lstat(lockPath)
+		if os.IsNotExist(err) {
+			file, err := os.OpenFile(lockPath, os.O_RDONLY|os.O_CREATE|os.O_EXCL, 0640)
+			if os.IsExist(err) {
+				continue
+			}
+			if err != nil {
+				return err
+			}
+			defer file.Close()
+			return file.Chmod(0640)
+		}
+		if err != nil {
+			return err
+		}
+		if !info.Mode().IsRegular() {
+			return errors.New("Vault lock must be a regular file")
+		}
+		return nil
+	}
 }

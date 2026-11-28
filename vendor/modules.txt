@@ -133,7 +133,7 @@ github.com/gorilla/securecookie
 # github.com/gorilla/sessions v1.4.0
 ## explicit; go 1.23
 github.com/gorilla/sessions
-# github.com/jarmo/secrets v0.0.0-20261122134747-80078d479eb5
+# github.com/jarmo/secrets v0.0.0-20261128112833-1b02f8fc4fdc
 ## explicit; go 1.27
 github.com/jarmo/secrets/crypto
 github.com/jarmo/secrets/secret
